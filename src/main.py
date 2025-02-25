@@ -1,6 +1,7 @@
-from src.data.production import Production
+from src.command_line_service import CommandLineService
 
-production = Production()
 
-production.build_layout(30, 30)
-print(production.print_layout(30, 30))
+
+if __name__ == '__main__':
+    command_line_service = CommandLineService()
+    command_line_service.create_production()
