@@ -12,7 +12,7 @@ class Production:
                 row.append(cell)
             self.production_layout.append(row)
 
-    def print_layout(self, max_x_coordinate, max_y_coordinate):
+    def print_layout(self, max_x_coordinate: int, max_y_coordinate: int):
         print_layout_str = ''
 
         for y_coordinate, x_coordinate in enumerate(self.production_layout):
@@ -23,9 +23,10 @@ class Production:
             else:
                 print_layout_str += f'  {index_variable_y}  '
             for cell in x_coordinate:
+                # elif bedingungen einrücken und die vorher definierten None nicht mehr erwähnen
                 if cell.machine is None and cell.transport_robot is None and cell.working_robot is None and cell.source is False and cell.sink is False:
                     print_layout_str += ' \u26AA '
-                elif cell.machine is not None and cell.transport_robot is None and cell.working_robot is None and cell.source is False and cell.sink is False:
+                elif cell.transport_robot is None and cell.working_robot is None and cell.source is False and cell.sink is False:
                     print_layout_str += ' \U0001F534 '
                 elif cell.machine is None and cell.transport_robot is not None and cell.working_robot is None and cell.source is False and cell.sink is False:
                     print_layout_str += ' \U0001F7E3 '

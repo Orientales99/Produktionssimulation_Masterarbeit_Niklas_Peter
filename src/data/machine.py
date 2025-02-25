@@ -1,7 +1,10 @@
+from dataclasses import dataclass
+
 from src.data.constant import MachineQuality
 from src.data.product import Product
 
 
+@dataclass
 class Machine:
     type_number: int
     machine_quality: MachineQuality
@@ -18,11 +21,12 @@ class Machine:
     producing_product: Product
     setting_up_time: int
 
-    def __init__(self, type_number, machine_quality, driving_speed, working_speed, machine_size,
-                 max_loading_capacity_product_before_process, quantity_loaded_product_before_processed,
-                 loaded_product_before_processed, max_loading_capacity_product_after_process,
-                 quantity_loaded_product_after_processed,
-                 loaded_product_after_processed, working_robot_on_machine, producing_product, setting_up_time):
+    def eigentlich_init_Methode(self, type_number, machine_quality, driving_speed, working_speed, machine_size,
+                                max_loading_capacity_product_before_process, quantity_loaded_product_before_processed,
+                                loaded_product_before_processed, max_loading_capacity_product_after_process,
+                                quantity_loaded_product_after_processed,
+                                loaded_product_after_processed, working_robot_on_machine, producing_product,
+                                setting_up_time):
         self.type_number = type_number
         self.machine_quality = machine_quality
         self.driving_speed = driving_speed
