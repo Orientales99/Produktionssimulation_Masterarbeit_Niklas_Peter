@@ -7,11 +7,11 @@ class CommandLineService:
     order_service = OrderService()
 
     def create_production(self):
-        max_x_coordinate = 2
-        max_y_coordinate = 7
+        max_x_coordinate = 30
+        max_y_coordinate = 30
         self.production.build_layout(max_x_coordinate, max_y_coordinate)
-        self.production.get_source_in_production_layout(max_x_coordinate, max_y_coordinate)
-        self.production.get_sink_in_production_layout(max_x_coordinate, max_y_coordinate)
+        self.production.set_source_in_production_layout(max_x_coordinate, max_y_coordinate)
+        self.production.set_sink_in_production_layout(max_x_coordinate, max_y_coordinate)
 
         wr_list = self.create_entities()
         self.production.get_working_robot_placed_in_production(wr_list)

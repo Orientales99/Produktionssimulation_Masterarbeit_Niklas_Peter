@@ -8,9 +8,11 @@ class ItemType(Enum):
     FINAL_PRODUCT_UNPACKED = 3
     FINAL_PRODUCT_PACKED = 4
 
+
 class OrderPriority(Enum):
     EXPRESS_ORDER = 0
     STANDARD_ORDER = 1
+
 
 class MachineQuality(Enum):
     NEW_MACHINE = 0
