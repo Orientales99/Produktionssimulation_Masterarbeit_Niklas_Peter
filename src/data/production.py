@@ -97,6 +97,7 @@ class Production:
                         new_x_coordinate_working_robot = cell.x_coordinate
                         print('x:', new_x_coordinate_working_robot, 'y:', new_y_coordinate_working_robot)
 
+
             for y_coordinate, x_coordinate in enumerate(self.production_layout):
                 for cell in x_coordinate:
                     if y_coordinate == new_y_coordinate_working_robot and x_coordinate == new_x_coordinate_working_robot:
