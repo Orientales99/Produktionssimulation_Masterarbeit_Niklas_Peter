@@ -33,15 +33,12 @@ class Production:
                 return cell
 
     def set_sink_in_production_layout(self, max_x_coordinate: int, max_y_coordinate: int):
-        coordinates = Coordinates(int(max_x_coordinate - 1), int(max_y_coordinate/2))
+        coordinates = Coordinates(int(max_x_coordinate - 1), int(max_y_coordinate / 2))
         cell = self.get_cell(coordinates)
         cell.placed_entity = Sink(0, 0, 0)
 
-    def get_cell(self, coordinates: Coordinates):
-
-        cell = self.production_layout[len(self.production_layout) - coordinates.y][coordinates.x]
-
-        return cell
+    def get_cell(self, coordinates: Coordinates) -> Cell:
+        return self.production_layout[len(self.production_layout) - coordinates.y][coordinates.x]
 
     def print_layout(self, max_x_coordinate: int, max_y_coordinate: int):
         print_layout_str = ''
