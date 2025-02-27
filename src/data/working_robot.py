@@ -1,6 +1,8 @@
+from src.data.coordinates import Coordinates
+
 class WorkingRobot:
     identification_number: int
-    robot_size: tuple
+    robot_size: Coordinates
     driving_speed: int
     product_transfer_rate: int
 

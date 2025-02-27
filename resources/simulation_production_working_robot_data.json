@@ -2,7 +2,8 @@
   "working_robot": [
     {
       "number_of_robots_in_production": "1",
-      "robot_size_x_y": ["3", "2"],
+      "robot_size_x": "3",
+      "robot_size_y":"2",
       "driving_speed":  "1",
       "product_transfer_rate_units_per_minute": "10"
     }
