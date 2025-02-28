@@ -17,3 +17,11 @@ class OrderPriority(Enum):
 class MachineQuality(Enum):
     NEW_MACHINE = 0
     OLD_MACHINE = 1
+
+
+class MachineType(Enum):
+    PACKAGING_MACHINE = 0
+    MANUFACTURING_MACHINE_A = 1
+    MANUFACTURING_MACHINE_B = 2
+    MANUFACTURING_MACHINE_C = 3
+

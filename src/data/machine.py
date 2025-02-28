@@ -2,24 +2,26 @@ from dataclasses import dataclass
 
 from src.data.constant import MachineQuality
 from src.data.product import Product
+from src.data.coordinates import Coordinates
 
 
 @dataclass
 class Machine:
+    machine_type: int
     identification_number: int
     machine_quality: MachineQuality
     driving_speed: int
     working_speed: int
-    machine_size: tuple
+    machine_size: Coordinates
     max_loading_capacity_product_before_process: int
     quantity_loaded_product_before_processed: int
-    loaded_product_before_processed: Product
+    loaded_product_before_processed: Product | None
     max_loading_capacity_product_after_process: int
     quantity_loaded_product_after_processed: int
-    loaded_product_after_processed: Product
+    loaded_product_after_processed: Product | None
     working_robot_on_machine: bool
-    producing_product: Product
-    setting_up_time: int
+    producing_product: Product | None
+    setting_up_time: int                            #Rüstzeit
 
     def eigentlich_init_Methode(self, identification_number, machine_quality, driving_speed, working_speed, machine_size,
                                 max_loading_capacity_product_before_process, quantity_loaded_product_before_processed,

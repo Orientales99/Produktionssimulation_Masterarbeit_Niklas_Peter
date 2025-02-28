@@ -60,8 +60,7 @@ class Production:
         for i in range(0, number_of_transport_robots):
             while True:
                 new_coordinates_transport_robot = Coordinates(self.source_coordinates.x,
-                                                              self.source_coordinates.y - tr_list[
-                                                                  i].robot_size.y - avoiding_collision_parameter)
+                                                              self.source_coordinates.y - avoiding_collision_parameter)
                 new_cell = self.get_cell(new_coordinates_transport_robot)
                 checked_free_area_list = self.check_area_of_cells_is_free(new_cell, tr_list[i].robot_size)
                 checked_free_area_list_length = len(checked_free_area_list)
@@ -71,7 +70,7 @@ class Production:
                         new_cell.placed_entity = tr_list[i]
                     break
                 else:
-                    avoiding_collision_parameter -= tr_list[i].robot_size.y - 1
+                    avoiding_collision_parameter += tr_list[i].robot_size.y + 1
 
     def check_area_of_cells_is_free(self, cell: Cell, free_area_size: Coordinates) -> list:
         list_of_checked_cells = []
@@ -90,7 +89,7 @@ class Production:
                     list_of_checked_cells.append(checked_cell)
         return list_of_checked_cells
 
-    def check_cell_is_free(self, cell: Cell):
+    def check_cell_is_free(self, cell: Cell) -> bool:
         if cell.placed_entity is None:
             return True
         else:
@@ -99,7 +98,7 @@ class Production:
     def get_cell(self, coordinates: Coordinates) -> Cell:
         return self.production_layout[len(self.production_layout) - 1 - coordinates.y][coordinates.x]
 
-    def print_layout(self, max_coordinate: Coordinates):
+    def print_layout(self, max_coordinate: Coordinates) -> str:
         print_layout_str = ''
 
         for index, row in enumerate(self.production_layout):
@@ -117,7 +116,7 @@ class Production:
                 elif type(cell.placed_entity) is Machine:
                     print_layout_str += ' \U0001F534 '
                 elif type(cell.placed_entity) is TransportRobot:
-                    print_layout_str += ' \U0001F7E3 '
+                    print_layout_str += ' \u26AB '
                 elif type(cell.placed_entity) is WorkingRobot:
                     print_layout_str += ' \U0001F535 '
                 elif type(cell.placed_entity) is Source or Sink:
@@ -139,15 +138,9 @@ class Production:
     def print_legend(self):
         print('\u26AA ist ein leeres unbenutzes Feld')
         print('\n \U0001F534 ist eine Maschine ')
-        print('\n \U0001F7E3 ist ein Transport Robot')
+        print('\n \u26AB ist ein Transport Robot')
         print('\n \U0001F535 ist ein Working Robot')
         print('\n \U0001F534 ist die Source (links) und Sink (rechts)')
-
-    def get_transport_robot_placed_in_production(self):
-        pass
-
-    def get_machine_placed_in_production(self):
-        pass
 
     def print_cell_information(self, coordinates: Coordinates):
         required_cell = self.get_cell(coordinates)
@@ -167,3 +160,9 @@ class Production:
             print('Cell is Sink')
         elif required_cell.placed_entity is None:
             print('Cell is empty')
+
+    def test_coordinates_in_layout(self, max_coordinates: Coordinates, testing_coordinates: Coordinates) -> bool:
+        if testing_coordinates.x >= 0 or testing_coordinates.x < max_coordinates.x or testing_coordinates.y >= 0 or testing_coordinates.y < max_coordinates.y:
+            return True
+        else:
+            return False

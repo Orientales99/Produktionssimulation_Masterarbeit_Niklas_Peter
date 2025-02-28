@@ -4,5 +4,5 @@ order_service = OrderService()
 
 order_service.get_file_production_entities()
 
-b = order_service.generate_wr_list()
-print(b)
+order_service.get_quantity_per_machine_types()
+

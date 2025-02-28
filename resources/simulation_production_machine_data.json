@@ -1,0 +1,46 @@
+{
+  "production_machine": [
+    {
+      "machine_type": "0",
+      "number_of_machines_in_production": "5",
+      "number_of_new_machines": "1",
+      "driving_speed":  "1",
+      "working_speed":  "1",
+      "robot_size_x": "3",
+      "robot_size_y":"2",
+      "max_loading_capacity_product_before_process": "100",
+      "quantity_loaded_product_before_processed": "0",
+      "max_loading_capacity_product_after_process": "100",
+      "quantity_loaded_product_after_processed": "0",
+      "setting_up_time": "1"
+    },
+    {
+      "machine_type": "1",
+      "number_of_machines_in_production": "1",
+      "number_of_new_machines": "1",
+      "driving_speed":  "1",
+      "working_speed":  "1",
+      "robot_size_x": "3",
+      "robot_size_y":"2",
+      "max_loading_capacity_product_before_process": "100",
+      "quantity_loaded_product_before_processed": "0",
+      "max_loading_capacity_product_after_process": "100",
+      "quantity_loaded_product_after_processed": "0",
+      "setting_up_time": "1"
+    },
+    {
+      "machine_type": "2",
+      "number_of_machines_in_production": "1",
+      "number_of_new_machines": "1",
+      "driving_speed":  "1",
+      "working_speed":  "1",
+      "robot_size_x": "3",
+      "robot_size_y":"2",
+      "max_loading_capacity_product_before_process": "100",
+      "quantity_loaded_product_before_processed": "0",
+      "max_loading_capacity_product_after_process": "100",
+      "quantity_loaded_product_after_processed": "0",
+      "setting_up_time": "1"
+    }
+  ]
+}
