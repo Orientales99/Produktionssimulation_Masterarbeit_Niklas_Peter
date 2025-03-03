@@ -72,6 +72,12 @@ class Production:
                 else:
                     avoiding_collision_parameter += tr_list[i].robot_size.y + 1
 
+    def get_machine_placed_in_production(self):
+        print(self.order_service.generate_machine_list())
+
+    def get_machine_placed_in_production_random(self):
+        pass
+
     def check_area_of_cells_is_free(self, cell: Cell, free_area_size: Coordinates) -> list:
         list_of_checked_cells = []
         y_range_min = cell.cell_coordinates.y - free_area_size.y

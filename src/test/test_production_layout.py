@@ -1,64 +1,27 @@
 import pytest
 
-from src.data.machine import Machine
-from src.data.order_service import OrderService
+from src.data.coordinates import Coordinates
 from src.data.production import Production
-from src.data.transport_robot import TransportRobot
-from src.data.working_robot import WorkingRobot
-
-
-@pytest.fixture(autouse=True)
-def order_service():
-    order_service = OrderService()
-    order_service.get_files_for_init()
-    return order_service
+from src.data.source import Source
 
 
 @pytest.fixture(autouse=True)
 def production(order_service):
     max_coordinates = order_service.set_max_coordinates_for_production_layout()
-    production = Production()
-    production.build_layout(max_coordinates)
     return production
 
 
-@pytest.fixture(autouse=True)
-def wr_list(order_service):
-    return order_service.generate_wr_list()
+def test__set_source_in_production_layout__always__source_is_in_layout():
+    # given
+    max_coordinates = Coordinates(100, 100)
+    production = Production()
+    production.build_layout(max_coordinates)
 
+    # when
+    production.set_source_in_production_layout(max_coordinates)
 
-@pytest.fixture(autouse=True)
-def tr_list(order_service):
-    return order_service.generate_tr_list()
-
-
-@pytest.fixture(autouse=True)
-def machine_list(order_service):
-    return order_service.generate_machine_list()
-
-
-# Test if WR_list is a list, has more than 0 Elements and that the Elements are objective of the Class WorkingRobot
-def test_wr_list(wr_list):
-    assert isinstance(wr_list, list)
-    assert len(wr_list) >= 0
-    for x in range(0, len(wr_list)):
-        assert isinstance(wr_list[x], WorkingRobot)
-
-
-# Test if WR_list is a list, has more than 0 Elements and that the Elements are objective of the Class TransportRobot
-def test_tr_list(tr_list):
-    assert isinstance(tr_list, list)
-    assert len(tr_list) >= 0
-    for x in range(0, len(tr_list)):
-        assert isinstance(tr_list[x], TransportRobot)
-
-
-# Test if WR_list is a list, has more than 0 Elements and that the Elements are objective of the Class Machine
-def test_machine_list(machine_list):
-    assert isinstance(machine_list, list)
-    assert len(machine_list) >= 0
-    for x in range(0, len(machine_list)):
-        assert isinstance(machine_list[x], Machine)
+    # then
+    assert isinstance(production.get_cell(Coordinates(0, 50)).placed_entity, Source)
 
 
 # Test: length of the layout is correct init.

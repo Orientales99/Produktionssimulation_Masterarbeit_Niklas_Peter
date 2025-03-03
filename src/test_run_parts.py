@@ -1,8 +1,9 @@
+from src.command_line_service import CommandLineService
 from src.data.order_service import OrderService
+from src.data.production import Production
 
-order_service = OrderService()
+command_line_service = CommandLineService()
+command_line_service.create_production()
+production = Production()
 
-order_service.get_files_for_init()
-
-order_service.generate_machine_list()
-
+production.get_machine_placed_in_production()
