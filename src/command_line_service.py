@@ -8,14 +8,14 @@ class CommandLineService:
     order_service = OrderService()
 
     def create_production(self):
-        max_coordinate = Coordinates(30, 30)
+        self.order_service.get_files_for_init()
+        wr_list = self.order_service.generate_wr_list()
+        tr_list = self.order_service.generate_tr_list()
+        max_coordinate = self.order_service.set_max_coordinates_for_production_layout()
+
         self.production.build_layout(max_coordinate)
         self.production.set_source_in_production_layout(max_coordinate)
         self.production.set_sink_in_production_layout(max_coordinate)
-
-        self.order_service.get_file_production_entities()
-        wr_list = self.order_service.generate_wr_list()
-        tr_list = self.order_service.generate_tr_list()
 
         self.production.get_working_robot_placed_in_production(wr_list)
         self.production.get_transport_robot_placed_in_production(tr_list)

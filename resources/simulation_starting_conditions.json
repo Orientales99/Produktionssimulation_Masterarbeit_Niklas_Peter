@@ -1,0 +1,7 @@
+
+{
+  "production_layout_size_x": "30",
+  "production_layout_size_y": "30",
+  "simulation_duration_in_days": "7",
+  "production_day_duration_in_h": "8"
+}

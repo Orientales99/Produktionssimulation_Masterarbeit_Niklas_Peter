@@ -17,7 +17,7 @@ class Production:
     def build_layout(self, max_coordinate: Coordinates):
         for y in reversed(range(0, max_coordinate.y)):
             row: list[Cell] = []
-            for x in range(0, max_coordinate.y):
+            for x in range(0, max_coordinate.x):
                 cell = Cell(Coordinates(x, y), None)
                 row.append(cell)
             self.production_layout.append(row)
@@ -122,7 +122,9 @@ class Production:
                 elif type(cell.placed_entity) is Source or Sink:
                     print_layout_str += ' \U0001F534 '
                 else:
-                    print_layout_str += ' Error '
+                    raise Exception(
+                        'Ein Celle hat eine ungültige cell.playced_entity, welche nicht in den Bedingungen von def print_layout berücksichtig wurde.')
+
 
             print_layout_str += "\n"
         print_layout_str += '      '
