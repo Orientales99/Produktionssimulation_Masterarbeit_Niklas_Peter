@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from src.data.cell import Cell
 from src.data.coordinates import Coordinates
 from src.data.machine import Machine
@@ -15,6 +17,8 @@ class Production:
     sink_coordinates: Coordinates
 
     def build_layout(self, max_coordinate: Coordinates):
+        """Forms a list in a list (production_layout), which represents a coordinate system consisting of the class
+        Cell"""
         for y in reversed(range(0, max_coordinate.y)):
             row: list[Cell] = []
             for x in range(0, max_coordinate.x):
@@ -35,7 +39,6 @@ class Production:
     def get_working_robot_placed_in_production(self, wr_list: list):
         number_of_working_robots = len(wr_list)
         avoiding_collision_parameter = 1
-
         for i in range(0, number_of_working_robots):
             while True:
                 new_coordinates_working_robot = Coordinates(self.source_coordinates.x,
@@ -53,10 +56,8 @@ class Production:
                     avoiding_collision_parameter += wr_list[i].robot_size.y + 1
 
     def get_transport_robot_placed_in_production(self, tr_list: list):
-
         number_of_transport_robots = len(tr_list)
         avoiding_collision_parameter = 1
-
         for i in range(0, number_of_transport_robots):
             while True:
                 new_coordinates_transport_robot = Coordinates(self.source_coordinates.x,
@@ -72,13 +73,90 @@ class Production:
                 else:
                     avoiding_collision_parameter += tr_list[i].robot_size.y + 1
 
-    def get_machine_placed_in_production(self):
-        print(self.order_service.generate_machine_list())
+    def get_max_length_of_tr_or_wr(self, wr_list, tr_list):
+        """Finds max. length of size.x or size.y from TR and WR"""
+        max_robot_size = 0
+        for x in range(0, len(wr_list)):
+            if max_robot_size < wr_list[x].robot_size.x:
+                max_robot_size = wr_list[x].robot_size.x
+            elif max_robot_size < wr_list[x].robot_size.y:
+                max_robot_size = wr_list[x].robot_size.y
+
+        for y in range(0, len(tr_list)):
+            if max_robot_size < tr_list[y].robot_size.x:
+                max_robot_size = tr_list[y].robot_size.x
+            elif max_robot_size < tr_list[y].robot_size.y:
+                max_robot_size = tr_list[y].robot_size.y
+        return max_robot_size
+
+    def safe_space_for_placing_machines_in_production(self, machine_list) -> list:
+        safed_cells_for_machine_list = []
+        pass
+
+    def get_size_and_number_of_machine(self, machine_list):
+        """Get a list of space per machine and the quantity of the required machine_space"""
+        coordinate_count = defaultdict(
+            int)  # int: The default value (in this example: Coordinate) for non-existent keys is 0
+        for x in range(0, len(machine_list)):
+            coordinates = (int(machine_list[x].machine_size.x), int(machine_list[x].machine_size.y))
+            coordinate_count[coordinates] += 1
+        coordinate_list = [(Coordinates(coord[0], coord[1]), int(count)) for coord, count in coordinate_count.items()]
+        return coordinate_list
+
+    def get_machine_placed_in_production(self, machine_list, wr_list, tr_list):
+        """sets machine in the production_layout. Alternate between one machine above source and one below. All
+        machines of one type are positioned one behind the other (x-axis)"""
+        machine_list = machine_list
+        number_of_machine = len(machine_list)
+        avoiding_collision_parameter_x = 0
+
+        space_between_machine = (self.get_max_length_of_tr_or_wr(wr_list,
+                                                                 tr_list) * 2)  # *2 because two robots should drive between machines simultaneously
+        y_start = self.source_coordinates.y + int(
+            (machine_list[0].machine_size.y) / 2) + 1
+        y_parameter = y_start
+        y_upwards = y_start
+        y_downwards = y_start
+        collusion_parameter = machine_list[0].machine_size.y
+
+        print(machine_list)
+        for i in range(0, number_of_machine):
+            while True:
+                new_coordinates = Coordinates(
+                    self.source_coordinates.x + 5 + space_between_machine + avoiding_collision_parameter_x,
+                    y_parameter)
+                new_cell = self.get_cell(new_coordinates)
+
+                checked_free_area_list = self.check_area_of_cells_is_free(new_cell, machine_list[i].machine_size)
+                checked_free_area_list_length = len(checked_free_area_list)
+
+                if checked_free_area_list_length != 0:
+                    for x in range(0, checked_free_area_list_length):
+                        new_cell = checked_free_area_list[x]
+                        new_cell.placed_entity = machine_list[i]
+                    break
+                else:
+                    if machine_list[i].machine_type == machine_list[i - 1].machine_type or machine_list[
+                        i].machine_type == machine_list[0].machine_type:
+                        avoiding_collision_parameter_x += machine_list[i].machine_size.x + space_between_machine + 1
+                    else:
+                        if machine_list[i].machine_type % 2 != 0:
+                            y_upwards += machine_list[i].machine_size.y + space_between_machine + 1
+                            y_parameter = y_upwards
+                            avoiding_collision_parameter_x = 0
+                        elif machine_list[i].machine_type % 2 == 0:
+                            y_downwards -= collusion_parameter + space_between_machine + 1
+                            collusion_parameter = machine_list[i].machine_size.y                                    # to get the machine above the intialized machine
+                            y_parameter = y_downwards
+                            avoiding_collision_parameter_x = 0
+                        else:
+                            print('hallo')
 
     def get_machine_placed_in_production_random(self):
         pass
 
     def check_area_of_cells_is_free(self, cell: Cell, free_area_size: Coordinates) -> list:
+        """get a cell and is checking if the area downward and to right is free"""
         list_of_checked_cells = []
         y_range_min = cell.cell_coordinates.y - free_area_size.y
         y_range_max = cell.cell_coordinates.y
@@ -105,6 +183,7 @@ class Production:
         return self.production_layout[len(self.production_layout) - 1 - coordinates.y][coordinates.x]
 
     def print_layout(self, max_coordinate: Coordinates) -> str:
+        """Build a string and every cell in the list production_layouts gets a UTF-8 code Symbol"""
         print_layout_str = ''
 
         for index, row in enumerate(self.production_layout):
@@ -131,7 +210,6 @@ class Production:
                     raise Exception(
                         'Ein Celle hat eine ungültige cell.playced_entity, welche nicht in den Bedingungen von def print_layout berücksichtig wurde.')
 
-
             print_layout_str += "\n"
         print_layout_str += '      '
         for x in range(0, max_coordinate.x):
@@ -144,6 +222,7 @@ class Production:
         return print_layout_str
 
     def print_legend(self):
+        """Legend of the production_layout will be printed"""
         print('\u26AA ist ein leeres unbenutzes Feld')
         print('\n \U0001F534 ist eine Maschine ')
         print('\n \u26AB ist ein Transport Robot')
@@ -169,7 +248,8 @@ class Production:
         elif required_cell.placed_entity is None:
             print('Cell is empty')
 
-    def test_coordinates_in_layout(self, max_coordinates: Coordinates, testing_coordinates: Coordinates) -> bool:
+    def coordinates_in_layout(self, max_coordinates: Coordinates, testing_coordinates: Coordinates) -> bool:
+        """Is checking if the coordinates are in the production_layout"""
         if testing_coordinates.x >= 0 or testing_coordinates.x < max_coordinates.x or testing_coordinates.y >= 0 or testing_coordinates.y < max_coordinates.y:
             return True
         else:

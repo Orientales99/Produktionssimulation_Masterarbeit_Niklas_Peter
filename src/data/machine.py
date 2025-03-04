@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from src.data.constant import MachineQuality
 from src.data.product import Product
 from src.data.coordinates import Coordinates
+from src.data.machine_storage import MachineStorage
 
 
 @dataclass
@@ -13,33 +14,8 @@ class Machine:
     driving_speed: int
     working_speed: int
     machine_size: Coordinates
-    max_loading_capacity_product_before_process: int
-    quantity_loaded_product_before_processed: int
-    loaded_product_before_processed: Product | None
-    max_loading_capacity_product_after_process: int
-    quantity_loaded_product_after_processed: int
-    loaded_product_after_processed: Product | None
+    machine_storage: MachineStorage
     working_robot_on_machine: bool
     producing_product: Product | None
     setting_up_time: int                            #Rüstzeit
 
-    def eigentlich_init_Methode(self, identification_number, machine_quality, driving_speed, working_speed, machine_size,
-                                max_loading_capacity_product_before_process, quantity_loaded_product_before_processed,
-                                loaded_product_before_processed, max_loading_capacity_product_after_process,
-                                quantity_loaded_product_after_processed,
-                                loaded_product_after_processed, working_robot_on_machine, producing_product,
-                                setting_up_time):
-        self.identification_number = identification_number
-        self.machine_quality = machine_quality
-        self.driving_speed = driving_speed
-        self.working_speed = working_speed
-        self.machine_size = machine_size
-        self.max_loading_capacity_product_before_process = max_loading_capacity_product_before_process
-        self.quantity_loaded_product_before_processed = quantity_loaded_product_before_processed
-        self.loaded_product_before_processed = loaded_product_before_processed
-        self.max_loading_capacity_product_after_process = max_loading_capacity_product_after_process
-        self.quantity_loaded_product_after_processed = quantity_loaded_product_after_processed
-        self.loaded_product_after_processed = loaded_product_after_processed
-        self.working_robot_on_machine = working_robot_on_machine
-        self.producing_product = producing_product
-        self.setting_up_time = setting_up_time

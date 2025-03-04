@@ -1,9 +1,13 @@
 import json
 
+from simpy import Container
+
 from src import RESOURCES
 from src.data.constant import MachineQuality
 from src.data.coordinates import Coordinates
+from src.data.simulation_environment import SimulationEnvironment
 from src.data.machine import Machine
+from src.data.machine_storage import MachineStorage
 from src.data.transport_robot import TransportRobot
 from src.data.working_robot import WorkingRobot
 
@@ -15,6 +19,7 @@ class OrderService:
         self.data_production_transport_robot = None
         self.data_production_machine = None
         self.data_process_starting_conditions = None
+        self.env = SimulationEnvironment()
 
     def get_files_for_init(self):
         with open(RESOURCES / "simulation_production_working_robot_data.json", 'r', encoding='utf-8') as w:
@@ -81,11 +86,12 @@ class OrderService:
         return Machine(machine_type, identification_number, MachineQuality(machine_quality),
                        machine_stats["driving_speed"],
                        machine_stats["working_speed"],
-                       Coordinates(machine_stats["robot_size_x"], machine_stats["robot_size_y"]),
-                       machine_stats["max_loading_capacity_product_before_process"],
-                       machine_stats["quantity_loaded_product_before_processed"], None,
-                       machine_stats["max_loading_capacity_product_after_process"],
-                       machine_stats["quantity_loaded_product_after_processed"], None, False, None,
+                       Coordinates(int(machine_stats["robot_size_x"]), int(machine_stats["robot_size_y"])), MachineStorage(
+                Container(self.env, int(machine_stats["max_loading_capacity_product_before_process"]),
+                          int(machine_stats["quantity_loaded_product_before_processed"])), None,
+                Container(self.env, int(machine_stats["max_loading_capacity_product_after_process"]),
+                          int(machine_stats["quantity_loaded_product_after_processed"])), None),
+                       False, None,
                        machine_stats["setting_up_time"])
 
     def generate_machine_list(self) -> list:
@@ -94,17 +100,14 @@ class OrderService:
         quantity_of_types = len(quantity_of_machines_per_type_list)
         for machine_type in range(0, quantity_of_types):
             quantity_of_machines_per_type = int(quantity_of_machines_per_type_list[machine_type][1])
-            print(self.data_production_machine)
             machines_with_good_quality = int(
                 self.data_production_machine["production_machine"][0]["number_of_new_machines"])
-
             for identification_number in range(0, quantity_of_machines_per_type):
                 if machines_with_good_quality > 0:
                     machine_quality = 1
                     machines_with_good_quality -= 1
                 else:
                     machine_quality = 0
-
                 machine_list.append(self.create_machine(machine_type, identification_number + 1, machine_quality))
         return machine_list
 
