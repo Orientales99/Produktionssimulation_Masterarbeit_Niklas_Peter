@@ -103,10 +103,71 @@ class Production:
         coordinate_list = [(Coordinates(coord[0], coord[1]), int(count)) for coord, count in coordinate_count.items()]
         return coordinate_list
 
-    def get_machine_placed_in_production(self, machine_list, wr_list, tr_list):
-        """sets machine in the production_layout. Alternate between one machine above source and one below. All
+    def get_every_machine_placed_in_production(self, machine_list, wr_list, tr_list):
+        machine_list_static = self.get_machine_list_static(machine_list)
+        machine_list_flexible = self.get_machine_list_flexible(machine_list)
+        self.get_static_machine_placed_in_production(machine_list_static, wr_list, tr_list)
+        self.get_flexible_machine_placed_in_production(machine_list_flexible, wr_list, tr_list)
+
+    def get_machine_list_static(self, machine_list):
+        return [machine for machine in machine_list if int(machine.driving_speed) == 0]
+
+    def get_machine_list_flexible(self, machine_list) -> list:
+        return [machine for machine in machine_list if int(machine.driving_speed) != 0]
+
+    def get_static_machine_placed_in_production(self, machine_list_static, wr_list, tr_list):
+        machine_list = machine_list_static
+        print(machine_list)
+        number_of_machine = len(machine_list)
+        avoiding_collision_parameter_x = 0
+
+        space_between_machine = (self.get_max_length_of_tr_or_wr(wr_list,
+                                                                 tr_list) * 2)  # *2 because two robots should drive between machines simultaneously
+        y_start = self.sink_coordinates.y + int(
+            (machine_list[0].machine_size.y) / 2) + 1
+        y_parameter = y_start
+        y_upwards = y_start
+        y_downwards = y_start
+        collusion_parameter = machine_list[0].machine_size.y
+
+        for i in range(0, number_of_machine):
+            while True:
+                new_coordinates = Coordinates(
+                    self.sink_coordinates.x - 5 - space_between_machine - avoiding_collision_parameter_x - machine_list[i].machine_size.x,
+                    y_parameter)
+                new_cell = self.get_cell(new_coordinates)
+
+                checked_free_area_list = self.check_area_of_cells_is_free(new_cell, machine_list[i].machine_size)
+                checked_free_area_list_length = len(checked_free_area_list)
+
+                if checked_free_area_list_length != 0:
+                    for x in range(0, checked_free_area_list_length):
+                        new_cell = checked_free_area_list[x]
+                        new_cell.placed_entity = machine_list[i]
+                    break
+                else:
+                    if machine_list[i].machine_type == machine_list[i - 1].machine_type or machine_list[
+                        i].machine_type == machine_list[0].machine_type:
+                        avoiding_collision_parameter_x -= machine_list[i].machine_size.x + space_between_machine + 1
+                    else:
+                        if machine_list[i].machine_type % 2 != 0:
+                            y_upwards += machine_list[i].machine_size.y + space_between_machine + 1
+                            y_parameter = y_upwards
+                            avoiding_collision_parameter_x = 0
+                        elif machine_list[i].machine_type % 2 == 0:
+                            y_downwards -= collusion_parameter + space_between_machine + 1
+                            collusion_parameter = machine_list[
+                                i].machine_size.y  # to get the machine above the initialized machine
+                            y_parameter = y_downwards
+                            avoiding_collision_parameter_x = 0
+                        else:
+                            raise Exception(
+                                'An error occurred when initialising static machines in the production_layout.')
+
+    def get_flexible_machine_placed_in_production(self, machine_list_flexible, wr_list, tr_list):
+        """sets flexible machine in the production_layout. Alternate between one machine above source and one below. All
         machines of one type are positioned one behind the other (x-axis)"""
-        machine_list = machine_list
+        machine_list = machine_list_flexible
         number_of_machine = len(machine_list)
         avoiding_collision_parameter_x = 0
 
@@ -119,7 +180,6 @@ class Production:
         y_downwards = y_start
         collusion_parameter = machine_list[0].machine_size.y
 
-        print(machine_list)
         for i in range(0, number_of_machine):
             while True:
                 new_coordinates = Coordinates(
@@ -146,14 +206,13 @@ class Production:
                             avoiding_collision_parameter_x = 0
                         elif machine_list[i].machine_type % 2 == 0:
                             y_downwards -= collusion_parameter + space_between_machine + 1
-                            collusion_parameter = machine_list[i].machine_size.y                                    # to get the machine above the intialized machine
+                            collusion_parameter = machine_list[
+                                i].machine_size.y  # to get the machine above the initialized machine
                             y_parameter = y_downwards
                             avoiding_collision_parameter_x = 0
                         else:
-                            print('hallo')
-
-    def get_machine_placed_in_production_random(self):
-        pass
+                            raise Exception(
+                                'An error occurred when initialising flexible machines in the production_layout.')
 
     def check_area_of_cells_is_free(self, cell: Cell, free_area_size: Coordinates) -> list:
         """get a cell and is checking if the area downward and to right is free"""
@@ -208,7 +267,7 @@ class Production:
                     print_layout_str += ' \U0001F534 '
                 else:
                     raise Exception(
-                        'Ein Celle hat eine ungültige cell.playced_entity, welche nicht in den Bedingungen von def print_layout berücksichtig wurde.')
+                        'A cell has an invalid cell.playced_entity, which was not taken into account in the conditions of def print_layout.')
 
             print_layout_str += "\n"
         print_layout_str += '      '

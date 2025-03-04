@@ -24,7 +24,7 @@ class CommandLineService:
 
         self.production.get_working_robot_placed_in_production(wr_list)
         self.production.get_transport_robot_placed_in_production(tr_list)
-        self.production.get_machine_placed_in_production(machine_list, wr_list, tr_list)
+        self.production.get_every_machine_placed_in_production(machine_list, wr_list, tr_list)
 
 
         print(self.production.print_layout(max_coordinate))

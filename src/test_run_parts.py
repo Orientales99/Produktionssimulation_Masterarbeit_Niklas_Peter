@@ -6,4 +6,4 @@ command_line_service = CommandLineService()
 command_line_service.create_production()
 production = Production()
 
-production.get_machine_placed_in_production()
+production.get_flexible_machine_placed_in_production()
