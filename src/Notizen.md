@@ -1,8 +1,11 @@
 # To-Dos
+
 - dataclasses der entitäten
 - random machine zuordnung
-- 
 
+# Buck-List
+
+- Bei zu vielen initialisierten Entitäten kann das production_layout zu klein sein
 
 Hotkeys:
 stg + fn + f12 -> Filestructure angucken (classe mit allen methoden)

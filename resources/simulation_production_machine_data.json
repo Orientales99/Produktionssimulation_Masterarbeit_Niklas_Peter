@@ -2,12 +2,12 @@
   "production_machine": [
     {
       "machine_type": "0",
-      "number_of_machines_in_production": "2",
+      "number_of_machines_in_production": "4",
       "number_of_new_machines": "1",
       "driving_speed":  "0",
       "working_speed":  "1",
-      "robot_size_x": "3",
-      "robot_size_y":"5",
+      "robot_size_x": "1",
+      "robot_size_y":"1",
       "max_loading_capacity_product_before_process": "100",
       "quantity_loaded_product_before_processed": "0",
       "max_loading_capacity_product_after_process": "100",
@@ -16,9 +16,9 @@
     },
     {
       "machine_type": "1",
-      "number_of_machines_in_production": "2",
+      "number_of_machines_in_production": "3",
       "number_of_new_machines": "1",
-      "driving_speed":  "1",
+      "driving_speed":  "0",
       "working_speed":  "1",
       "robot_size_x": "2",
       "robot_size_y":"2",

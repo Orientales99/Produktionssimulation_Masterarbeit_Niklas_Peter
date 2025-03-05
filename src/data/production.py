@@ -79,13 +79,13 @@ class Production:
         for x in range(0, len(wr_list)):
             if max_robot_size < wr_list[x].robot_size.x:
                 max_robot_size = wr_list[x].robot_size.x
-            elif max_robot_size < wr_list[x].robot_size.y:
+            if max_robot_size < wr_list[x].robot_size.y:
                 max_robot_size = wr_list[x].robot_size.y
 
         for y in range(0, len(tr_list)):
             if max_robot_size < tr_list[y].robot_size.x:
                 max_robot_size = tr_list[y].robot_size.x
-            elif max_robot_size < tr_list[y].robot_size.y:
+            if max_robot_size < tr_list[y].robot_size.y:
                 max_robot_size = tr_list[y].robot_size.y
         return max_robot_size
 
@@ -133,7 +133,8 @@ class Production:
         for i in range(0, number_of_machine):
             while True:
                 new_coordinates = Coordinates(
-                    self.sink_coordinates.x - 5 - space_between_machine - avoiding_collision_parameter_x - machine_list[i].machine_size.x,
+                    self.sink_coordinates.x - 5 - space_between_machine - avoiding_collision_parameter_x - machine_list[
+                        i].machine_size.x,
                     y_parameter)
                 new_cell = self.get_cell(new_coordinates)
 
@@ -148,21 +149,23 @@ class Production:
                 else:
                     if machine_list[i].machine_type == machine_list[i - 1].machine_type or machine_list[
                         i].machine_type == machine_list[0].machine_type:
-                        avoiding_collision_parameter_x -= machine_list[i].machine_size.x + space_between_machine + 1
-                    else:
-                        if machine_list[i].machine_type % 2 != 0:
-                            y_upwards += machine_list[i].machine_size.y + space_between_machine + 1
+                        if machine_list[i].identification_number % 2 != 0:
+                            y_upwards += machine_list[i].machine_size.y + space_between_machine + 3
                             y_parameter = y_upwards
-                            avoiding_collision_parameter_x = 0
-                        elif machine_list[i].machine_type % 2 == 0:
-                            y_downwards -= collusion_parameter + space_between_machine + 1
+                        elif machine_list[i].identification_number % 2 == 0:
+                            y_downwards -= collusion_parameter + space_between_machine + 3
                             collusion_parameter = machine_list[
-                                i].machine_size.y  # to get the machine above the initialized machine
+                                i].machine_size.y
                             y_parameter = y_downwards
-                            avoiding_collision_parameter_x = 0
                         else:
                             raise Exception(
                                 'An error occurred when initialising static machines in the production_layout.')
+
+                    else:
+                        avoiding_collision_parameter_x += machine_list[i].machine_size.x + space_between_machine + 1
+                        y_parameter = y_start
+                        y_upwards = y_start
+                        y_downwards = y_start
 
     def get_flexible_machine_placed_in_production(self, machine_list_flexible, wr_list, tr_list):
         """sets flexible machine in the production_layout. Alternate between one machine above source and one below. All
@@ -201,13 +204,13 @@ class Production:
                         avoiding_collision_parameter_x += machine_list[i].machine_size.x + space_between_machine + 1
                     else:
                         if machine_list[i].machine_type % 2 != 0:
-                            y_upwards += machine_list[i].machine_size.y + space_between_machine + 1
+                            y_upwards += machine_list[i].machine_size.y + space_between_machine + 3
                             y_parameter = y_upwards
                             avoiding_collision_parameter_x = 0
                         elif machine_list[i].machine_type % 2 == 0:
-                            y_downwards -= collusion_parameter + space_between_machine + 1
+                            y_downwards -= collusion_parameter + space_between_machine + 3
                             collusion_parameter = machine_list[
-                                i].machine_size.y  # to get the machine above the initialized machine
+                                i].machine_size.y
                             y_parameter = y_downwards
                             avoiding_collision_parameter_x = 0
                         else:
@@ -215,7 +218,7 @@ class Production:
                                 'An error occurred when initialising flexible machines in the production_layout.')
 
     def check_area_of_cells_is_free(self, cell: Cell, free_area_size: Coordinates) -> list:
-        """get a cell and is checking if the area downward and to right is free"""
+        """get a cell and is checking if the area downward and to right is free; if free -> return list with free cells; if not free -> if not free -> return empty list"""
         list_of_checked_cells = []
         y_range_min = cell.cell_coordinates.y - free_area_size.y
         y_range_max = cell.cell_coordinates.y
