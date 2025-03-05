@@ -9,6 +9,26 @@ class ItemType(Enum):
     FINAL_PRODUCT_PACKED = 4
 
 
+class ColorRGB(Enum):
+    WHITE = [255, 255, 255]
+    RED = [255, 0, 0]
+    GREEN = [0, 255, 0]
+    BLUE = [0, 0, 255]
+    YELLOW = [255, 255, 0]
+    CYAN = [0, 255, 255]
+    MAGENTA = [255, 0, 255]
+    ORANGE = [255, 165, 0]
+    PURPLE = [128, 0, 128]
+    PINK = [255, 192, 203]
+    BROWN = [165, 42, 42]
+    DARK_GREEN = [0, 100, 0]
+    LIGHT_BLUE = [173, 216, 230]
+    DARK_GRAY = [105, 105, 105]
+    GOLD = [255, 215, 0]
+    SILVER = [192, 192, 192]
+    BLACK = [0, 0, 0]
+
+
 class OrderPriority(Enum):
     EXPRESS_ORDER = 0
     STANDARD_ORDER = 1
@@ -24,4 +44,3 @@ class MachineType(Enum):
     MANUFACTURING_MACHINE_A = 1
     MANUFACTURING_MACHINE_B = 2
     MANUFACTURING_MACHINE_C = 3
-

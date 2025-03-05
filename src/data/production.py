@@ -1,6 +1,10 @@
 from collections import defaultdict
 
+import numpy as np
+from matplotlib import pyplot as plt
+
 from src.data.cell import Cell
+from src.data.constant import ColorRGB
 from src.data.coordinates import Coordinates
 from src.data.machine import Machine
 from src.data.order_service import OrderService
@@ -244,7 +248,7 @@ class Production:
     def get_cell(self, coordinates: Coordinates) -> Cell:
         return self.production_layout[len(self.production_layout) - 1 - coordinates.y][coordinates.x]
 
-    def print_layout(self, max_coordinate: Coordinates) -> str:
+    def print_layout_in_command_box(self, max_coordinate: Coordinates) -> str:
         """Build a string and every cell in the list production_layouts gets a UTF-8 code Symbol"""
         print_layout_str = ''
 
@@ -290,6 +294,49 @@ class Production:
         print('\n \u26AB ist ein Transport Robot')
         print('\n \U0001F535 ist ein Working Robot')
         print('\n \U0001F534 ist die Source (links) und Sink (rechts)')
+
+    def print_layout_as_a_field_in_extra_tab(self, max_coordinate: Coordinates):
+        grid_size = (max_coordinate.x, max_coordinate.y, 3)  # 3 Dimensions for RGB-Colors
+        grid = np.full(grid_size, [255, 255, 255], dtype=np.uint8)
+        for index, row in enumerate(self.production_layout):
+            for cell in row:
+                if cell.placed_entity is None:
+                    grid[index, cell.cell_coordinates.x] = ColorRGB.WHITE.value
+                elif type(cell.placed_entity) is Machine:
+                    grid[index, cell.cell_coordinates.x] = ColorRGB.BLACK.value
+                elif type(cell.placed_entity) is TransportRobot:
+                    grid[index, cell.cell_coordinates.x] = ColorRGB.BROWN.value
+                elif type(cell.placed_entity) is WorkingRobot:
+                    grid[index, cell.cell_coordinates.x] = ColorRGB.ORANGE.value
+                elif type(cell.placed_entity) is Source or Sink:
+                    grid[index, cell.cell_coordinates.x] = ColorRGB.RED.value
+        return grid
+
+    def hover_for_cell_information(self, event, info_text):
+        if event.xdata is not None and event.ydata is not None:
+            row = int(event.xdata)
+            col = int(event.ydata)
+            cell = self.get_cell(Coordinates(row, col))
+            # Hier können beliebige weitere Informationen zu den Zellen angezeigt werden
+            if cell.placed_entity is None:
+                cell_info = f"Row: {row}, Col: {col}, None"
+                info_text.set_text(cell_info)
+            elif type(cell.placed_entity) is Machine:
+                cell_info = f"Row: {row}, Col: {col}, MA{cell.placed_entity.machine_type}, ID: {cell.placed_entity.identification_number}"
+                info_text.set_text(cell_info)
+            elif type(cell.placed_entity) is TransportRobot:
+                cell_info = f"Row: {row}, Col: {col}, TR(ID:{cell.placed_entity.identification_number})"
+                info_text.set_text(cell_info)
+            elif type(cell.placed_entity) is WorkingRobot:
+                cell_info = f"Row: {row}, Col: {col}, WR(ID:{cell.placed_entity.identification_number})"
+                info_text.set_text(cell_info)
+            elif type(cell.placed_entity) is Source:
+                cell_info = f"Row: {row}, Col: {col}, Source"
+                info_text.set_text(cell_info)
+            elif type(cell.placed_entity) is Sink:
+                cell_info = f"Row: {row}, Col: {col}, Sink"
+                info_text.set_text(cell_info)
+        plt.draw()
 
     def print_cell_information(self, coordinates: Coordinates):
         required_cell = self.get_cell(coordinates)
