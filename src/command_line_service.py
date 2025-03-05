@@ -26,8 +26,11 @@ class CommandLineService:
         self.production.get_transport_robot_placed_in_production(tr_list)
         self.production.get_every_machine_placed_in_production(machine_list, wr_list, tr_list)
 
-        self.visualize_production_layout_in_matplotlib(max_coordinate)
-        #self.visualize_production_layout_in_terminal(max_coordinate)
+        if self.order_service.set_visualising_via_matplotlib() == True:
+            self.visualize_production_layout_in_matplotlib(max_coordinate)
+
+        if self.order_service.set_visualising_via_terminal() == True:
+            self.visualize_production_layout_in_terminal(max_coordinate)
 
 
     def get_cell_information(self):

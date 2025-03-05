@@ -295,6 +295,26 @@ class Production:
         print('\n \U0001F535 ist ein Working Robot')
         print('\n \U0001F534 ist die Source (links) und Sink (rechts)')
 
+    def print_cell_information(self, coordinates: Coordinates):
+        required_cell = self.get_cell(coordinates)
+        print('x: ', required_cell.cell_coordinates.x)
+        print('y: ', required_cell.cell_coordinates.y)
+        print('Cell type: ', required_cell.placed_entity)
+
+        if required_cell.placed_entity is Machine or TransportRobot or WorkingRobot:
+            print('Machine ID: ', required_cell.placed_entity.identification_number)
+        elif required_cell.placed_entity is TransportRobot:
+            print('TR ID: ', required_cell.placed_entity.identification_number)
+        elif required_cell.placed_entity is WorkingRobot:
+            print('WR ID: ', required_cell.placed_entity.identification_number)
+        elif required_cell.placed_entity is Source:
+            print('Cell is Source')
+        elif required_cell.placed_entity is Sink:
+            print('Cell is Sink')
+        elif required_cell.placed_entity is None:
+            print('Cell is empty')
+
+
     def print_layout_as_a_field_in_extra_tab(self, max_coordinate: Coordinates):
         grid_size = (max_coordinate.x, max_coordinate.y, 3)  # 3 Dimensions for RGB-Colors
         grid = np.full(grid_size, [255, 255, 255], dtype=np.uint8)
@@ -338,24 +358,6 @@ class Production:
                 info_text.set_text(cell_info)
         plt.draw()
 
-    def print_cell_information(self, coordinates: Coordinates):
-        required_cell = self.get_cell(coordinates)
-        print('x: ', required_cell.cell_coordinates.x)
-        print('y: ', required_cell.cell_coordinates.y)
-        print('Cell type: ', required_cell.placed_entity)
-
-        if required_cell.placed_entity is Machine or TransportRobot or WorkingRobot:
-            print('Machine ID: ', required_cell.placed_entity.identification_number)
-        elif required_cell.placed_entity is TransportRobot:
-            print('TR ID: ', required_cell.placed_entity.identification_number)
-        elif required_cell.placed_entity is WorkingRobot:
-            print('WR ID: ', required_cell.placed_entity.identification_number)
-        elif required_cell.placed_entity is Source:
-            print('Cell is Source')
-        elif required_cell.placed_entity is Sink:
-            print('Cell is Sink')
-        elif required_cell.placed_entity is None:
-            print('Cell is empty')
 
     def coordinates_in_layout(self, max_coordinates: Coordinates, testing_coordinates: Coordinates) -> bool:
         """Is checking if the coordinates are in the production_layout"""
