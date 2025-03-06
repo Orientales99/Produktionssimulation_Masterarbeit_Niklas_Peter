@@ -19,6 +19,27 @@ class Production:
     order_service = OrderService()
     source_coordinates: Coordinates
     sink_coordinates: Coordinates
+    wr_list = []
+    self.tr_list = []
+    machine_list = []
+    max_coordinate = None
+
+    def create_production(self):
+        self.build_layout(self.max_coordinate)
+        self.set_source_in_production_layout(self.max_coordinate)
+        self.set_sink_in_production_layout(self.max_coordinate)
+
+    def set_entities(self):
+
+        self.get_working_robot_placed_in_production()
+        self.get_transport_robot_placed_in_production()
+        self.get_every_machine_placed_in_production()
+
+    def get_data_from_order_service(self):
+        self.wr_list = self.order_service.generate_wr_list()
+        self.tr_list = self.order_service.generate_tr_list()
+        self.machine_list = self.order_service.generate_machine_list()
+        pass
 
     def build_layout(self, max_coordinate: Coordinates):
         """Forms a list in a list (production_layout), which represents a coordinate system consisting of the class
@@ -59,25 +80,25 @@ class Production:
                 else:
                     avoiding_collision_parameter += wr_list[i].robot_size.y + 1
 
-    def get_transport_robot_placed_in_production(self, tr_list: list):
-        number_of_transport_robots = len(tr_list)
+    def get_transport_robot_placed_in_production(self, ):
+        number_of_transport_robots = len(self.tr_list)
         avoiding_collision_parameter = 1
         for i in range(0, number_of_transport_robots):
             while True:
                 new_coordinates_transport_robot = Coordinates(self.source_coordinates.x,
                                                               self.source_coordinates.y - avoiding_collision_parameter)
                 new_cell = self.get_cell(new_coordinates_transport_robot)
-                checked_free_area_list = self.check_area_of_cells_is_free(new_cell, tr_list[i].robot_size)
+                checked_free_area_list = self.check_area_of_cells_is_free(new_cell, self.tr_list[i].robot_size)
                 checked_free_area_list_length = len(checked_free_area_list)
                 if checked_free_area_list_length != 0:
                     for x in range(0, checked_free_area_list_length):
                         new_cell = checked_free_area_list[x]
-                        new_cell.placed_entity = tr_list[i]
+                        new_cell.placed_entity = self.tr_list[i]
                     break
                 else:
-                    avoiding_collision_parameter += tr_list[i].robot_size.y + 1
+                    avoiding_collision_parameter += self.tr_list[i].robot_size.y + 1
 
-    def get_max_length_of_tr_or_wr(self, wr_list, tr_list):
+    def get_max_length_of_tr_or_wr(self):
         """Finds max. length of size.x or size.y from TR and WR"""
         max_robot_size = 0
         for x in range(0, len(wr_list)):
@@ -86,11 +107,11 @@ class Production:
             if max_robot_size < wr_list[x].robot_size.y:
                 max_robot_size = wr_list[x].robot_size.y
 
-        for y in range(0, len(tr_list)):
-            if max_robot_size < tr_list[y].robot_size.x:
-                max_robot_size = tr_list[y].robot_size.x
-            if max_robot_size < tr_list[y].robot_size.y:
-                max_robot_size = tr_list[y].robot_size.y
+        for y in range(0, len(self.tr_list)):
+            if max_robot_size < self.tr_list[y].robot_size.x:
+                max_robot_size = self.tr_list[y].robot_size.x
+            if max_robot_size < self.tr_list[y].robot_size.y:
+                max_robot_size = self.tr_list[y].robot_size.y
         return max_robot_size
 
     def safe_space_for_placing_machines_in_production(self, machine_list) -> list:
@@ -107,11 +128,11 @@ class Production:
         coordinate_list = [(Coordinates(coord[0], coord[1]), int(count)) for coord, count in coordinate_count.items()]
         return coordinate_list
 
-    def get_every_machine_placed_in_production(self, machine_list, wr_list, tr_list):
+    def get_every_machine_placed_in_production(self):
         machine_list_static = self.get_machine_list_static(machine_list)
         machine_list_flexible = self.get_machine_list_flexible(machine_list)
-        self.get_static_machine_placed_in_production(machine_list_static, wr_list, tr_list)
-        self.get_flexible_machine_placed_in_production(machine_list_flexible, wr_list, tr_list)
+        self.get_static_machine_placed_in_production(machine_list_static)
+        self.get_flexible_machine_placed_in_production(machine_list_flexible)
 
     def get_machine_list_static(self, machine_list):
         return [machine for machine in machine_list if int(machine.driving_speed) == 0]
@@ -119,14 +140,12 @@ class Production:
     def get_machine_list_flexible(self, machine_list) -> list:
         return [machine for machine in machine_list if int(machine.driving_speed) != 0]
 
-    def get_static_machine_placed_in_production(self, machine_list_static, wr_list, tr_list):
+    def get_static_machine_placed_in_production(self):
         machine_list = machine_list_static
-        print(machine_list)
         number_of_machine = len(machine_list)
         avoiding_collision_parameter_x = 0
 
-        space_between_machine = (self.get_max_length_of_tr_or_wr(wr_list,
-                                                                 tr_list) * 2)  # *2 because two robots should drive between machines simultaneously
+        space_between_machine = (self.get_max_length_of_tr_or_wr() * 2)  # *2 because two robots should drive between machines simultaneously
         y_start = self.sink_coordinates.y + int(
             (machine_list[0].machine_size.y) / 2) + 1
         y_parameter = y_start
@@ -171,15 +190,14 @@ class Production:
                         y_upwards = y_start
                         y_downwards = y_start
 
-    def get_flexible_machine_placed_in_production(self, machine_list_flexible, wr_list, tr_list):
+    def get_flexible_machine_placed_in_production(self):
         """sets flexible machine in the production_layout. Alternate between one machine above source and one below. All
         machines of one type are positioned one behind the other (x-axis)"""
         machine_list = machine_list_flexible
         number_of_machine = len(machine_list)
         avoiding_collision_parameter_x = 0
 
-        space_between_machine = (self.get_max_length_of_tr_or_wr(wr_list,
-                                                                 tr_list) * 2)  # *2 because two robots should drive between machines simultaneously
+        space_between_machine = (self.get_max_length_of_tr_or_wr() * 2)  # *2 because two robots should drive between machines simultaneously
         y_start = self.source_coordinates.y + int(
             (machine_list[0].machine_size.y) / 2) + 1
         y_parameter = y_start
@@ -314,7 +332,6 @@ class Production:
         elif required_cell.placed_entity is None:
             print('Cell is empty')
 
-
     def print_layout_as_a_field_in_extra_tab(self, max_coordinate: Coordinates):
         grid_size = (max_coordinate.x, max_coordinate.y, 3)  # 3 Dimensions for RGB-Colors
         grid = np.full(grid_size, [255, 255, 255], dtype=np.uint8)
@@ -357,7 +374,6 @@ class Production:
                 cell_info = f"Row: {row}, Col: {col}, Sink"
                 info_text.set_text(cell_info)
         plt.draw()
-
 
     def coordinates_in_layout(self, max_coordinates: Coordinates, testing_coordinates: Coordinates) -> bool:
         """Is checking if the coordinates are in the production_layout"""

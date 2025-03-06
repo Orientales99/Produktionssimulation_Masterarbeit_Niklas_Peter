@@ -1,4 +1,5 @@
 import json
+import pandas as pd
 
 from simpy import Container
 
@@ -19,7 +20,9 @@ class OrderService:
         self.data_production_transport_robot = None
         self.data_production_machine = None
         self.data_process_starting_conditions = None
+        self.df_order_list = None
         self.env = SimulationEnvironment()
+        self.get_files_for_init()
 
     def get_files_for_init(self):
         with open(RESOURCES / "simulation_production_working_robot_data.json", 'r', encoding='utf-8') as w:
@@ -33,6 +36,8 @@ class OrderService:
 
         with open(RESOURCES / "simulation_starting_conditions.json", 'r', encoding='utf-8') as psc:
             self.data_process_starting_conditions = json.load(psc)
+
+        self.df_order_list = pd.read_excel(RESOURCES / 'Bestellauftraege.xlsx', header=None)
 
     def get_quantity_of_wr(self) -> int:
         working_robot_stats = self.data_production_working_robot["working_robot"][0]
@@ -126,3 +131,21 @@ class OrderService:
             return True
         else:
             return False
+
+    def generate_order_list(self):
+        print(self.df_order_list)
+        self.remove_quotes_from_order_list()
+        self.remove_head_row_from_order_list()
+        self.split_row_in_separate_columns()
+        print(self.df_order_list)
+
+    def remove_quotes_from_order_list(self):
+        self.df_order_list = self.df_order_list.apply(lambda x: x.str.replace('"', ''))
+
+    def remove_head_row_from_order_list(self):
+        self.df_order_list = self.df_order_list.drop(0).reset_index(drop=True)
+
+    def split_row_in_separate_columns(self):
+        self.df_order_list = self.df_order_list[0].str.split(',', expand=True)
+
+

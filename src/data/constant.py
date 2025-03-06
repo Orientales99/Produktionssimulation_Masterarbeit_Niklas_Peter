@@ -44,3 +44,28 @@ class MachineType(Enum):
     MANUFACTURING_MACHINE_A = 1
     MANUFACTURING_MACHINE_B = 2
     MANUFACTURING_MACHINE_C = 3
+
+
+class ProductGroup():
+    ONE = 1
+    TWO = 2
+    THREE = 3
+    FOUR = 4
+    FIVE = 5
+    SIX = 6
+    SEVEN = 7
+    EIGHT = 8
+    NINE = 9
+    TEN = 10
+    ELEVEN = 11
+    TWELVE = 12
+    THIRTEEN = 13
+    FOURTEEN = 14
+    FIFTEEN = 15
+
+    def building_groups_of_product(self):
+        ProductGroup.ONE = "Ballfreunde", "Fuballfreunde_4teilig"
+        pass
+
+    def building_random_groups_of_product(self):
+        pass

@@ -12,26 +12,18 @@ class CommandLineService:
     simulation_environment = SimulationEnvironment()
 
     def create_production(self):
-        self.order_service.get_files_for_init()
-        wr_list = self.order_service.generate_wr_list()
-        tr_list = self.order_service.generate_tr_list()
-        machine_list = self.order_service.generate_machine_list()
+
         max_coordinate = self.order_service.set_max_coordinates_for_production_layout()
 
-        self.production.build_layout(max_coordinate)
-        self.production.set_source_in_production_layout(max_coordinate)
-        self.production.set_sink_in_production_layout(max_coordinate)
+        self.production.create_production(max_coordinate)
+        self.production.set_entities(wr_list, tr_list, machine_list)
 
-        self.production.get_working_robot_placed_in_production(wr_list)
-        self.production.get_transport_robot_placed_in_production(tr_list)
-        self.production.get_every_machine_placed_in_production(machine_list, wr_list, tr_list)
 
         if self.order_service.set_visualising_via_matplotlib() == True:
             self.visualize_production_layout_in_matplotlib(max_coordinate)
 
         if self.order_service.set_visualising_via_terminal() == True:
             self.visualize_production_layout_in_terminal(max_coordinate)
-
 
     def get_cell_information(self):
         print('From which cell do you require information:')
@@ -55,7 +47,8 @@ class CommandLineService:
 
         plt.imshow(grid, origin='lower')
         plt.show()
-    
+
     def visualize_production_layout_in_terminal(self, max_coordinate):
         print(self.production.print_layout_in_command_box(max_coordinate))
         print(self.production.print_legend())
+        self.get_cell_information()
