@@ -21,11 +21,9 @@ class ServiceOrder:
         self.df_order_list = pd.read_excel(RESOURCES / 'Bestellauftraege.xlsx', header=None)
 
     def generate_order_list(self):
-        print(self.df_order_list)
         self.remove_quotes_from_order_list()
         self.set_head_as_column_name()
         self.create_new_column_for_product_group()
-        print(self.df_order_list)
         self.set_product_order_list()
 
     def remove_quotes_from_order_list(self):
