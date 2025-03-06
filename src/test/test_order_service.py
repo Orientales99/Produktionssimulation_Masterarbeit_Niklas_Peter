@@ -1,19 +1,26 @@
 import pytest
 
 from src.data.machine import Machine
-from src.data.order_service import OrderService
+from src.data.service_entity import ServiceEntity
+from src.data.service_order import ServiceOrder
 from src.data.transport_robot import TransportRobot
 from src.data.working_robot import WorkingRobot
 
 
 @pytest.fixture(autouse=True)
 def order_service():
-    order_service = OrderService()
+    order_service = ServiceOrder()
     return order_service
 
 
 def test_wr_list__always__wr_list_is_correct_init(order_service):
-    wr_list = order_service.generate_wr_list()
+    # given
+    service_entity = ServiceEntity()
+
+    # when
+    wr_list = service_entity.generate_wr_list()
+
+    # then
     assert isinstance(wr_list, list)
     assert len(wr_list) >= 0
     for x in range(0, len(wr_list)):
@@ -21,7 +28,13 @@ def test_wr_list__always__wr_list_is_correct_init(order_service):
 
 
 def test_tr_list__always__wr_list_is_correct_init(order_service):
-    tr_list = order_service.generate_tr_list()
+    # given
+    service_entity = ServiceEntity()
+
+    # when
+    tr_list = service_entity.generate_tr_list()
+
+    # then
     assert isinstance(tr_list, list)
     assert len(tr_list) >= 0
     for x in range(0, len(tr_list)):
@@ -29,7 +42,13 @@ def test_tr_list__always__wr_list_is_correct_init(order_service):
 
 
 def test_machine_list__always__wr_list_is_correct_init(order_service):
-    machine_list = order_service.generate_machine_list()
+    # given
+    service_entity = ServiceEntity()
+
+    # when
+    machine_list = service_entity.generate_machine_list()
+
+    # then
     assert isinstance(machine_list, list)
     assert len(machine_list) >= 0
     for x in range(0, len(machine_list)):

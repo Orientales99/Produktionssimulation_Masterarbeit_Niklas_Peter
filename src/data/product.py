@@ -1,9 +1,11 @@
+from src.data.coordinates import Coordinates
+
 from src.data.constant import ItemType
 
 
 class Product:
     product_id: int
-    size: int               # Europalette = 100 units
+    size: Coordinates               # Europalette = 100 units
     item_type: ItemType
 
     def __init__(self, product_id, size, item_type):

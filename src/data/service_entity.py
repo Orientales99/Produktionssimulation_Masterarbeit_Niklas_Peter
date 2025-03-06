@@ -1,5 +1,4 @@
 import json
-import pandas as pd
 
 from simpy import Container
 
@@ -13,31 +12,22 @@ from src.data.transport_robot import TransportRobot
 from src.data.working_robot import WorkingRobot
 
 
-class OrderService:
+class ServiceEntity:
 
     def __init__(self):
         self.data_production_working_robot = None
         self.data_production_transport_robot = None
         self.data_production_machine = None
-        self.data_process_starting_conditions = None
-        self.df_order_list = None
         self.env = SimulationEnvironment()
-        self.get_files_for_init()
+        self.get_entity_files_for_init()
 
-    def get_files_for_init(self):
+    def get_entity_files_for_init(self):
         with open(RESOURCES / "simulation_production_working_robot_data.json", 'r', encoding='utf-8') as w:
             self.data_production_working_robot = json.load(w)
-
         with open(RESOURCES / "simulation_production_transport_robot_data.json", 'r', encoding='utf-8') as t:
             self.data_production_transport_robot = json.load(t)
-
         with open(RESOURCES / "simulation_production_machine_data.json", 'r', encoding='utf-8') as m:
             self.data_production_machine = json.load(m)
-
-        with open(RESOURCES / "simulation_starting_conditions.json", 'r', encoding='utf-8') as psc:
-            self.data_process_starting_conditions = json.load(psc)
-
-        self.df_order_list = pd.read_excel(RESOURCES / 'Bestellauftraege.xlsx', header=None)
 
     def get_quantity_of_wr(self) -> int:
         working_robot_stats = self.data_production_working_robot["working_robot"][0]
@@ -91,11 +81,12 @@ class OrderService:
         return Machine(machine_type, identification_number, MachineQuality(machine_quality),
                        machine_stats["driving_speed"],
                        machine_stats["working_speed"],
-                       Coordinates(int(machine_stats["robot_size_x"]), int(machine_stats["robot_size_y"])), MachineStorage(
-                Container(self.env, int(machine_stats["max_loading_capacity_product_before_process"]),
-                          int(machine_stats["quantity_loaded_product_before_processed"])), None,
-                Container(self.env, int(machine_stats["max_loading_capacity_product_after_process"]),
-                          int(machine_stats["quantity_loaded_product_after_processed"])), None),
+                       Coordinates(int(machine_stats["robot_size_x"]), int(machine_stats["robot_size_y"])),
+                       MachineStorage(
+                           Container(self.env, int(machine_stats["max_loading_capacity_product_before_process"]),
+                                     int(machine_stats["quantity_loaded_product_before_processed"])), None,
+                           Container(self.env, int(machine_stats["max_loading_capacity_product_after_process"]),
+                                     int(machine_stats["quantity_loaded_product_after_processed"])), None),
                        False, None,
                        machine_stats["setting_up_time"])
 
@@ -115,37 +106,3 @@ class OrderService:
                     machine_quality = 0
                 machine_list.append(self.create_machine(machine_type, identification_number + 1, machine_quality))
         return machine_list
-
-    def set_max_coordinates_for_production_layout(self) -> Coordinates:
-        return Coordinates(int(self.data_process_starting_conditions["production_layout_size_x"]),
-                           int(self.data_process_starting_conditions["production_layout_size_y"]))
-
-    def set_visualising_via_terminal(self):
-        if self.data_process_starting_conditions["visualising_via_terminal(y/n)"] == "y":
-            return True
-        else:
-            return False
-
-    def set_visualising_via_matplotlib(self):
-        if self.data_process_starting_conditions["visualising_via_matplotlib(y/n)"] == "y":
-            return True
-        else:
-            return False
-
-    def generate_order_list(self):
-        print(self.df_order_list)
-        self.remove_quotes_from_order_list()
-        self.remove_head_row_from_order_list()
-        self.split_row_in_separate_columns()
-        print(self.df_order_list)
-
-    def remove_quotes_from_order_list(self):
-        self.df_order_list = self.df_order_list.apply(lambda x: x.str.replace('"', ''))
-
-    def remove_head_row_from_order_list(self):
-        self.df_order_list = self.df_order_list.drop(0).reset_index(drop=True)
-
-    def split_row_in_separate_columns(self):
-        self.df_order_list = self.df_order_list[0].str.split(',', expand=True)
-
-

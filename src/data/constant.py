@@ -46,7 +46,7 @@ class MachineType(Enum):
     MANUFACTURING_MACHINE_C = 3
 
 
-class ProductGroup():
+class ProductGroup(Enum):
     ONE = 1
     TWO = 2
     THREE = 3
@@ -64,8 +64,23 @@ class ProductGroup():
     FIFTEEN = 15
 
     def building_groups_of_product(self):
-        ProductGroup.ONE = "Ballfreunde", "Fuballfreunde_4teilig"
-        pass
+        return{
+            ProductGroup.ONE: ("ballfreunde", "fussballfreunde_4teilig"),
+            ProductGroup.TWO: ("bauernfreunde", "bauernfreunde_4teilig"),
+            ProductGroup.THREE: ("janosch_4teilig", "janosch_6teilig"),
+            ProductGroup.FOUR: ("kÃ¶nig_lÃ¶wen_4teilig", "kÃ¶nig_lÃ¶wen_6teilig"),
+            ProductGroup.FIVE: ("LYTO_AMEFA_BAUERNFREUNDE", "LYTO_AMEFA_WALDFREUNDE"),
+            ProductGroup.SIX: ("LYTO_AMEFA_FUSSBALLFREUNDE", "LYTO_AMEFA_PRINZESSIN", "LYTO_WMF_SAFARI"),
+            ProductGroup.SEVEN: ("Namensgravur_Tiere", "Safari_Namensgravur"),
+            ProductGroup.EIGHT: ("prinzessinnen", "prinzessin_4teilig"),
+            ProductGroup.NINE: ("waldfreunde", "waldfreunde_4teilig"),
+            ProductGroup.TEN: ("wmf_einhorn_4teilig", "wmf_farm_4teilig", "wmf_first_lyric_4teilig"),
+            ProductGroup.ELEVEN: ("wmf_kinderbesteck_knuddel", "wmf_knuddel_gravur"),
+            ProductGroup.TWELVE: ("wmf_safari_new", "wmf_lion_king_4teilig"),
+            ProductGroup.THIRTEEN: ("wmf_safari_set_6teilig", "wmf_zwerge_gravur"),
+            ProductGroup.FOURTEEN: ("zoo", "zoo_4teilig"),
+            ProductGroup.FIFTEEN: "zwerge_gravur"
+        }.get(self)
 
     def building_random_groups_of_product(self):
         pass
