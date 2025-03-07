@@ -1,10 +1,10 @@
 from src.data.coordinates import Coordinates
 
-from src.data.constant import ItemType
+from src.data.constant import ItemType, ProductGroup
 
 
 class Product:
-    product_id: int
+    product_id: ProductGroup
     size: Coordinates               # Europalette = 100 units
     item_type: ItemType
 

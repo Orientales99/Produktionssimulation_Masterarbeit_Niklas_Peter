@@ -30,7 +30,6 @@ class Production:
         self.set_sink_in_production_layout()
 
     def set_entities(self):
-
         self.get_working_robot_placed_in_production()
         self.get_transport_robot_placed_in_production()
         self.get_every_machine_placed_in_production()
@@ -113,10 +112,6 @@ class Production:
             if max_robot_size < self.tr_list[y].robot_size.y:
                 max_robot_size = self.tr_list[y].robot_size.y
         return max_robot_size
-
-    def safe_space_for_placing_machines_in_production(self) -> list:
-        safed_cells_for_machine_list = []
-        pass
 
     def get_size_and_number_of_machine(self):
         """Get a list of space per machine and the quantity of the required machine_space"""

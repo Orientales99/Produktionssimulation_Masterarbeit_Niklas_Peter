@@ -1,5 +1,7 @@
-from src.data.service_order import ServiceOrder
+from src.process_logic.manufacturing_plan import ManufacturingPlan
 
-service_order = ServiceOrder()
+manufacturing_plan = ManufacturingPlan()
 
-service_order.generate_order_list()
+manufacturing_plan.analyse_orders()
+
+
