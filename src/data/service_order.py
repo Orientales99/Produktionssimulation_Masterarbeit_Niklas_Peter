@@ -55,7 +55,10 @@ class ServiceOrder:
 
         for _, row in self.df_order_list.iterrows():
             order = Order(
-                Product(ProductGroup(row["product"]), Coordinates(0, 0), ItemType.FINAL_PRODUCT_PACKED),
+                Product(
+                    ProductGroup(row["product"]),
+                    Coordinates(0, 0),
+                    ItemType.FINAL_PRODUCT_PACKED),
                 row["AnzahlProArtikel"],
                 date.fromisoformat(row["datum"]), 1
             )

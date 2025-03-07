@@ -36,11 +36,11 @@ class ServiceEntity:
     def create_wr(self, identification_number) -> WorkingRobot:
         working_robot_stats = self.data_production_working_robot["working_robot"][0]
         return WorkingRobot(identification_number,
-                            robot_size=Coordinates(int(working_robot_stats["robot_size_x"]),
-                                                   int(working_robot_stats["robot_size_y"])),
-                            driving_speed=working_robot_stats["driving_speed"],
-                            product_transfer_rate=working_robot_stats[
-                                "product_transfer_rate_units_per_minute"])
+                            Coordinates(
+                                int(working_robot_stats["robot_size_x"]),
+                                int(working_robot_stats["robot_size_y"])),
+                            working_robot_stats["driving_speed"],
+                            working_robot_stats["product_transfer_rate_units_per_minute"])
 
     def generate_wr_list(self) -> list:
         wr_list = []
@@ -56,10 +56,13 @@ class ServiceEntity:
 
     def create_tr(self, identification_number) -> TransportRobot:
         transport_robot_stats = self.data_production_transport_robot["transport_robot"][0]
-        return TransportRobot(identification_number, None,
-                              Coordinates(int(transport_robot_stats["robot_size_x"]),
-                                          int(transport_robot_stats["robot_size_y"])),
-                              transport_robot_stats["driving_speed"], transport_robot_stats["loaded_capacity"],
+        return TransportRobot(identification_number,
+                              None,
+                              Coordinates(
+                                  int(transport_robot_stats["robot_size_x"]),
+                                  int(transport_robot_stats["robot_size_y"])),
+                              transport_robot_stats["driving_speed"],
+                              transport_robot_stats["loaded_capacity"],
                               transport_robot_stats["max_loading_capacity"])
 
     def generate_tr_list(self) -> list:
@@ -78,16 +81,27 @@ class ServiceEntity:
 
     def create_machine(self, machine_type, identification_number, machine_quality) -> Machine:
         machine_stats = self.data_production_machine["production_machine"][machine_type]
-        return Machine(machine_type, identification_number, MachineQuality(machine_quality),
+        return Machine(machine_type,
+                       identification_number,
+                       MachineQuality(machine_quality),
                        machine_stats["driving_speed"],
                        machine_stats["working_speed"],
-                       Coordinates(int(machine_stats["robot_size_x"]), int(machine_stats["robot_size_y"])),
+                       Coordinates(
+                           int(machine_stats["robot_size_x"]),
+                           int(machine_stats["robot_size_y"])),
                        MachineStorage(
-                           Container(self.env, int(machine_stats["max_loading_capacity_product_before_process"]),
-                                     int(machine_stats["quantity_loaded_product_before_processed"])), None,
-                           Container(self.env, int(machine_stats["max_loading_capacity_product_after_process"]),
-                                     int(machine_stats["quantity_loaded_product_after_processed"])), None),
-                       False, None,
+                           Container(
+                               self.env,
+                               int(machine_stats["max_loading_capacity_product_before_process"]),
+                               int(machine_stats["quantity_loaded_product_before_processed"])),
+                           None,
+                           Container(
+                               self.env,
+                               int(machine_stats["max_loading_capacity_product_after_process"]),
+                               int(machine_stats["quantity_loaded_product_after_processed"])),
+                           None),
+                       False,
+                       None,
                        machine_stats["setting_up_time"])
 
     def generate_machine_list(self) -> list:

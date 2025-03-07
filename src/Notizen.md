@@ -1,6 +1,5 @@
 # To-Dos
 
-- dataclasses der entitäten
 - random machine zuordnung
 
 # Buck-List
