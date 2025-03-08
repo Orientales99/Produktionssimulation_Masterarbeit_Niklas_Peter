@@ -1,6 +1,6 @@
 import pandas as pd
 
-from src import RESOURCES
+from src import RESOURCES, ANALYSIS_SOLUTION
 from src.data.coordinates import Coordinates
 from src.data.order import Order
 from src.data.product import Product
@@ -65,5 +65,5 @@ class ServiceOrder:
             self.product_order_list.append(order)
 
     def print_as_xlsx(self):
-        self.df_order_list.to_excel(RESOURCES / 'bestellauftraege_auswertung.xlsx', sheet_name='Bestellauftraege',
+        self.df_order_list.to_excel(ANALYSIS_SOLUTION / 'bestellauftraege_auswertung.xlsx', sheet_name='Bestellauftraege',
                                     index=False)

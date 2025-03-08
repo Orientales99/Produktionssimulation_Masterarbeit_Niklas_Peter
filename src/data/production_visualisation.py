@@ -22,21 +22,10 @@ class ProductionVisualisation:
         if self.service_starting_conditions.set_visualising_via_terminal() is True:
             self.visualize_production_layout_in_terminal()
 
-    def visualize_production_layout_in_matplotlib(self):
-        grid = self.print_layout_as_a_field_in_extra_tab()
-        fig, ax = plt.subplots()
-        info_text = ax.text(0.95, 0.05, '', transform=ax.transAxes, fontsize=12,
-                            verticalalignment='bottom', horizontalalignment='right', color='black')
-        fig.canvas.mpl_connect('motion_notify_event',
-                               lambda event: self.hover_for_cell_information(event, info_text))
-
-        plt.imshow(grid, origin='lower')
-        plt.show()
-
     def visualize_production_layout_in_terminal(self):
         print(self.print_layout_in_command_box())
         print(self.print_legend())
-        self.get_cell_information()
+        #self.get_cell_information()
 
     def print_layout_in_command_box(self) -> str:
         """Build a string and every cell in the list production_layouts gets a UTF-8 code Symbol"""
@@ -133,6 +122,18 @@ class ProductionVisualisation:
                 elif type(cell.placed_entity) is Source or Sink:
                     grid[index, cell.cell_coordinates.x] = ColorRGB.RED.value
         return grid
+
+    def visualize_production_layout_in_matplotlib(self):
+        grid = self.print_layout_as_a_field_in_extra_tab()
+        fig, ax = plt.subplots()
+        info_text = ax.text(0.95, 0.05, '', transform=ax.transAxes, fontsize=12,
+                            verticalalignment='bottom', horizontalalignment='right', color='black')
+        fig.canvas.mpl_connect('motion_notify_event',
+                               lambda event: self.hover_for_cell_information(event, info_text))
+
+        plt.imshow(grid, origin='lower')
+        plt.grid(color='gray', linestyle='--', linewidth=0.5)
+        plt.show()
 
     def hover_for_cell_information(self, event, info_text):
         if event.xdata is not None and event.ydata is not None:

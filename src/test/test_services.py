@@ -37,7 +37,7 @@ def test_tr_list__always__wr_list_is_correct_init(order_service):
         assert isinstance(tr_list[x], TransportRobot)
 
 
-def test_machine_list__always__wr_list_is_correct_init(order_service):
+def test_machine_list__always__wr_list_is_correct_init():
     # given
     service_entity = ServiceEntity()
 
