@@ -9,7 +9,6 @@ class PathFinding:
     production = Production()
     production_layout = production.production_layout
 
-
     def update_cell_neighbors_list(self, cell_position: Coordinates):
         """Create a list of neighbor cells which are not free """
         self.cell_neighbors_list = []
