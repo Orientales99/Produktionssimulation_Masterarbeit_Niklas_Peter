@@ -10,4 +10,6 @@ class WorkingRobot:
     driving_speed: int
     product_transfer_rate: int
 
-
+    @property  # only if identification_str is used; one time calculation -> is cached
+    def identification_str(self) -> str:
+        return f"WR: {self.identification_number}"

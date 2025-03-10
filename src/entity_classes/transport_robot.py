@@ -12,3 +12,7 @@ class TransportRobot:
     driving_speed: int
     loaded_capacity: int
     max_loading_capacity: int
+
+    @property  # only if identification_str is used; one time calculation -> is cached
+    def identification_str(self) -> str:
+        return f"TR: {self.identification_number}"

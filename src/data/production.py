@@ -5,8 +5,11 @@ from src.data.service_entity import ServiceEntity
 from src.data.service_starting_condition import ServiceStartingConditions
 from src.data.cell import Cell
 from src.data.coordinates import Coordinates
-from src.data.sink import Sink
-from src.data.source import Source
+from src.entity_classes.machine import Machine
+from src.entity_classes.sink import Sink
+from src.entity_classes.source import Source
+from src.entity_classes.transport_robot import TransportRobot
+from src.entity_classes.working_robot import WorkingRobot
 
 
 class Production:
@@ -17,6 +20,7 @@ class Production:
     source_coordinates: Coordinates
     sink_coordinates: Coordinates
     wr_list = []
+    entities_located = {}
     tr_list = []
     machine_list = []
     max_coordinate: Coordinates
@@ -61,10 +65,13 @@ class Production:
         cell.placed_entity = Sink(0, 0, 0)
 
     def get_working_robot_placed_in_production(self):
+        """Places working robots in the production layout and stores their locations in a dictionary"""
+
         number_of_working_robots = len(self.wr_list)
         avoiding_collision_parameter = 1
         for i in range(0, number_of_working_robots):
             while True:
+                location_list = []
                 new_coordinates_working_robot = Coordinates(self.source_coordinates.x,
                                                             self.source_coordinates.y + self.wr_list[
                                                                 i].robot_size.y + 1 + avoiding_collision_parameter)
@@ -75,15 +82,20 @@ class Production:
                     for x in range(0, checked_free_area_list_length):
                         new_cell = checked_free_area_list[x]
                         new_cell.placed_entity = self.wr_list[i]
+                        location_list.append(new_cell)
                     break
                 else:
                     avoiding_collision_parameter += self.wr_list[i].robot_size.y + 1
+            self.entities_located[self.wr_list[i].identification_str] = location_list
 
-    def get_transport_robot_placed_in_production(self, ):
+    def get_transport_robot_placed_in_production(self):
+        """Places transport robots in the production layout and stores their locations in a dictionary"""
+
         number_of_transport_robots = len(self.tr_list)
         avoiding_collision_parameter = 1
         for i in range(0, number_of_transport_robots):
             while True:
+                location_list = []
                 new_coordinates_transport_robot = Coordinates(self.source_coordinates.x,
                                                               self.source_coordinates.y - avoiding_collision_parameter)
                 new_cell = self.get_cell(new_coordinates_transport_robot)
@@ -93,9 +105,11 @@ class Production:
                     for x in range(0, checked_free_area_list_length):
                         new_cell = checked_free_area_list[x]
                         new_cell.placed_entity = self.tr_list[i]
+                        location_list.append(new_cell)
                     break
                 else:
                     avoiding_collision_parameter += self.tr_list[i].robot_size.y + 1
+            self.entities_located[self.tr_list[i].identification_str] = location_list
 
     def get_max_length_of_tr_or_wr(self):
         """Finds max. length of size.x or size.y from TR and WR"""
@@ -154,6 +168,7 @@ class Production:
 
         for i in range(0, number_of_machine):
             while True:
+                location_list = []
                 new_coordinates = Coordinates(
                     self.sink_coordinates.x - 5 - space_between_machine - avoiding_collision_parameter_x -
                     machine_list_static[
@@ -168,6 +183,7 @@ class Production:
                     for x in range(0, checked_free_area_list_length):
                         new_cell = checked_free_area_list[x]
                         new_cell.placed_entity = machine_list_static[i]
+                        location_list.append(new_cell)
                     break
                 else:
                     if machine_list_static[i].machine_type == machine_list_static[i - 1].machine_type or \
@@ -191,6 +207,7 @@ class Production:
                         y_parameter = y_start
                         y_upwards = y_start
                         y_downwards = y_start
+            self.entities_located[machine_list_static[i].identification_str] = location_list
 
     def get_flexible_machine_placed_in_production(self, machine_list_flexible: list):
         """sets flexible machine in the production_layout. Alternate between one machine above source and one below. All
@@ -209,6 +226,7 @@ class Production:
 
         for i in range(0, number_of_machine):
             while True:
+                location_list = []
                 new_coordinates = Coordinates(
                     self.source_coordinates.x + 5 + space_between_machine + avoiding_collision_parameter_x,
                     y_parameter)
@@ -222,6 +240,7 @@ class Production:
                     for x in range(0, checked_free_area_list_length):
                         new_cell = checked_free_area_list[x]
                         new_cell.placed_entity = machine_list_flexible[i]
+                        location_list.append(new_cell)
                     break
                 else:
                     if machine_list_flexible[i].machine_type == machine_list_flexible[i - 1].machine_type or \
@@ -243,8 +262,9 @@ class Production:
                         else:
                             raise Exception(
                                 'An error occurred when initialising flexible machines in the production_layout.')
+            self.entities_located[machine_list_flexible[i].identification_str] = location_list
 
-    def check_area_of_cells_is_free(self, cell: Cell, free_area_size: Coordinates) -> list:
+    def check_area_of_cells_is_free(self, cell: Cell, free_area_size: Coordinates) -> list[Cell]:
         """get a cell and is checking if the area downward and to right is free; if free -> return list with free cells; if not free -> if not free -> return empty list"""
         list_of_checked_cells = []
         y_range_min = cell.cell_coordinates.y - free_area_size.y
@@ -277,3 +297,74 @@ class Production:
             return True
         else:
             return False
+
+    def check_move_possible(self, new_coordinates: Coordinates) -> bool:
+        pass
+
+    def move_entity_right(self, entity: Machine | WorkingRobot | TransportRobot) -> bool:
+        entity_cell_list = self.entities_located[entity.identification_str]
+        lowest_highest_x_coordinate = self.get_horizontal_edges_of_coordinates(entity_cell_list)
+        lowest_highest_y_coordinate = self.get_vertical_edges_of_coordinates(entity_cell_list)
+
+        for cell in entity_cell_list:
+
+            # cell get the new entity attribute
+            if cell.cell_coordinates.x == lowest_highest_x_coordinate[1]:
+                for y in range(lowest_highest_y_coordinate[0], lowest_highest_y_coordinate[1] + 1):
+                    new_cell = self.get_cell(Coordinates(lowest_highest_x_coordinate[1] + 1, y))
+                    new_cell.placed_entity = entity
+                    self.entities_located.setdefault(entity.identification_str, []).append(new_cell)
+
+            # left side of the cell get deleted
+            if cell.cell_coordinates.x == lowest_highest_x_coordinate[0]:
+                for y in range(lowest_highest_y_coordinate[0], lowest_highest_y_coordinate[1] + 1):
+                    new_empty_cell = self.get_cell(Coordinates(lowest_highest_x_coordinate[0], y))
+                    new_empty_cell.placed_entity = None
+                    self.entities_located[entity.identification_str].remove(new_empty_cell)
+        return True
+
+    def move_entity_left(self, entity: Machine | WorkingRobot | TransportRobot) -> bool:
+        entity_cell_list = self.entities_located[entity.identification_str]
+        lowest_highest_x_coordinate = self.get_horizontal_edges_of_coordinates(entity_cell_list)
+        lowest_highest_y_coordinate = self.get_vertical_edges_of_coordinates(entity_cell_list)
+
+        for cell in entity_cell_list:
+
+            # cell get the new entity attribute
+            if cell.cell_coordinates.x == lowest_highest_x_coordinate[0]:
+                for y in range(lowest_highest_y_coordinate[0], lowest_highest_y_coordinate[1] + 1):
+                    new_cell = self.get_cell(Coordinates(lowest_highest_x_coordinate[0] - 1, y))
+                    new_cell.placed_entity = entity
+                    self.entities_located.setdefault(entity.identification_str, []).append(new_cell)
+
+            # left side of the cell get deleted
+            if cell.cell_coordinates.x == lowest_highest_x_coordinate[1]:
+                for y in range(lowest_highest_y_coordinate[0], lowest_highest_y_coordinate[1] + 1):
+                    new_empty_cell = self.get_cell(Coordinates(lowest_highest_x_coordinate[1], y))
+                    new_empty_cell.placed_entity = None
+                    self.entities_located[entity.identification_str].remove(new_empty_cell)
+        return True
+
+    def get_horizontal_edges_of_coordinates(self, cell_list: list[Cell]) -> tuple:
+        right_edge_cell = 0
+        left_edge_cell = self.max_coordinate.x
+        for cell in cell_list:
+            if cell.cell_coordinates.x > right_edge_cell:
+                right_edge_cell = cell.cell_coordinates.x
+            if cell.cell_coordinates.x < left_edge_cell:
+                left_edge_cell = cell.cell_coordinates.x
+        lowest_highest_x_coordinate = (left_edge_cell, right_edge_cell)
+        return lowest_highest_x_coordinate
+
+    def get_vertical_edges_of_coordinates(self, cell_list: list[Cell]) -> tuple:
+        upper_edge_cell = 0
+        lower_edge_cell = self.max_coordinate.y
+
+        for cell in cell_list:
+            if cell.cell_coordinates.y < lower_edge_cell:
+                lower_edge_cell = cell.cell_coordinates.y
+            if cell.cell_coordinates.y > upper_edge_cell:
+                upper_edge_cell = cell.cell_coordinates.y
+
+        lowest_highest_y_coordinate = (lower_edge_cell, upper_edge_cell)
+        return lowest_highest_y_coordinate

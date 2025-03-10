@@ -17,5 +17,8 @@ class Machine:
     machine_storage: MachineStorage
     working_robot_on_machine: bool
     producing_product: Product | None
-    setting_up_time: int                            #Rüstzeit
+    setting_up_time: int  # Rüstzeit
 
+    @property  # only if identification_str is used; one time calculation -> is cached
+    def identification_str(self) -> str:
+        return f"Ma: {self.machine_type}, {self.identification_number}"

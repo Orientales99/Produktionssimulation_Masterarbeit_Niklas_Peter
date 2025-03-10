@@ -6,10 +6,10 @@ from src import RESOURCES
 from src.data.constant import MachineQuality
 from src.data.coordinates import Coordinates
 from src.data.simulation_environment import SimulationEnvironment
-from src.data.machine import Machine
+from src.entity_classes.machine import Machine
 from src.data.machine_storage import MachineStorage
-from src.data.transport_robot import TransportRobot
-from src.data.working_robot import WorkingRobot
+from src.entity_classes.transport_robot import TransportRobot
+from src.entity_classes.working_robot import WorkingRobot
 
 
 class ServiceEntity:
@@ -42,7 +42,8 @@ class ServiceEntity:
                             working_robot_stats["driving_speed"],
                             working_robot_stats["product_transfer_rate_units_per_minute"])
 
-    def generate_wr_list(self) -> list:
+    def generate_wr_list(self) -> list[WorkingRobot]:
+
         wr_list = []
 
         quantity_of_wr = self.get_quantity_of_wr()
@@ -65,7 +66,7 @@ class ServiceEntity:
                               transport_robot_stats["loaded_capacity"],
                               transport_robot_stats["max_loading_capacity"])
 
-    def generate_tr_list(self) -> list:
+    def generate_tr_list(self) -> list[TransportRobot]:
         tr_list = []
         quantity_of_tr = self.get_quantity_of_tr()
         for x in range(0, quantity_of_tr):
@@ -104,7 +105,7 @@ class ServiceEntity:
                        None,
                        machine_stats["setting_up_time"])
 
-    def generate_machine_list(self) -> list:
+    def generate_machine_list(self) -> list[Machine]:
         machine_list = []
         quantity_of_machines_per_type_list = self.get_quantity_per_machine_types_list()
         quantity_of_types = len(quantity_of_machines_per_type_list)

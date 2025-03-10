@@ -1,8 +1,6 @@
-import pytest
-
 from src.data.coordinates import Coordinates
 from src.data.production import Production
-from src.data.source import Source
+from src.entity_classes.source import Source
 
 
 def test__set_source_in_production_layout__always__source_is_in_layout():

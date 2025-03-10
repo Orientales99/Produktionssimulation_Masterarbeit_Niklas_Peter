@@ -4,12 +4,12 @@ from src.data.service_starting_condition import ServiceStartingConditions
 from matplotlib import pyplot as plt
 import numpy as np
 
-from src.data.transport_robot import TransportRobot
-from src.data.working_robot import WorkingRobot
-from src.data.machine import Machine
+from src.entity_classes.transport_robot import TransportRobot
+from src.entity_classes.working_robot import WorkingRobot
+from src.entity_classes.machine import Machine
 from src.data.constant import ColorRGB
-from src.data.sink import Sink
-from src.data.source import Source
+from src.entity_classes.sink import Sink
+from src.entity_classes.source import Source
 
 
 class ProductionVisualisation:
@@ -24,7 +24,7 @@ class ProductionVisualisation:
 
     def visualize_production_layout_in_terminal(self):
         print(self.print_layout_in_command_box())
-        print(self.print_legend())
+        #print(self.print_legend())
         #self.get_cell_information()
 
     def print_layout_in_command_box(self) -> str:

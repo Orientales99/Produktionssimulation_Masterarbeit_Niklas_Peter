@@ -1,11 +1,9 @@
-import pytest
-
-from src.data.machine import Machine
+from src.entity_classes.machine import Machine
 from src.data.order import Order
 from src.data.service_entity import ServiceEntity
 from src.data.service_order import ServiceOrder
-from src.data.transport_robot import TransportRobot
-from src.data.working_robot import WorkingRobot
+from src.entity_classes.transport_robot import TransportRobot
+from src.entity_classes.working_robot import WorkingRobot
 
 
 
