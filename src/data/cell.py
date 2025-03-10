@@ -11,7 +11,14 @@ from src.data.working_robot import WorkingRobot
 @dataclass
 class Cell:
     # 400 mm x 400 mm ≙ 1 Cell
+    cell_id = ""
     cell_coordinates: Coordinates
     placed_entity: Machine | TransportRobot | WorkingRobot | Source | Sink | None
+    neighbors_list = []
 
 
+    def __post_init__(self):
+        self.cell_id = self.get_cell_id()
+
+    def get_cell_id(self) -> str:
+        return f"{self.cell_coordinates.x}:{self.cell_coordinates.y}"

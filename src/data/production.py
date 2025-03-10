@@ -126,8 +126,10 @@ class Production:
     def get_every_machine_placed_in_production(self):
         machine_list_static = self.get_machine_list_static()
         machine_list_flexible = self.get_machine_list_flexible()
-        self.get_static_machine_placed_in_production(machine_list_static)
-        self.get_flexible_machine_placed_in_production(machine_list_flexible)
+        if len(machine_list_static) > 0:
+            self.get_static_machine_placed_in_production(machine_list_static)
+        if len(machine_list_flexible) > 0:
+            self.get_flexible_machine_placed_in_production(machine_list_flexible)
 
     def get_machine_list_static(self):
         return [machine for machine in self.machine_list if int(machine.driving_speed) == 0]

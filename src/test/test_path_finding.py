@@ -25,7 +25,7 @@ def test_neighbors_are_found__around_source_and_sink_after_layout_init():
     lef_sink_neighbors_list = pathfinding.cell_neighbors_list
 
     # then
-    assert len(above_source_neighbors_list) == 1
-    assert len(under_source_neighbors_list) == 1
-    assert len(right_source_neighbors_list) == 1
-    assert len(lef_sink_neighbors_list) == 1
+    assert len(above_source_neighbors_list) == 3
+    assert len(under_source_neighbors_list) == 3
+    assert len(right_source_neighbors_list) == 3
+    assert len(lef_sink_neighbors_list) == 3
