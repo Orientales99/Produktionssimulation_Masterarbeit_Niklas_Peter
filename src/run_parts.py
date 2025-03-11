@@ -35,24 +35,35 @@ def init_production():
     command_line_service = CommandLineService()
     command_line_service.create_production()
     production = Production()
+    production.set_sink_in_production_layout()
+    production.set_source_in_production_layout()
+    production.set_entities()
     command_line_service.visualise_layout()
-    for x in range(0, 45):
+    for x in range(0, 35):
         production.move_entity_right(WorkingRobot(1, Coordinates(1, 1), 1, 10))
         command_line_service.visualise_layout()
-    for x in range(0, 45):
-        production.move_entity_left(WorkingRobot(1, Coordinates(1, 1), 1, 10))
+
+    for x in range(0, 12):
+        production.move_entity_downwards(WorkingRobot(1, Coordinates(1, 1), 1, 10))
         command_line_service.visualise_layout()
 
+   # for x in range(0, 3):
+   #     production.move_entity_left(WorkingRobot(1, Coordinates(1, 1), 1, 10))
+   #     command_line_service.visualise_layout()
+#
+   # for x in range(0,10):
+   #     production.move_entity_upwards(WorkingRobot(1, Coordinates(1, 1), 1, 10))
+   #     command_line_service.visualise_layout()
 
 
-    #for value in production.entities_located.values():
+    # for value in production.entities_located.values():
     #    print(production.entities_located.keys())
     #    print("\n")
     #    print(value)
-    #print("\n")
+    # print("\n")
 
 
 if __name__ == '__main__':
     init_production()
 
-    # cProfile.run('run_10000()')
+    #cProfile.run('init_production()')
