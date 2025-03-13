@@ -90,3 +90,6 @@ class PathFinding:
             cell_neighbors_list.append(self.production.get_cell(Coordinates(cell_position.x - 1, cell_position.y)))
 
         return cell_neighbors_list
+
+    def move_entity_along_path(self):
+        pass

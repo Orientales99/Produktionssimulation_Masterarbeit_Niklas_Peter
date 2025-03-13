@@ -1,6 +1,7 @@
 from src.data.cell import Cell
 from src.data.coordinates import Coordinates
 from src.data.production import Production
+from src.data.production_visualisation import ProductionVisualisation
 from src.entity_classes.working_robot import WorkingRobot
 from src.process_logic.path_finding import PathFinding
 
@@ -72,8 +73,8 @@ def test_finding_shortest_way__layout_diagonal_start_and_end_point_with_three_ba
 
     # when
     pathfinding.run_a_star_algorithm(start_cell, end_cell)
-    #v = ProductionVisualisation()
-    #v.visualize_production_layout_in_terminal()
+    v = ProductionVisualisation()
+    v.visualize_production_layout_in_terminal()
 
     # then
     assert len(pathfinding.path_line_list) == 22

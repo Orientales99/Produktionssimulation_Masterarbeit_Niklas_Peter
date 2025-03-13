@@ -1,10 +1,7 @@
-import cProfile
-
 from src.command_line_service import CommandLineService
 from src.data.coordinates import Coordinates
 from src.data.production import Production
 from src.entity_classes.working_robot import WorkingRobot
-from src.process_logic.manufacturing_plan import ManufacturingPlan
 from src.process_logic.path_finding import PathFinding
 
 
@@ -37,33 +34,30 @@ def init_production():
     production = Production()
     production.set_sink_in_production_layout()
     production.set_source_in_production_layout()
-    production.set_entities()
+    # production.set_entities()
     command_line_service.visualise_layout()
-    for x in range(0, 35):
+
+
+    for x in range(0, 3):
+        production.move_entity_upwards(WorkingRobot(1, Coordinates(2, 2), 1, 10))
+        command_line_service.visualise_layout()
+
+    for x in range(0, 2):
         production.move_entity_right(WorkingRobot(1, Coordinates(1, 1), 1, 10))
-        command_line_service.visualise_layout()
+    command_line_service.visualise_layout()
+    for x in range(0, 3):
+        production.move_entity_downwards(WorkingRobot(1, Coordinates(2, 2), 1, 10))
+    command_line_service.visualise_layout()
 
-    for x in range(0, 12):
-        production.move_entity_downwards(WorkingRobot(1, Coordinates(1, 1), 1, 10))
-        command_line_service.visualise_layout()
+    for x in range(0, 10):
+        production.move_entity_left(WorkingRobot(1, Coordinates(2, 2), 1, 10))
+    command_line_service.visualise_layout()
 
-   # for x in range(0, 3):
-   #     production.move_entity_left(WorkingRobot(1, Coordinates(1, 1), 1, 10))
-   #     command_line_service.visualise_layout()
-#
-   # for x in range(0,10):
-   #     production.move_entity_upwards(WorkingRobot(1, Coordinates(1, 1), 1, 10))
-   #     command_line_service.visualise_layout()
-
-
-    # for value in production.entities_located.values():
-    #    print(production.entities_located.keys())
-    #    print("\n")
-    #    print(value)
-    # print("\n")
-
+    for x in range(0, 25):
+        production.move_entity_upwards(WorkingRobot(1, Coordinates(2, 2), 1, 10))
+    command_line_service.visualise_layout()
 
 if __name__ == '__main__':
-    init_production()
+    run_pathfinding()
 
-    #cProfile.run('init_production()')
+    # cProfile.run('init_production()')

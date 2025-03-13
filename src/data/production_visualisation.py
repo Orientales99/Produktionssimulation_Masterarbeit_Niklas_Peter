@@ -131,7 +131,7 @@ class ProductionVisualisation:
         fig.canvas.mpl_connect('motion_notify_event',
                                lambda event: self.hover_for_cell_information(event, info_text))
 
-        plt.imshow(grid, origin='lower')
+        plt.imshow(np.flipud(grid), origin='lower')
         plt.grid(color='gray', linestyle='--', linewidth=0.5)
         plt.show()
 

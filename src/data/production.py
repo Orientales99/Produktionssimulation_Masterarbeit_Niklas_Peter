@@ -293,7 +293,7 @@ class Production:
 
     def coordinates_in_layout(self, testing_coordinates: Coordinates) -> bool:
         """Is checking if the coordinates are in the production_layout"""
-        if testing_coordinates.x < 0 or testing_coordinates.x > self.max_coordinate.x or testing_coordinates.y < 0 or testing_coordinates.y > self.max_coordinate.y:
+        if testing_coordinates.x < 0 or testing_coordinates.x >= self.max_coordinate.x or testing_coordinates.y < 0 or testing_coordinates.y >= self.max_coordinate.y:
             return False
         else:
             return True
@@ -302,7 +302,9 @@ class Production:
         check_coordinates_in_layout = self.coordinates_in_layout(new_coordinates)
         if check_coordinates_in_layout is True:
             new_cell = self.get_cell(new_coordinates)
-            if new_cell.placed_entity is None:
+            if new_cell.placed_entity is not None:
+                return False
+            else:
                 return True
         else:
             return False
@@ -313,7 +315,9 @@ class Production:
         entity_cell_list = self.entities_located[entity.identification_str]
         lowest_highest_x_coordinate = self.get_horizontal_edges_of_coordinates(entity_cell_list)
         lowest_highest_y_coordinate = self.get_vertical_edges_of_coordinates(entity_cell_list)
-        for y in range(lowest_highest_y_coordinate[0], lowest_highest_y_coordinate[1]):
+        possible_move = True
+
+        for y in range(lowest_highest_y_coordinate[0], lowest_highest_y_coordinate[1] + 1):
             possible_move = self.check_move_possible(Coordinates(lowest_highest_x_coordinate[1] + 1, y))
             if possible_move is False:
                 return False
@@ -324,6 +328,7 @@ class Production:
             if cell.cell_coordinates.x == lowest_highest_x_coordinate[1]:
                 for y in range(lowest_highest_y_coordinate[0], lowest_highest_y_coordinate[1] + 1):
                     new_cell = self.get_cell(Coordinates(lowest_highest_x_coordinate[1] + 1, y))
+
                     new_cell.placed_entity = entity
                     self.entities_located.setdefault(entity.identification_str, []).append(new_cell)
 
@@ -333,15 +338,18 @@ class Production:
                     new_empty_cell = self.get_cell(Coordinates(lowest_highest_x_coordinate[0], y))
                     new_empty_cell.placed_entity = None
                     self.entities_located[entity.identification_str].remove(new_empty_cell)
-        return True
+        if possible_move is True:
+            return True
+        else:
+            return False
 
     def move_entity_left(self, entity: Machine | WorkingRobot | TransportRobot) -> bool:
         entity_cell_list = self.entities_located[entity.identification_str]
-
         lowest_highest_x_coordinate = self.get_horizontal_edges_of_coordinates(entity_cell_list)
         lowest_highest_y_coordinate = self.get_vertical_edges_of_coordinates(entity_cell_list)
+        possible_move = True
 
-        for y in range(lowest_highest_y_coordinate[0], lowest_highest_y_coordinate[1]):
+        for y in range(lowest_highest_y_coordinate[0], lowest_highest_y_coordinate[1] + 1):
             possible_move = self.check_move_possible(Coordinates(lowest_highest_x_coordinate[0] - 1, y))
             if possible_move is False:
                 return False
@@ -354,6 +362,10 @@ class Production:
 
                 for y in range(lowest_highest_y_coordinate[0], lowest_highest_y_coordinate[1] + 1):
                     new_cell = self.get_cell(Coordinates(lowest_highest_x_coordinate[0] - 1, y))
+
+                    if self.check_move_possible(new_cell.cell_coordinates) is False:
+                        break
+
                     new_cell.placed_entity = entity
                     self.entities_located.setdefault(entity.identification_str, []).append(new_cell)
 
@@ -366,13 +378,17 @@ class Production:
                     self.entities_located[entity.identification_str] = [
                         cell for cell in self.entities_located[entity.identification_str] if
                         cell.cell_id != new_empty_cell.cell_id]
-        return True
 
-    def move_entity_upwards(self,entity: Machine | WorkingRobot | TransportRobot) -> bool:
+        if possible_move is True:
+            return True
+        else:
+            return False
+
+    def move_entity_upwards(self, entity: Machine | WorkingRobot | TransportRobot) -> bool:
         entity_cell_list = self.entities_located[entity.identification_str]
-
         lowest_highest_x_coordinate = self.get_horizontal_edges_of_coordinates(entity_cell_list)
         lowest_highest_y_coordinate = self.get_vertical_edges_of_coordinates(entity_cell_list)
+        possible_move = True
 
         for x in range(lowest_highest_x_coordinate[0], lowest_highest_x_coordinate[1]):
             possible_move = self.check_move_possible(Coordinates(x, lowest_highest_y_coordinate[1] + 1))
@@ -387,6 +403,8 @@ class Production:
 
                 for x in range(lowest_highest_x_coordinate[0], lowest_highest_x_coordinate[1] + 1):
                     new_cell = self.get_cell(Coordinates(x, lowest_highest_y_coordinate[1] + 1))
+                    if self.check_move_possible(new_cell.cell_coordinates) is False:
+                        break
                     new_cell.placed_entity = entity
                     self.entities_located.setdefault(entity.identification_str, []).append(new_cell)
 
@@ -399,15 +417,18 @@ class Production:
                     self.entities_located[entity.identification_str] = [
                         cell for cell in self.entities_located[entity.identification_str] if
                         cell.cell_id != new_empty_cell.cell_id]
-        return True
+        if possible_move is True:
+            return True
+        else:
+            return False
 
-    def move_entity_downwards(self,entity: Machine | WorkingRobot | TransportRobot) -> bool:
+    def move_entity_downwards(self, entity: Machine | WorkingRobot | TransportRobot) -> bool:
         entity_cell_list = self.entities_located[entity.identification_str]
-
         lowest_highest_x_coordinate = self.get_horizontal_edges_of_coordinates(entity_cell_list)
         lowest_highest_y_coordinate = self.get_vertical_edges_of_coordinates(entity_cell_list)
+        possible_move = True
 
-        for x in range(lowest_highest_x_coordinate[0], lowest_highest_x_coordinate[1]):
+        for x in range(lowest_highest_x_coordinate[0], lowest_highest_x_coordinate[1] + 1):
             possible_move = self.check_move_possible(Coordinates(x, lowest_highest_y_coordinate[0] - 1))
             if possible_move is False:
                 return False
@@ -420,6 +441,8 @@ class Production:
 
                 for x in range(lowest_highest_x_coordinate[0], lowest_highest_x_coordinate[1] + 1):
                     new_cell = self.get_cell(Coordinates(x, lowest_highest_y_coordinate[0] - 1))
+                    if self.check_move_possible(new_cell.cell_coordinates) is False:
+                        break
                     new_cell.placed_entity = entity
                     self.entities_located.setdefault(entity.identification_str, []).append(new_cell)
 
@@ -432,9 +455,10 @@ class Production:
                     self.entities_located[entity.identification_str] = [
                         cell for cell in self.entities_located[entity.identification_str] if
                         cell.cell_id != new_empty_cell.cell_id]
-        return True
-
-
+        if possible_move is True:
+            return True
+        else:
+            return False
 
     def get_horizontal_edges_of_coordinates(self, cell_list: list[Cell]) -> tuple:
         right_edge_cell = 0
