@@ -74,9 +74,9 @@ class Production:
                 location_list = []
                 new_coordinates_working_robot = Coordinates(self.source_coordinates.x,
                                                             self.source_coordinates.y + self.wr_list[
-                                                                i].robot_size.y + 1 + avoiding_collision_parameter)
+                                                                i].size.y + 1 + avoiding_collision_parameter)
                 new_cell = self.get_cell(new_coordinates_working_robot)
-                checked_free_area_list = self.check_area_of_cells_is_free(new_cell, self.wr_list[i].robot_size)
+                checked_free_area_list = self.check_area_of_cells_is_free(new_cell, self.wr_list[i].size, None)
                 checked_free_area_list_length = len(checked_free_area_list)
                 if checked_free_area_list_length != 0:
                     for x in range(0, checked_free_area_list_length):
@@ -85,7 +85,7 @@ class Production:
                         location_list.append(new_cell)
                     break
                 else:
-                    avoiding_collision_parameter += self.wr_list[i].robot_size.y + 1
+                    avoiding_collision_parameter += self.wr_list[i].size.y + 1
             self.entities_located[self.wr_list[i].identification_str] = location_list
 
     def get_transport_robot_placed_in_production(self):
@@ -99,7 +99,7 @@ class Production:
                 new_coordinates_transport_robot = Coordinates(self.source_coordinates.x,
                                                               self.source_coordinates.y - avoiding_collision_parameter)
                 new_cell = self.get_cell(new_coordinates_transport_robot)
-                checked_free_area_list = self.check_area_of_cells_is_free(new_cell, self.tr_list[i].robot_size)
+                checked_free_area_list = self.check_area_of_cells_is_free(new_cell, self.tr_list[i].size, None)
                 checked_free_area_list_length = len(checked_free_area_list)
                 if checked_free_area_list_length != 0:
                     for x in range(0, checked_free_area_list_length):
@@ -108,23 +108,23 @@ class Production:
                         location_list.append(new_cell)
                     break
                 else:
-                    avoiding_collision_parameter += self.tr_list[i].robot_size.y + 1
+                    avoiding_collision_parameter += self.tr_list[i].size.y + 1
             self.entities_located[self.tr_list[i].identification_str] = location_list
 
     def get_max_length_of_tr_or_wr(self):
         """Finds max. length of size.x or size.y from TR and WR"""
         max_robot_size = 0
         for x in range(0, len(self.wr_list)):
-            if max_robot_size < self.wr_list[x].robot_size.x:
-                max_robot_size = self.wr_list[x].robot_size.x
-            if max_robot_size < self.wr_list[x].robot_size.y:
-                max_robot_size = self.wr_list[x].robot_size.y
+            if max_robot_size < self.wr_list[x].size.x:
+                max_robot_size = self.wr_list[x].size.x
+            if max_robot_size < self.wr_list[x].size.y:
+                max_robot_size = self.wr_list[x].size.y
 
         for y in range(0, len(self.tr_list)):
-            if max_robot_size < self.tr_list[y].robot_size.x:
-                max_robot_size = self.tr_list[y].robot_size.x
-            if max_robot_size < self.tr_list[y].robot_size.y:
-                max_robot_size = self.tr_list[y].robot_size.y
+            if max_robot_size < self.tr_list[y].size.x:
+                max_robot_size = self.tr_list[y].size.x
+            if max_robot_size < self.tr_list[y].size.y:
+                max_robot_size = self.tr_list[y].size.y
         return max_robot_size
 
     def get_size_and_number_of_machine(self):
@@ -132,7 +132,7 @@ class Production:
         coordinate_count = defaultdict(
             int)  # int: The default value (in this example: Coordinate) for non-existent keys is 0
         for x in range(0, len(self.machine_list)):
-            coordinates = (int(self.machine_list[x].machine_size.x), int(self.machine_list[x].machine_size.y))
+            coordinates = (int(self.machine_list[x].size.x), int(self.machine_list[x].size.y))
             coordinate_count[coordinates] += 1
         coordinate_list = [(Coordinates(coord[0], coord[1]), int(count)) for coord, count in coordinate_count.items()]
         return coordinate_list
@@ -160,11 +160,11 @@ class Production:
         space_between_machine = (
                 self.get_max_length_of_tr_or_wr() * 2)  # *2 because two robots should drive between machines simultaneously
         y_start = self.sink_coordinates.y + int(
-            (machine_list_static[0].machine_size.y) / 2) + 1
+            (machine_list_static[0].size.y) / 2) + 1
         y_parameter = y_start
         y_upwards = y_start
         y_downwards = y_start
-        collusion_parameter = machine_list_static[0].machine_size.y
+        collusion_parameter = machine_list_static[0].size.y
 
         for i in range(0, number_of_machine):
             while True:
@@ -172,11 +172,11 @@ class Production:
                 new_coordinates = Coordinates(
                     self.sink_coordinates.x - 5 - space_between_machine - avoiding_collision_parameter_x -
                     machine_list_static[
-                        i].machine_size.x,
+                        i].size.x,
                     y_parameter)
                 new_cell = self.get_cell(new_coordinates)
 
-                checked_free_area_list = self.check_area_of_cells_is_free(new_cell, machine_list_static[i].machine_size)
+                checked_free_area_list = self.check_area_of_cells_is_free(new_cell, machine_list_static[i].size, None)
                 checked_free_area_list_length = len(checked_free_area_list)
 
                 if checked_free_area_list_length != 0:
@@ -190,12 +190,12 @@ class Production:
                             machine_list_static[
                                 i].machine_type == machine_list_static[0].machine_type:
                         if machine_list_static[i].identification_number % 2 != 0:
-                            y_upwards += machine_list_static[i].machine_size.y + space_between_machine + 3
+                            y_upwards += machine_list_static[i].size.y + space_between_machine + 3
                             y_parameter = y_upwards
                         elif machine_list_static[i].identification_number % 2 == 0:
                             y_downwards -= collusion_parameter + space_between_machine + 3
                             collusion_parameter = machine_list_static[
-                                i].machine_size.y
+                                i].size.y
                             y_parameter = y_downwards
                         else:
                             raise Exception(
@@ -203,7 +203,7 @@ class Production:
 
                     else:
                         avoiding_collision_parameter_x += machine_list_static[
-                                                              i].machine_size.x + space_between_machine + 1
+                                                              i].size.x + space_between_machine + 1
                         y_parameter = y_start
                         y_upwards = y_start
                         y_downwards = y_start
@@ -218,11 +218,11 @@ class Production:
         space_between_machine = (
                 self.get_max_length_of_tr_or_wr() * 2)  # *2 because two robots should drive between machines simultaneously
         y_start = self.source_coordinates.y + int(
-            (machine_list_flexible[0].machine_size.y) / 2) + 1
+            (machine_list_flexible[0].size.y) / 2) + 1
         y_parameter = y_start
         y_upwards = y_start
         y_downwards = y_start
-        collusion_parameter = machine_list_flexible[0].machine_size.y
+        collusion_parameter = machine_list_flexible[0].size.y
 
         for i in range(0, number_of_machine):
             while True:
@@ -233,7 +233,7 @@ class Production:
                 new_cell = self.get_cell(new_coordinates)
 
                 checked_free_area_list = self.check_area_of_cells_is_free(new_cell,
-                                                                          machine_list_flexible[i].machine_size)
+                                                                          machine_list_flexible[i].size, None)
                 checked_free_area_list_length = len(checked_free_area_list)
 
                 if checked_free_area_list_length != 0:
@@ -247,16 +247,16 @@ class Production:
                             machine_list_flexible[
                                 i].machine_type == machine_list_flexible[0].machine_type:
                         avoiding_collision_parameter_x += machine_list_flexible[
-                                                              i].machine_size.x + space_between_machine + 1
+                                                              i].size.x + space_between_machine + 1
                     else:
                         if machine_list_flexible[i].machine_type % 2 != 0:
-                            y_upwards += machine_list_flexible[i].machine_size.y + space_between_machine + 3
+                            y_upwards += machine_list_flexible[i].size.y + space_between_machine + 3
                             y_parameter = y_upwards
                             avoiding_collision_parameter_x = 0
                         elif machine_list_flexible[i].machine_type % 2 == 0:
                             y_downwards -= collusion_parameter + space_between_machine + 3
                             collusion_parameter = machine_list_flexible[
-                                i].machine_size.y
+                                i].size.y
                             y_parameter = y_downwards
                             avoiding_collision_parameter_x = 0
                         else:
@@ -264,10 +264,11 @@ class Production:
                                 'An error occurred when initialising flexible machines in the production_layout.')
             self.entities_located[machine_list_flexible[i].identification_str] = location_list
 
-    def check_area_of_cells_is_free(self, cell: Cell, free_area_size: Coordinates) -> list[Cell]:
-        """get a cell and is checking if the area downward and to right is free; if free -> return list with free cells; if not free -> if not free -> return empty list"""
+    def check_area_of_cells_is_free(self, cell: Cell, free_area_size: Coordinates,
+                                    free_condition_entity: Machine | WorkingRobot | TransportRobot) -> list[Cell]:
+        """get a cell and is checking if the area downwards and to the right is free; if free -> return list with free cells; if not free -> if not free -> return empty list"""
         list_of_checked_cells = []
-        y_range_min = cell.cell_coordinates.y - free_area_size.y
+        y_range_min = max(0, cell.cell_coordinates.y - free_area_size.y)
         y_range_max = cell.cell_coordinates.y
         x_range_min = cell.cell_coordinates.x
         x_range_max = cell.cell_coordinates.x + free_area_size.x
@@ -275,20 +276,22 @@ class Production:
         for y in range(y_range_min, y_range_max):
             for x in range(x_range_min, x_range_max):
                 checked_cell = self.get_cell(Coordinates(x, y))
-                if self.check_cell_is_free(checked_cell) is False:
+                if self.check_cell_is_free(checked_cell, free_condition_entity) is False:
                     list_of_checked_cells = []
                     return list_of_checked_cells
                 else:
                     list_of_checked_cells.append(checked_cell)
         return list_of_checked_cells
 
-    def check_cell_is_free(self, cell: Cell) -> bool:
-        if cell.placed_entity is None:
+    def check_cell_is_free(self, cell: Cell, free_condition_entity: Machine | WorkingRobot | TransportRobot) -> bool:
+        if cell.placed_entity is None or cell.placed_entity == free_condition_entity:
             return True
-        else:
-            return False
+
+        return cell.placed_entity.identification_str == free_condition_entity.identification_str
+
 
     def get_cell(self, coordinates: Coordinates) -> Cell:
+
         return self.production_layout[len(self.production_layout) - 1 - coordinates.y][coordinates.x]
 
     def coordinates_in_layout(self, testing_coordinates: Coordinates) -> bool:
@@ -337,7 +340,9 @@ class Production:
                 for y in range(lowest_highest_y_coordinate[0], lowest_highest_y_coordinate[1] + 1):
                     new_empty_cell = self.get_cell(Coordinates(lowest_highest_x_coordinate[0], y))
                     new_empty_cell.placed_entity = None
-                    self.entities_located[entity.identification_str].remove(new_empty_cell)
+                    self.entities_located[entity.identification_str] = [
+                        cell for cell in self.entities_located[entity.identification_str] if
+                        cell.cell_id != new_empty_cell.cell_id]
         if possible_move is True:
             return True
         else:

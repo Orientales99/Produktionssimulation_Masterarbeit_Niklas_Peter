@@ -13,7 +13,7 @@ class Machine:
     machine_quality: MachineQuality
     driving_speed: int
     working_speed: int
-    machine_size: Coordinates
+    size: Coordinates
     machine_storage: MachineStorage
     working_robot_on_machine: bool
     producing_product: Product | None

@@ -6,3 +6,6 @@ class Sink:
     number_of_static_wr: int
     number_of_tr: int
     product_transfer_rate: int
+
+    def identification_str(self) -> str:
+        return f"Sink"

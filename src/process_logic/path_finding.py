@@ -4,6 +4,10 @@ from queue import PriorityQueue
 from src.data.production import Production
 from src.data.coordinates import Coordinates
 from src.data.cell import Cell
+from src.entity_classes.machine import Machine
+from src.entity_classes.transport_robot import TransportRobot
+from src.entity_classes.working_robot import WorkingRobot
+from src.data.production_visualisation import ProductionVisualisation
 
 
 @dataclass
@@ -12,7 +16,8 @@ class PathFinding:
     production_layout = production.production_layout
     path_line_list = []
 
-    def run_a_star_algorithm(self, start_cell: Cell, end_cell: Cell) -> bool:
+    def run_a_star_algorithm(self, start_cell: Cell, end_cell: Cell,
+                             moving_entity: Machine | WorkingRobot | TransportRobot) -> bool:
         count = 0
         open_set = PriorityQueue()
         open_set.put((0, count, start_cell))  # item (0) = f_score, count = keep track, when it put into Queue
@@ -33,7 +38,9 @@ class PathFinding:
                 self.reconstruct_path(came_from, end_cell.cell_id)
                 return True
 
-            current_cell.neighbors_list = self.get_current_cell_neighbors(current_cell.cell_coordinates)
+            # current_cell.neighbors_list = self.get_current_cell_neighbors(current_cell.cell_coordinates)
+            current_cell.neighbors_list = self.check_neighbor_cells_complete_wide(current_cell.cell_coordinates,
+                                                                                  moving_entity)
             for neighbor in current_cell.neighbors_list:
                 temp_g_score = g_score[current_cell.cell_id] + 1
 
@@ -64,32 +71,82 @@ class PathFinding:
     def calculate_h_score(self, start_coordinates: Coordinates, end_coordinates: Coordinates):
         return abs(start_coordinates.x - end_coordinates.x) + abs(start_coordinates.y - end_coordinates.y)
 
-    def get_current_cell_neighbors(self, cell_position: Coordinates) -> list[Cell]:
-        """Create a list of neighbor cells which are free """
-        cell_neighbors_list = []
-        cell = self.production.get_cell(cell_position)
+    def get_current_cell_neighbors(self, cell_position: Coordinates, current_cell: Cell, moving_entity) -> list[Cell]:
+        cell_neighbors_down = self.get_current_cell_neighbor_down(cell_position, current_cell, moving_entity)
+        cell_neighbors_up = self.get_current_cell_neighbor_up(cell_position, current_cell, moving_entity)
+        cell_neighbors_right = self.get_current_cell_neighbor_right(cell_position, current_cell, moving_entity)
+        cell_neighbors_left = self.get_current_cell_neighbor_left(cell_position, current_cell, moving_entity)
 
-        # Down
-        if cell.cell_coordinates.y < len(self.production_layout) - 1 and \
-                self.production.get_cell(Coordinates(cell_position.x, cell_position.y + 1)).placed_entity is None:
-            cell_neighbors_list.append(self.production.get_cell(Coordinates(cell_position.x, cell_position.y + 1)))
+        cell_neighbors_list = [cell for cell in
+                               [cell_neighbors_down, cell_neighbors_up, cell_neighbors_right, cell_neighbors_left] if
+                               cell is not None]
+        return cell_neighbors_list
 
-        # Up
-        if cell.cell_coordinates.y > 0 and \
-                self.production.get_cell(Coordinates(cell_position.x, cell_position.y - 1)).placed_entity is None:
-            cell_neighbors_list.append(self.production.get_cell(Coordinates(cell_position.x, cell_position.y - 1)))
+    def get_current_cell_neighbor_up(self, cell_position: Coordinates, current_cell: Cell, moving_entity) -> Cell:
+        if current_cell.cell_coordinates.y < len(self.production_layout) - 1 and \
+                (self.production.get_cell(Coordinates(cell_position.x,
+                                                      cell_position.y + 1)).placed_entity is None or self.production.get_cell(
+                    Coordinates(cell_position.x, cell_position.y + 1)).placed_entity is moving_entity):
+            return self.production.get_cell(Coordinates(cell_position.x, cell_position.y + 1))
 
-        # Right
-        if cell.cell_coordinates.x < len(self.production_layout[cell_position.y]) - 1 and \
-                self.production.get_cell(Coordinates(cell_position.x + 1, cell_position.y)).placed_entity is None:
-            cell_neighbors_list.append(self.production.get_cell(Coordinates(cell_position.x + 1, cell_position.y)))
+    def get_current_cell_neighbor_down(self, cell_position: Coordinates, current_cell: Cell, moving_entity) -> Cell:
+        if current_cell.cell_coordinates.y > 0 and \
+                (self.production.get_cell(Coordinates(cell_position.x,
+                                                      cell_position.y - 1)).placed_entity is None or self.production.get_cell(
+                    Coordinates(cell_position.x, cell_position.y - 1)).placed_entity is moving_entity):
+            return self.production.get_cell(Coordinates(cell_position.x, cell_position.y - 1))
 
-        # Left
-        if cell.cell_coordinates.x > 0 and \
-                self.production.get_cell(Coordinates(cell_position.x - 1, cell_position.y)).placed_entity is None:
-            cell_neighbors_list.append(self.production.get_cell(Coordinates(cell_position.x - 1, cell_position.y)))
+    def get_current_cell_neighbor_right(self, cell_position: Coordinates, current_cell: Cell, moving_entity) -> Cell:
+        if current_cell.cell_coordinates.x < len(self.production_layout[cell_position.y]) - 1 and \
+                (self.production.get_cell(Coordinates(cell_position.x + 1,
+                                                      cell_position.y)).placed_entity is None or self.production.get_cell(
+                    Coordinates(cell_position.x + 1, cell_position.y)).placed_entity is moving_entity):
+            return self.production.get_cell(Coordinates(cell_position.x + 1, cell_position.y))
+
+    def get_current_cell_neighbor_left(self, cell_position: Coordinates, current_cell: Cell, moving_entity) -> Cell:
+        if current_cell.cell_coordinates.x > 0 and \
+                (self.production.get_cell(Coordinates(cell_position.x - 1,
+                                                      cell_position.y)).placed_entity is None or self.production.get_cell(
+                    Coordinates(cell_position.x - 1, cell_position.y)).placed_entity is moving_entity):
+            return self.production.get_cell(Coordinates(cell_position.x - 1, cell_position.y))
+
+    def check_neighbor_cells_complete_wide(self, cell_position: Coordinates,
+                                           entity: Machine | WorkingRobot | TransportRobot) -> list[Cell]:
+        current_cell = self.production.get_cell(cell_position)
+        cell_neighbors_list = self.get_current_cell_neighbors(cell_position, current_cell, entity)
+        cell_neighbors_list_copy = cell_neighbors_list
+
+        for cell in cell_neighbors_list_copy:
+            entity_cell_list = self.production.check_area_of_cells_is_free(cell, entity.size, entity)
+            if len(entity_cell_list) == 0:
+                cell_neighbors_list.remove(cell)
 
         return cell_neighbors_list
 
-    def move_entity_along_path(self):
-        pass
+    def move_entity_along_path(self, start_cell, entity: Machine | WorkingRobot | TransportRobot):
+        cell = start_cell
+        print(self.path_line_list)
+        v = ProductionVisualisation()
+        v.visualize_layout()
+        for step in self.path_line_list:
+            x, y = map(int, step.split(":"))
+
+            # up
+            if Coordinates(cell.cell_coordinates.x, cell.cell_coordinates.y + 1) == Coordinates(x, y):
+                self.production.move_entity_upwards(entity)
+                v.visualize_layout()
+            # down
+            if Coordinates(cell.cell_coordinates.x, cell.cell_coordinates.y - 1) == Coordinates(x, y):
+                self.production.move_entity_downwards(entity)
+                v.visualize_layout()
+            # left
+            if Coordinates(cell.cell_coordinates.x - 1, cell.cell_coordinates.y) == Coordinates(x, y):
+                self.production.move_entity_left(entity)
+                v.visualize_layout()
+            # right
+            if Coordinates(cell.cell_coordinates.x + 1, cell.cell_coordinates.y) == Coordinates(x, y):
+                self.production.move_entity_right(entity)
+                v.visualize_layout()
+
+            cell = self.production.get_cell(Coordinates(x, y))
+        v.visualize_layout()

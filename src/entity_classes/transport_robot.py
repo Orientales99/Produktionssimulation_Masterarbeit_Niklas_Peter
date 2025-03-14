@@ -8,7 +8,7 @@ from src.data.product import Product
 class TransportRobot:
     identification_number: int
     product: Product | None
-    robot_size: Coordinates
+    size: Coordinates
     driving_speed: int
     loaded_capacity: int
     max_loading_capacity: int

@@ -39,42 +39,44 @@ def test_finding_shortest_way__empty_layout_diagonal_start_and_end_point():
     # given
     pathfinding = PathFinding()
     production = Production()
-    production.max_coordinate = Coordinates(10, 10)
+    production.max_coordinate = Coordinates(15, 15)
     production.build_layout()
-    start_cell = Cell(Coordinates(0, 0), None)
-    end_cell = Cell(Coordinates(9, 9,), None)
+    start_cell = Cell(Coordinates(2, 2), None)
+    end_cell = Cell(Coordinates(9, 9), None)
 
     # when
-    pathfinding.run_a_star_algorithm(start_cell, end_cell)
+    pathfinding.run_a_star_algorithm(start_cell, end_cell, WorkingRobot(1, Coordinates(1, 1), 1, 10))
 
     # then
-    assert len(pathfinding.path_line_list) == 18
+    assert len(pathfinding.path_line_list) == 14
+
 
 def test_finding_shortest_way__layout_diagonal_start_and_end_point_with_three_barrier():
     # given
     pathfinding = PathFinding()
     production = Production()
-    production.max_coordinate = Coordinates(10, 10)
+    production.max_coordinate = Coordinates(16, 16)
     production.build_layout()
-    start_cell = Cell(Coordinates(0, 0), None)
-    end_cell = Cell(Coordinates(9, 9,), None)
-    for x in range(0, 6):
-        cell = production.get_cell(Coordinates(x, 3))
-        cell.placed_entity = WorkingRobot(0, Coordinates(1,1), 0, 0)
+    start_cell = Cell(Coordinates(3, 3), None)
+    end_cell = Cell(Coordinates(13, 13), None)
+    test_entity = WorkingRobot(1, Coordinates(1, 1), 1, 10)
 
-    for x in range(5, 10):
-        cell = production.get_cell(Coordinates(x, 5))
-        cell.placed_entity = WorkingRobot(0, Coordinates(1,1), 0, 0)
+    for x in range(0, 9):
+        cell = production.get_cell(Coordinates(x, 4))
+        cell.placed_entity = WorkingRobot(0, Coordinates(1, 1), 0, 0)
 
-    for x in range(2, 9):
+    for x in range(5, 15):
         cell = production.get_cell(Coordinates(x, 7))
-        cell.placed_entity = WorkingRobot(0, Coordinates(1,1), 0, 0)
+        cell.placed_entity = WorkingRobot(0, Coordinates(1, 1), 0, 0)
 
+    for x in range(1, 14):
+        cell = production.get_cell(Coordinates(x, 10))
+        cell.placed_entity = WorkingRobot(0, Coordinates(1, 1), 0, 0)
 
     # when
-    pathfinding.run_a_star_algorithm(start_cell, end_cell)
+    pathfinding.run_a_star_algorithm(start_cell, end_cell, test_entity)
     v = ProductionVisualisation()
     v.visualize_production_layout_in_terminal()
 
     # then
-    assert len(pathfinding.path_line_list) == 22
+    assert len(pathfinding.path_line_list) == 24

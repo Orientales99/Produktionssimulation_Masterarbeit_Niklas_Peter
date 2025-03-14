@@ -1,3 +1,5 @@
+import cProfile
+
 from src.command_line_service import CommandLineService
 from src.data.coordinates import Coordinates
 from src.data.production import Production
@@ -13,9 +15,14 @@ def run_pathfinding():
     command_line_service.create_production()
     path_finding = PathFinding()
     production = Production()
-    x = production.get_cell(Coordinates(0, 0))
-    y = production.get_cell(Coordinates(9, 9))
-    funktioniert = path_finding.run_a_star_algorithm(x, y)
+    production.set_sink_in_production_layout()
+    production.set_source_in_production_layout()
+    start_cell = production.get_cell(Coordinates(0, 24))
+    end_cell = production.get_cell(Coordinates(33, 20))
+    test_wr = WorkingRobot(1, Coordinates(3, 3), 1, 10)
+    funktioniert = path_finding.run_a_star_algorithm(start_cell, end_cell, test_wr)
+    path_finding.move_entity_along_path(start_cell, test_wr)
+
     if funktioniert is True:
         print("Funktioniert")
     else:
@@ -28,7 +35,7 @@ def run_1000():
         run_pathfinding()
 
 
-def init_production():
+def move_entity():
     command_line_service = CommandLineService()
     command_line_service.create_production()
     production = Production()
@@ -37,27 +44,36 @@ def init_production():
     # production.set_entities()
     command_line_service.visualise_layout()
 
+    for x in range(0, 100):
+        production.move_entity_right(WorkingRobot(1, Coordinates(2, 2), 1, 10))
+    command_line_service.visualise_layout()
 
     for x in range(0, 3):
         production.move_entity_upwards(WorkingRobot(1, Coordinates(2, 2), 1, 10))
-        command_line_service.visualise_layout()
-
-    for x in range(0, 2):
-        production.move_entity_right(WorkingRobot(1, Coordinates(1, 1), 1, 10))
     command_line_service.visualise_layout()
+
     for x in range(0, 3):
+        production.move_entity_right(WorkingRobot(1, Coordinates(2, 2), 1, 10))
+    command_line_service.visualise_layout()
+
+    for x in range(0, 100):
         production.move_entity_downwards(WorkingRobot(1, Coordinates(2, 2), 1, 10))
     command_line_service.visualise_layout()
 
-    for x in range(0, 10):
+    for x in range(0, 100):
         production.move_entity_left(WorkingRobot(1, Coordinates(2, 2), 1, 10))
     command_line_service.visualise_layout()
 
-    for x in range(0, 25):
+    for x in range(0, 100):
         production.move_entity_upwards(WorkingRobot(1, Coordinates(2, 2), 1, 10))
     command_line_service.visualise_layout()
 
-if __name__ == '__main__':
-    run_pathfinding()
+    for x in range(0, 100):
+        production.move_entity_downwards(WorkingRobot(1, Coordinates(2, 2), 1, 10))
+    command_line_service.visualise_layout()
 
-    # cProfile.run('init_production()')
+
+if __name__ == '__main__':
+    # move_entity()
+    #run_pathfinding()
+    cProfile.run('run_pathfinding()')

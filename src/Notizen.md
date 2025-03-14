@@ -1,7 +1,8 @@
 # To-Dos
 
 - random machine zuordnung
-- Kollisionsbedingungne für bewegliche Entities
+- Path finding -> validate move vereinheitlichen
+- move entity mit größeren einheiten funktioniert nicht
 
 # Buck-List
 
