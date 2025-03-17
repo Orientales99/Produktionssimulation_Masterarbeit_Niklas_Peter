@@ -11,5 +11,5 @@ class Order:
     number_of_products_per_order: int
     order_date: date
     priority: OrderPriority
-
+    daily_manufacturing_sequence: int | None = None
 

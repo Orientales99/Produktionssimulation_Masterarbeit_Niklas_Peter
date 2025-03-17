@@ -76,7 +76,9 @@ class Production:
                                                             self.source_coordinates.y + self.wr_list[
                                                                 i].size.y + 1 + avoiding_collision_parameter)
                 new_cell = self.get_cell(new_coordinates_working_robot)
-                checked_free_area_list = self.check_area_of_cells_is_free(new_cell, self.wr_list[i].size, None)
+                checked_free_area_list = self.check_area_of_cells_is_free_for_entity(new_cell,
+                                                                                     self.wr_list[i].size,
+                                                                                     None)
                 checked_free_area_list_length = len(checked_free_area_list)
                 if checked_free_area_list_length != 0:
                     for x in range(0, checked_free_area_list_length):
@@ -99,7 +101,9 @@ class Production:
                 new_coordinates_transport_robot = Coordinates(self.source_coordinates.x,
                                                               self.source_coordinates.y - avoiding_collision_parameter)
                 new_cell = self.get_cell(new_coordinates_transport_robot)
-                checked_free_area_list = self.check_area_of_cells_is_free(new_cell, self.tr_list[i].size, None)
+                checked_free_area_list = self.check_area_of_cells_is_free_for_entity(new_cell,
+                                                                                     self.tr_list[i].size,
+                                                                                     None)
                 checked_free_area_list_length = len(checked_free_area_list)
                 if checked_free_area_list_length != 0:
                     for x in range(0, checked_free_area_list_length):
@@ -176,7 +180,9 @@ class Production:
                     y_parameter)
                 new_cell = self.get_cell(new_coordinates)
 
-                checked_free_area_list = self.check_area_of_cells_is_free(new_cell, machine_list_static[i].size, None)
+                checked_free_area_list = self.check_area_of_cells_is_free_for_entity(new_cell,
+                                                                                     machine_list_static[
+                                                                                                   i].size, None)
                 checked_free_area_list_length = len(checked_free_area_list)
 
                 if checked_free_area_list_length != 0:
@@ -232,8 +238,9 @@ class Production:
                     y_parameter)
                 new_cell = self.get_cell(new_coordinates)
 
-                checked_free_area_list = self.check_area_of_cells_is_free(new_cell,
-                                                                          machine_list_flexible[i].size, None)
+                checked_free_area_list = self.check_area_of_cells_is_free_for_entity(new_cell,
+                                                                                     machine_list_flexible[
+                                                                                                   i].size, None)
                 checked_free_area_list_length = len(checked_free_area_list)
 
                 if checked_free_area_list_length != 0:
@@ -264,8 +271,9 @@ class Production:
                                 'An error occurred when initialising flexible machines in the production_layout.')
             self.entities_located[machine_list_flexible[i].identification_str] = location_list
 
-    def check_area_of_cells_is_free(self, cell: Cell, free_area_size: Coordinates,
-                                    free_condition_entity: Machine | WorkingRobot | TransportRobot) -> list[Cell]:
+    def check_area_of_cells_is_free_for_entity(self, cell: Cell, free_area_size: Coordinates,
+                                               free_condition_entity: Machine | WorkingRobot | TransportRobot) -> \
+    list[Cell]:
         """get a cell and is checking if the area downwards and to the right is free; if free -> return list with free cells; if not free -> if not free -> return empty list"""
         list_of_checked_cells = []
         y_range_min = max(0, cell.cell_coordinates.y - free_area_size.y)
@@ -275,6 +283,8 @@ class Production:
 
         for y in range(y_range_min, y_range_max):
             for x in range(x_range_min, x_range_max):
+                if self.coordinates_in_layout(Coordinates(x, y)) is False:
+                    break
                 checked_cell = self.get_cell(Coordinates(x, y))
                 if self.check_cell_is_free(checked_cell, free_condition_entity) is False:
                     list_of_checked_cells = []
@@ -288,7 +298,6 @@ class Production:
             return True
 
         return cell.placed_entity.identification_str == free_condition_entity.identification_str
-
 
     def get_cell(self, coordinates: Coordinates) -> Cell:
 
@@ -328,7 +337,8 @@ class Production:
         for cell in entity_cell_list:
 
             # cell get the new entity attribute
-            if cell.cell_coordinates.x == lowest_highest_x_coordinate[1]:
+            if cell.cell_coordinates.x == lowest_highest_x_coordinate[1] and cell.cell_coordinates.y == \
+                    lowest_highest_y_coordinate[0]:
                 for y in range(lowest_highest_y_coordinate[0], lowest_highest_y_coordinate[1] + 1):
                     new_cell = self.get_cell(Coordinates(lowest_highest_x_coordinate[1] + 1, y))
 
@@ -395,7 +405,7 @@ class Production:
         lowest_highest_y_coordinate = self.get_vertical_edges_of_coordinates(entity_cell_list)
         possible_move = True
 
-        for x in range(lowest_highest_x_coordinate[0], lowest_highest_x_coordinate[1]):
+        for x in range(lowest_highest_x_coordinate[0], lowest_highest_x_coordinate[1] + 1):
             possible_move = self.check_move_possible(Coordinates(x, lowest_highest_y_coordinate[1] + 1))
             if possible_move is False:
                 return False

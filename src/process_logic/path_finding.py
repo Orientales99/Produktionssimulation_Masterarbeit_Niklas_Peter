@@ -117,7 +117,8 @@ class PathFinding:
         cell_neighbors_list_copy = cell_neighbors_list
 
         for cell in cell_neighbors_list_copy:
-            entity_cell_list = self.production.check_area_of_cells_is_free(cell, entity.size, entity)
+            entity_cell_list = self.production.check_area_of_cells_is_free_for_entity(cell, Coordinates(
+                entity.size.x + 1, entity.size.y + 1), entity)
             if len(entity_cell_list) == 0:
                 cell_neighbors_list.remove(cell)
 
@@ -133,19 +134,23 @@ class PathFinding:
 
             # up
             if Coordinates(cell.cell_coordinates.x, cell.cell_coordinates.y + 1) == Coordinates(x, y):
-                self.production.move_entity_upwards(entity)
+                if self.production.move_entity_upwards(entity) is False:
+                    return Exception(f'move from {cell.cell_id} to {x}:{y} not possible')
                 v.visualize_layout()
             # down
             if Coordinates(cell.cell_coordinates.x, cell.cell_coordinates.y - 1) == Coordinates(x, y):
-                self.production.move_entity_downwards(entity)
+                if self.production.move_entity_downwards(entity) is False:
+                    return Exception(f'move from {cell.cell_id} to {x}:{y} not possible')
                 v.visualize_layout()
             # left
             if Coordinates(cell.cell_coordinates.x - 1, cell.cell_coordinates.y) == Coordinates(x, y):
-                self.production.move_entity_left(entity)
+                if self.production.move_entity_left(entity) is False:
+                    return Exception(f'move from {cell.cell_id} to {x}:{y} not possible')
                 v.visualize_layout()
             # right
             if Coordinates(cell.cell_coordinates.x + 1, cell.cell_coordinates.y) == Coordinates(x, y):
-                self.production.move_entity_right(entity)
+                if self.production.move_entity_right(entity) is False:
+                    return Exception(f'move from {cell.cell_id} to {x}:{y} not possible')
                 v.visualize_layout()
 
             cell = self.production.get_cell(Coordinates(x, y))

@@ -1,9 +1,9 @@
 {
   "transport_robot": [
     {
-      "number_of_robots_in_production": "0",
-      "robot_size_x": "2",
-      "robot_size_y":"3",
+      "number_of_robots_in_production": "1",
+      "robot_size_x": "4",
+      "robot_size_y":"4",
       "driving_speed":  "1",
       "loaded_capacity": "0",
       "max_loading_capacity": "100"
