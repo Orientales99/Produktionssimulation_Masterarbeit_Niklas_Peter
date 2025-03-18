@@ -55,11 +55,13 @@ class Production:
             self.production_layout.append(row)
 
     def set_source_in_production_layout(self):
+        """Places the source at the center of the left side of the production layout."""
         self.source_coordinates = Coordinates(0, int(self.max_coordinate.y / 2))
         cell = self.get_cell(self.source_coordinates)
         cell.placed_entity = Source(0, 0, 0)
 
     def set_sink_in_production_layout(self):
+        """Places the sink at the center of the right side of the production layout."""
         self.sink_coordinates = Coordinates(int(self.max_coordinate.x - 1), int(self.max_coordinate.y / 2))
         cell = self.get_cell(self.sink_coordinates)
         cell.placed_entity = Sink(0, 0, 0)
@@ -157,7 +159,8 @@ class Production:
 
     def get_static_machine_placed_in_production(self, machine_list_static: list):
         """sets static machine in the production_layout. Alternate between one machine above source and one below. All
-        machines of one type are positioned on the same x-Axis. The next machine_type [i] is positions on the left side from the machine_type [i-1]"""
+        machines of one type are positioned on the same x-Axis. The next machine_type [i] is positions on the left side
+        from the machine_type [i-1]"""
         number_of_machine = len(machine_list_static)
         avoiding_collision_parameter_x = 0
 
@@ -182,7 +185,7 @@ class Production:
 
                 checked_free_area_list = self.check_area_of_cells_is_free_for_entity(new_cell,
                                                                                      machine_list_static[
-                                                                                                   i].size, None)
+                                                                                         i].size, None)
                 checked_free_area_list_length = len(checked_free_area_list)
 
                 if checked_free_area_list_length != 0:
@@ -240,7 +243,7 @@ class Production:
 
                 checked_free_area_list = self.check_area_of_cells_is_free_for_entity(new_cell,
                                                                                      machine_list_flexible[
-                                                                                                   i].size, None)
+                                                                                         i].size, None)
                 checked_free_area_list_length = len(checked_free_area_list)
 
                 if checked_free_area_list_length != 0:
@@ -273,8 +276,9 @@ class Production:
 
     def check_area_of_cells_is_free_for_entity(self, cell: Cell, free_area_size: Coordinates,
                                                free_condition_entity: Machine | WorkingRobot | TransportRobot) -> \
-    list[Cell]:
-        """get a cell and is checking if the area downwards and to the right is free; if free -> return list with free cells; if not free -> if not free -> return empty list"""
+            list[Cell]:
+        """get a cell and is checking if the area downwards and to the right is free; if free
+        -> return list with free cells; if not free -> if not free -> return empty list"""
         list_of_checked_cells = []
         y_range_min = max(0, cell.cell_coordinates.y - free_area_size.y)
         y_range_max = cell.cell_coordinates.y
@@ -294,6 +298,7 @@ class Production:
         return list_of_checked_cells
 
     def check_cell_is_free(self, cell: Cell, free_condition_entity: Machine | WorkingRobot | TransportRobot) -> bool:
+        """Checks if the cell is empty or has an entity that is allowed to be in the cell."""
         if cell.placed_entity is None or cell.placed_entity == free_condition_entity:
             return True
 
@@ -324,6 +329,7 @@ class Production:
         pass
 
     def move_entity_right(self, entity: Machine | WorkingRobot | TransportRobot) -> bool:
+        """moves entity right on the production layout and checks if the move is possible (return bool)"""
         entity_cell_list = self.entities_located[entity.identification_str]
         lowest_highest_x_coordinate = self.get_horizontal_edges_of_coordinates(entity_cell_list)
         lowest_highest_y_coordinate = self.get_vertical_edges_of_coordinates(entity_cell_list)
@@ -359,6 +365,7 @@ class Production:
             return False
 
     def move_entity_left(self, entity: Machine | WorkingRobot | TransportRobot) -> bool:
+        """moves entity left on the production layout and checks if the move is possible (return bool)"""
         entity_cell_list = self.entities_located[entity.identification_str]
         lowest_highest_x_coordinate = self.get_horizontal_edges_of_coordinates(entity_cell_list)
         lowest_highest_y_coordinate = self.get_vertical_edges_of_coordinates(entity_cell_list)
@@ -400,6 +407,7 @@ class Production:
             return False
 
     def move_entity_upwards(self, entity: Machine | WorkingRobot | TransportRobot) -> bool:
+        """moves entity upwards on the production layout and checks if the move is possible (return bool)"""
         entity_cell_list = self.entities_located[entity.identification_str]
         lowest_highest_x_coordinate = self.get_horizontal_edges_of_coordinates(entity_cell_list)
         lowest_highest_y_coordinate = self.get_vertical_edges_of_coordinates(entity_cell_list)
@@ -438,6 +446,7 @@ class Production:
             return False
 
     def move_entity_downwards(self, entity: Machine | WorkingRobot | TransportRobot) -> bool:
+        """moves entity downwards on the production layout and checks if the move is possible (return bool)"""
         entity_cell_list = self.entities_located[entity.identification_str]
         lowest_highest_x_coordinate = self.get_horizontal_edges_of_coordinates(entity_cell_list)
         lowest_highest_y_coordinate = self.get_vertical_edges_of_coordinates(entity_cell_list)

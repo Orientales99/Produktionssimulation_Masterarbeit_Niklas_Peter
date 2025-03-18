@@ -53,7 +53,8 @@ class ProductionVisualisation:
                     print_layout_str += ' \U0001F534 '
                 else:
                     raise Exception(
-                        'A cell has an invalid cell.playced_entity, which was not taken into account in the conditions of def print_layout.')
+                        'A cell has an invalid cell.playced_entity, which was not taken into account '
+                        'in the conditions of def print_layout.')
 
             print_layout_str += "\n"
         print_layout_str += '      '
@@ -92,22 +93,21 @@ class ProductionVisualisation:
         print('y: ', required_cell.cell_coordinates.y)
         print('Cell type: ', required_cell.placed_entity)
 
-        if required_cell.placed_entity is Machine or TransportRobot or WorkingRobot:
-            print('Machine ID: ', required_cell.placed_entity.identification_number)
-        elif required_cell.placed_entity is TransportRobot:
-            print('TR ID: ', required_cell.placed_entity.identification_number)
-        elif required_cell.placed_entity is WorkingRobot:
-            print('WR ID: ', required_cell.placed_entity.identification_number)
-        elif required_cell.placed_entity is Source:
+        if required_cell.placed_entity is Source:
             print('Cell is Source')
         elif required_cell.placed_entity is Sink:
             print('Cell is Sink')
+        elif required_cell.placed_entity is Machine or TransportRobot or WorkingRobot:
+            print(f'{required_cell.placed_entity.identification_str}')
         elif required_cell.placed_entity is None:
             print('Cell is empty')
 
+
     def print_layout_as_a_field_in_extra_tab(self):
+        """Generates a visual representation of the production layout as a 2D grid.
+        The 3 Dimension is for the RGB-Colors"""
         grid_size = (
-            self.production.max_coordinate.x, self.production.max_coordinate.y, 3)  # 3 Dimensions for RGB-Colors
+            self.production.max_coordinate.x, self.production.max_coordinate.y, 3)
         grid = np.full(grid_size, [255, 255, 255], dtype=np.uint8)
         for index, row in enumerate(self.production.production_layout):
             for cell in row:
@@ -124,6 +124,8 @@ class ProductionVisualisation:
         return grid
 
     def visualize_production_layout_in_matplotlib(self):
+        """Displays the production layout as a visual grid using Matplotlib"""
+
         grid = self.print_layout_as_a_field_in_extra_tab()
         fig, ax = plt.subplots()
         info_text = ax.text(0.95, 0.05, '', transform=ax.transAxes, fontsize=12,
@@ -136,6 +138,7 @@ class ProductionVisualisation:
         plt.show()
 
     def hover_for_cell_information(self, event, info_text):
+        """Displays information about a specific cell when hovering over it on the production layout"""
         if event.xdata is not None and event.ydata is not None:
             row = int(event.xdata)
             col = int(event.ydata)

@@ -8,7 +8,6 @@ from src.data.production_material import ProductionMaterial
 
 class ServiceProductInformation:
 
-
     def __init__(self):
         self.data_product_information = None
         self.get_product_information_files_for_init()
@@ -19,6 +18,8 @@ class ServiceProductInformation:
             self.data_product_information = json.load(p)
 
     def create_product_information_list(self):
+        """Creates a list of products, with each product's details including the steps needed for production,
+        the time each step takes and which material(production_material) is necessary for this step"""
         for product_key, product_data_list in self.data_product_information.items():
             for product in product_data_list:
 
@@ -57,5 +58,4 @@ class ServiceProductInformation:
                             required_product_type_step_1, processing_step_1, processing_time_step_1,
                             required_product_type_step_2, processing_step_2, processing_time_step_2,
                             required_product_type_step_3, processing_step_3, processing_time_step_3,
-                            required_product_type_step_4, processing_step_4,processing_time_step_4))
-
+                            required_product_type_step_4, processing_step_4, processing_time_step_4))

@@ -85,5 +85,6 @@ if __name__ == '__main__':
     # move_entity()
     # run_pathfinding()
     # cProfile.run('run_pathfinding()')
-    service_product_information = ServiceProductInformation()
-    service_product_information.create_product_information_list()
+    run_manufacturing_plan()
+    #service_product_information = ServiceProductInformation()
+    #service_product_information.create_product_information_list()

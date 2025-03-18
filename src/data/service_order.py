@@ -4,6 +4,7 @@ from src import RESOURCES, ANALYSIS_SOLUTION
 from src.data.coordinates import Coordinates
 from src.data.order import Order
 from src.data.product import Product
+from src.data.service_product_information import ServiceProductInformation
 from src.data.simulation_environment import SimulationEnvironment
 from src.data.constant import ProductGroup, ItemType
 from datetime import date
@@ -16,6 +17,8 @@ class ServiceOrder:
         self.env = SimulationEnvironment()
         self.get_order_files_for_init()
         self.product_order_list = []
+        self.service_product_information = ServiceProductInformation()
+        self.service_product_information.create_product_information_list()
 
     def get_order_files_for_init(self):
         self.df_order_list = pd.read_excel(RESOURCES / 'Bestellauftraege.xlsx', header=None)
@@ -45,25 +48,27 @@ class ServiceOrder:
         self.df_order_list["product"] = self.df_order_list["sku"].apply(self.get_product_group)
 
     def get_product_group(self, value: str) -> ProductGroup:
+        """Assigns a product group to the ordered product (from Constant ProductGroup)"""
         for group in ProductGroup:
             if value in group.building_groups_of_product():
                 return group
         return None
 
     def set_product_order_list(self):
+        """Creates an Order list that includes every order from the Excel sheet. """
         self.product_order_list = []
 
         for _, row in self.df_order_list.iterrows():
+            product_group = row["product"]
+            product = next((product for product in self.service_product_information.product_list if product.product_id == product_group), None)
             order = Order(
-                Product(
-                    ProductGroup(row["product"]),
-                    Coordinates(0, 0),
-                    ItemType.FINAL_PRODUCT_PACKED),
+                product,
                 row["AnzahlProArtikel"],
                 date.fromisoformat(row["datum"]), 1
             )
             self.product_order_list.append(order)
 
     def print_as_xlsx(self):
+        """printing the Order list in Excel"""
         self.df_order_list.to_excel(ANALYSIS_SOLUTION / 'bestellauftraege_auswertung.xlsx', sheet_name='Bestellauftraege',
                                     index=False)
