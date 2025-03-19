@@ -78,7 +78,16 @@ def move_entity():
 
 def run_manufacturing_plan():
     manufacturing_plan = ManufacturingPlan()
+    command_line_service = CommandLineService()
+    command_line_service.create_production()
+    production = Production()
+    production.set_sink_in_production_layout()
+    production.set_source_in_production_layout()
+
+
     manufacturing_plan.get_daily_manufacturing_plan(date(2024, 5, 2))
+    manufacturing_plan.set_processing_machine_list__queue_length_estimation()
+    command_line_service.visualise_layout()
 
 
 if __name__ == '__main__':

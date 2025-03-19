@@ -2,17 +2,17 @@ import pandas as pd
 
 from collections import defaultdict
 
-from src.data.coordinates import Coordinates
-
 from src.data.order import Order
-from src.data.product import Product
+from src.data.production import Production
 from src.data.service_order import ServiceOrder
 from src.data.service_product_information import ServiceProductInformation
+from datetime import date
 
 
 class ManufacturingPlan:
     service_order = ServiceOrder()
     service_product_information = ServiceProductInformation()
+    production = Production()
     summarised_order_list: list[Order] | None
     dictionary_summarised_order_per_day: dict = {}
     daily_manufacturing_plan: list[Order] = []
@@ -21,12 +21,15 @@ class ManufacturingPlan:
         self.product_order_list = self.service_order.generate_order_list()
         self.product_information_list = self.service_product_information.create_product_information_list()
 
-    def get_daily_manufacturing_plan(self, date):
+    def get_daily_manufacturing_plan(self, current_date: date):
+        """calling methods -> creating daily_manufacturing_plan as a list"""
         self.analyse_orders()
-        self.manufacturing_sequence_per_day(date)
+        self.manufacturing_sequence_per_day(current_date)
+        self.sort_by_highest_product_order_count()
         print(self.daily_manufacturing_plan)
 
     def analyse_orders(self):
+        """calling methods -> creating a list with summarised orders and sort them by day"""
         self.summarise_orders()
         self.sort_list_by_date()
 
@@ -86,13 +89,61 @@ class ManufacturingPlan:
         period_of_time = (first_date, last_date)
         return period_of_time
 
-    def manufacturing_sequence_per_day(self, date):
+    def manufacturing_sequence_per_day(self, current_date: date):
         """creating a list of every order for one specific date (list: daily_manufacturing_plan)"""
-        orders_for_day = self.dictionary_summarised_order_per_day.get(date, {}).get("orders", [])
+        orders_for_day = self.dictionary_summarised_order_per_day.get(current_date, {}).get("orders", [])
+        self.daily_manufacturing_plan = orders_for_day
 
-        sorted_orders = sorted(orders_for_day, key=lambda order: order.number_of_products_per_order, reverse=True)
+    def sort_by_highest_product_order_count(self):
+        """sort list: daily_manufacturing_plan by the highest order (number_of_products_per_order)"""
+        sorted_orders = sorted(self.daily_manufacturing_plan,
+                               key=lambda order: order.number_of_products_per_order, reverse=True)
 
         for sequence, order in enumerate(sorted_orders):
             order.daily_manufacturing_sequence = sequence
 
         self.daily_manufacturing_plan = sorted_orders
+
+    def set_processing_machine_list__queue_length_estimation(self):
+        """Each machine gets a processing list. The machine with the shortest queue time gets the next order.
+           Each order is added only once to avoid duplicates."""
+        machine_type_list = self.production.service_entity.get_quantity_per_machine_types_list()
+
+        for order in self.daily_manufacturing_plan:
+            executing_machine_type_step_1 = order.product.processing_step_1
+            for machine_type, number_of_machines_in_production in machine_type_list:
+                if executing_machine_type_step_1 == machine_type:
+                    identification_str_shortest_que_time = self.get_machine_str_with_shortest_queue_time(machine_type,
+                                                                                                         number_of_machines_in_production)
+                    for cell in self.production.entities_located[identification_str_shortest_que_time]:
+                        new_cell = self.production.find_cell_in_production_layout(cell)
+                        if order not in new_cell.placed_entity.processing_list:
+                            new_cell.placed_entity.processing_list.append(order)
+
+    def get_machine_str_with_shortest_queue_time(self, machine_type: int,
+                                                 number_of_machines_per_machine_type: int) -> str:
+        """Finds the machine with the shortest queue time and returns its identification string.
+           If no machine is found, an error is returned."""
+        identification_str_shortest_que_time = ""
+        total_shortest_que_time = float("inf")
+
+        for identification_number in range(1, number_of_machines_per_machine_type + 1):
+            identification_str = f"Ma: {machine_type}, {identification_number}"
+
+            new_cell = self.production.find_cell_in_production_layout(
+                self.production.entities_located[identification_str][1])
+            shortest_que_time = new_cell.placed_entity.processing_list_time_length
+
+            if shortest_que_time < total_shortest_que_time:
+                total_shortest_que_time = shortest_que_time
+                identification_str_shortest_que_time = identification_str
+
+        if identification_str_shortest_que_time == "":
+            return Exception("Queue time couldn't be calculated. Check if every required machine type is initialised")
+
+        return identification_str_shortest_que_time
+
+
+    def calculating_queue_length(self) -> float:
+        """calculates the queue time of a machine"""
+        pass

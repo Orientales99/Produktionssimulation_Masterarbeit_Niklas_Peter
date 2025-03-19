@@ -76,7 +76,7 @@ class ServiceEntity:
     def get_quantity_per_machine_types_list(self) -> list:
         machine_type_list = []
         for machines in self.data_production_machine["production_machine"]:
-            machine_type = (machines["machine_type"], machines["number_of_machines_in_production"])
+            machine_type = (int(machines["machine_type"]), int(machines["number_of_machines_in_production"]))
             machine_type_list.append(machine_type)
         return machine_type_list
 

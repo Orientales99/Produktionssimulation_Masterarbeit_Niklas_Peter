@@ -158,7 +158,7 @@ class Production:
         return [machine for machine in self.machine_list if int(machine.driving_speed) != 0]
 
     def get_static_machine_placed_in_production(self, machine_list_static: list):
-        """sets static machine in the production_layout. Alternate between one machine above source and one below. All
+        """sets static machine in the production_layout. Alternate between one machine above sink and one below. All
         machines of one type are positioned on the same x-Axis. The next machine_type [i] is positions on the left side
         from the machine_type [i-1]"""
         number_of_machine = len(machine_list_static)
@@ -275,7 +275,7 @@ class Production:
             self.entities_located[machine_list_flexible[i].identification_str] = location_list
 
     def check_area_of_cells_is_free_for_entity(self, cell: Cell, free_area_size: Coordinates,
-                                               free_condition_entity: Machine | WorkingRobot | TransportRobot) -> \
+                                               free_condition_entity: Machine | WorkingRobot | TransportRobot | None) -> \
             list[Cell]:
         """get a cell and is checking if the area downwards and to the right is free; if free
         -> return list with free cells; if not free -> if not free -> return empty list"""
@@ -297,16 +297,22 @@ class Production:
                     list_of_checked_cells.append(checked_cell)
         return list_of_checked_cells
 
-    def check_cell_is_free(self, cell: Cell, free_condition_entity: Machine | WorkingRobot | TransportRobot) -> bool:
+    def check_cell_is_free(self, cell: Cell, free_condition_entity: Machine | WorkingRobot | TransportRobot | None) -> bool:
         """Checks if the cell is empty or has an entity that is allowed to be in the cell."""
         if cell.placed_entity is None or cell.placed_entity == free_condition_entity:
             return True
 
-        return cell.placed_entity.identification_str == free_condition_entity.identification_str
+        return False
 
     def get_cell(self, coordinates: Coordinates) -> Cell:
 
         return self.production_layout[len(self.production_layout) - 1 - coordinates.y][coordinates.x]
+
+    def find_cell_in_production_layout(self, cell) -> Cell:
+        for row in self.production_layout:
+            for new_cell in row:
+                if cell == new_cell:
+                    return new_cell
 
     def coordinates_in_layout(self, testing_coordinates: Coordinates) -> bool:
         """Is checking if the coordinates are in the production_layout"""

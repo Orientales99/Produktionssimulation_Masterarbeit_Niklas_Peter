@@ -1,6 +1,7 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from src.data.constant import MachineQuality
+from src.data.order import Order
 from src.data.product import Product
 from src.data.coordinates import Coordinates
 from src.data.machine_storage import MachineStorage
@@ -18,6 +19,8 @@ class Machine:
     working_robot_on_machine: bool
     producing_product: Product | None
     setting_up_time: int  # Rüstzeit
+    processing_list: list[Order] = field(default_factory=list)  #defaul: empty
+    processing_list_time_length: float = 0
 
     @property  # only if identification_str is used; one time calculation -> is cached
     def identification_str(self) -> str:

@@ -72,6 +72,8 @@ class PathFinding:
         return abs(start_coordinates.x - end_coordinates.x) + abs(start_coordinates.y - end_coordinates.y)
 
     def get_current_cell_neighbors(self, cell_position: Coordinates, current_cell: Cell, moving_entity) -> list[Cell]:
+        """Checks if the neighbors of current cell are empty or part of the moving_entity. In will the cell be added to
+        the cell_neighbors_list. Cell_position are the coordinates of current_cell"""
         cell_neighbors_down = self.get_current_cell_neighbor_down(cell_position, current_cell, moving_entity)
         cell_neighbors_up = self.get_current_cell_neighbor_up(cell_position, current_cell, moving_entity)
         cell_neighbors_right = self.get_current_cell_neighbor_right(cell_position, current_cell, moving_entity)

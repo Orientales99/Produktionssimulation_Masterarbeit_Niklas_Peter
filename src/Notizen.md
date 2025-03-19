@@ -2,7 +2,7 @@
 
 - random machine zuordnung
 - Path finding -> validate move vereinheitlichen
-- move entity mit größeren einheiten funktioniert nicht
+- Auftragsliste der einzelnen Maschinen (Berechnung der Queue length hinzufügen)
 
 # Buck-List
 

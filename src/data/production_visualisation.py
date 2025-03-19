@@ -25,7 +25,7 @@ class ProductionVisualisation:
     def visualize_production_layout_in_terminal(self):
         print(self.print_layout_in_command_box())
         #print(self.print_legend())
-        #self.get_cell_information()
+        self.get_cell_information()
 
     def print_layout_in_command_box(self) -> str:
         """Build a string and every cell in the list production_layouts gets a UTF-8 code Symbol"""
@@ -91,7 +91,7 @@ class ProductionVisualisation:
         required_cell = self.production.get_cell(coordinates)
         print('x: ', required_cell.cell_coordinates.x)
         print('y: ', required_cell.cell_coordinates.y)
-        print('Cell type: ', required_cell.placed_entity)
+        #print('Cell type: ', required_cell.placed_entity)
 
         if required_cell.placed_entity is Source:
             print('Cell is Source')
@@ -99,6 +99,7 @@ class ProductionVisualisation:
             print('Cell is Sink')
         elif required_cell.placed_entity is Machine or TransportRobot or WorkingRobot:
             print(f'{required_cell.placed_entity.identification_str}')
+            print(f'{required_cell.placed_entity.processing_list}')
         elif required_cell.placed_entity is None:
             print('Cell is empty')
 

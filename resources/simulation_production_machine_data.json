@@ -2,9 +2,9 @@
   "production_machine": [
     {
       "machine_type": "0",
-      "number_of_machines_in_production": "1",
+      "number_of_machines_in_production": "3",
       "number_of_new_machines": "1",
-      "driving_speed":  "0",
+      "driving_speed":  "1",
       "working_speed":  "1",
       "robot_size_x": "5",
       "robot_size_y":"5",
@@ -16,7 +16,7 @@
     },
     {
       "machine_type": "1",
-      "number_of_machines_in_production": "1",
+      "number_of_machines_in_production": "2",
       "number_of_new_machines": "1",
       "driving_speed":  "1",
       "working_speed":  "1",
@@ -30,7 +30,7 @@
     },
     {
       "machine_type": "2",
-      "number_of_machines_in_production": "0",
+      "number_of_machines_in_production": "2",
       "number_of_new_machines": "1",
       "driving_speed":  "1",
       "working_speed":  "1",
@@ -44,9 +44,9 @@
     },
   {
       "machine_type": "3",
-      "number_of_machines_in_production": "0",
+      "number_of_machines_in_production": "2",
       "number_of_new_machines": "1",
-      "driving_speed":  "0",
+      "driving_speed":  "1",
       "working_speed":  "1",
       "robot_size_x": "5",
       "robot_size_y":"5",
