@@ -100,6 +100,7 @@ class ProductionVisualisation:
         elif required_cell.placed_entity is Machine or TransportRobot or WorkingRobot:
             print(f'{required_cell.placed_entity.identification_str}')
             print(f'{required_cell.placed_entity.processing_list}')
+            print(f'{required_cell.placed_entity.processing_list_queue_length}')
         elif required_cell.placed_entity is None:
             print('Cell is empty')
 

@@ -117,8 +117,8 @@ class ManufacturingPlan:
                                                                                                          number_of_machines_in_production)
                     for cell in self.production.entities_located[identification_str_shortest_que_time]:
                         new_cell = self.production.find_cell_in_production_layout(cell)
-                        if order not in new_cell.placed_entity.processing_list:
-                            new_cell.placed_entity.processing_list.append(order)
+                        if (order, 1) not in new_cell.placed_entity.processing_list:
+                            new_cell.placed_entity.processing_list.append((order, 1))
 
     def get_machine_str_with_shortest_queue_time(self, machine_type: int,
                                                  number_of_machines_per_machine_type: int) -> str:
@@ -132,7 +132,7 @@ class ManufacturingPlan:
 
             new_cell = self.production.find_cell_in_production_layout(
                 self.production.entities_located[identification_str][1])
-            shortest_que_time = new_cell.placed_entity.processing_list_time_length
+            shortest_que_time = new_cell.placed_entity.calculating_processing_list_queue_length()
 
             if shortest_que_time < total_shortest_que_time:
                 total_shortest_que_time = shortest_que_time

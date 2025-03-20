@@ -103,7 +103,7 @@ class ServiceEntity:
                            None),
                        False,
                        None,
-                       machine_stats["setting_up_time"])
+                       float(machine_stats["setting_up_time"]))
 
     def generate_machine_list(self) -> list[Machine]:
         machine_list = []
