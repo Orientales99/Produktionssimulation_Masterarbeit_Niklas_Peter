@@ -5,6 +5,7 @@ from src.command_line_service import CommandLineService
 from src.data.coordinates import Coordinates
 from src.data.production import Production
 from src.data.service_product_information import ServiceProductInformation
+from src.entity_classes.machine import Machine
 from src.entity_classes.transport_robot import TransportRobot
 from src.entity_classes.working_robot import WorkingRobot
 from src.process_logic.manufacturing_plan import ManufacturingPlan
@@ -87,7 +88,9 @@ def run_manufacturing_plan():
 
     manufacturing_plan.get_daily_manufacturing_plan(date(2024, 5, 2))
     manufacturing_plan.set_processing_machine_list__queue_length_estimation()
+    manufacturing_plan.get_required_material_for_every_machine()
     command_line_service.visualise_layout()
+    print(manufacturing_plan.required_materials_for_every_machine["Ma: 2, 1"])
 
 
 if __name__ == '__main__':

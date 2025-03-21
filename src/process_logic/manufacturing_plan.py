@@ -4,6 +4,7 @@ from collections import defaultdict
 
 from src.data.order import Order
 from src.data.production import Production
+from src.data.production_material import ProductionMaterial
 from src.data.service_order import ServiceOrder
 from src.data.service_product_information import ServiceProductInformation
 from datetime import date
@@ -16,6 +17,7 @@ class ManufacturingPlan:
     summarised_order_list: list[Order] | None
     dictionary_summarised_order_per_day: dict = {}
     daily_manufacturing_plan: list[Order] = []
+    required_materials_for_every_machine: dict = {}
 
     def __init__(self):
         self.product_order_list = self.service_order.generate_order_list()
@@ -143,7 +145,20 @@ class ManufacturingPlan:
 
         return identification_str_shortest_que_time
 
+    def get_required_material_for_every_machine(self) -> dict[str: list[ProductionMaterial, int]]:
+        """Get a dictionary (key word: identification_str) with the required Materials"""
 
-    def calculating_queue_length(self) -> float:
-        """calculates the queue time of a machine"""
-        pass
+        machine_type_list = self.production.service_entity.get_quantity_per_machine_types_list()
+        for machine_type, number_of_machines_in_production in machine_type_list:
+            for identification_number in range(1, number_of_machines_in_production + 1):
+                identification_str = f"Ma: {machine_type}, {identification_number}"
+
+                cell = self.production.find_cell_in_production_layout(
+                    self.production.entities_located[identification_str][1])
+
+                list_with_required_material_for_one_machine = cell.placed_entity.get_list_with_required_material()
+                if len(list_with_required_material_for_one_machine) != 0:
+                    self.required_materials_for_every_machine.update({identification_str:
+                                                                      list_with_required_material_for_one_machine})
+
+        return self.required_materials_for_every_machine

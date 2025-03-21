@@ -1,6 +1,6 @@
 import json
 
-from simpy import Container
+from simpy import Store
 
 from src import RESOURCES
 from src.data.constant import MachineQuality
@@ -91,15 +91,13 @@ class ServiceEntity:
                            int(machine_stats["robot_size_x"]),
                            int(machine_stats["robot_size_y"])),
                        MachineStorage(
-                           Container(
+                           Store(
                                self.env,
-                               int(machine_stats["max_loading_capacity_product_before_process"]),
-                               int(machine_stats["quantity_loaded_product_before_processed"])),
+                               capacity=int(machine_stats["max_loading_capacity_product_before_process"])),
                            None,
-                           Container(
+                           Store(
                                self.env,
-                               int(machine_stats["max_loading_capacity_product_after_process"]),
-                               int(machine_stats["quantity_loaded_product_after_processed"])),
+                               capacity=int(machine_stats["max_loading_capacity_product_after_process"])),
                            None),
                        False,
                        None,
