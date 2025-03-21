@@ -10,8 +10,7 @@ from src.entity_classes.transport_robot import TransportRobot
 from src.entity_classes.working_robot import WorkingRobot
 from src.process_logic.manufacturing_plan import ManufacturingPlan
 from src.process_logic.path_finding import PathFinding
-
-
+from src.process_logic.working_robot_manager import WorkingRobotManager
 
 
 def run_pathfinding():
@@ -90,7 +89,9 @@ def run_manufacturing_plan():
     manufacturing_plan.set_processing_machine_list__queue_length_estimation()
     manufacturing_plan.get_required_material_for_every_machine()
     command_line_service.visualise_layout()
-    print(manufacturing_plan.required_materials_for_every_machine["Ma: 2, 1"])
+    #working_robot_manager = WorkingRobotManager()
+    # list_of_all_wr_identification_str = working_robot_manager.get_list_of_all_wr_identification_str()
+    # working_robot_manager.get_every_process_order_from_machines()
 
 
 if __name__ == '__main__':

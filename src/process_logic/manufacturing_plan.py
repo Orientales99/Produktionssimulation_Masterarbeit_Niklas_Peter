@@ -1,13 +1,13 @@
-import pandas as pd
-
 from collections import defaultdict
+from datetime import date
+
+import pandas as pd
 
 from src.data.order import Order
 from src.data.production import Production
 from src.data.production_material import ProductionMaterial
 from src.data.service_order import ServiceOrder
 from src.data.service_product_information import ServiceProductInformation
-from datetime import date
 
 
 class ManufacturingPlan:
@@ -159,6 +159,17 @@ class ManufacturingPlan:
                 list_with_required_material_for_one_machine = cell.placed_entity.get_list_with_required_material()
                 if len(list_with_required_material_for_one_machine) != 0:
                     self.required_materials_for_every_machine.update({identification_str:
-                                                                      list_with_required_material_for_one_machine})
+                                                                          list_with_required_material_for_one_machine})
 
         return self.required_materials_for_every_machine
+
+    def get_list_machine_identification_str(self) -> list[str]:
+        machine_type_list = self.production.service_entity.get_quantity_per_machine_types_list()
+        list_machine_identification_str = []
+        # get every initialised object of class Machine
+        for machine_type, number_of_machines_in_production in machine_type_list:
+            for identification_number in range(1, number_of_machines_in_production + 1):
+                identification_str = f"Ma: {machine_type}, {identification_number}"
+                list_machine_identification_str.append(identification_str)
+
+        return list_machine_identification_str
