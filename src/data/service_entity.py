@@ -5,6 +5,7 @@ from simpy import Store
 from src import RESOURCES
 from src.data.constant import MachineQuality
 from src.data.coordinates import Coordinates
+from src.data.entity_working_status import EntityWorkingStatus
 from src.data.simulation_environment import SimulationEnvironment
 from src.entity_classes.machine import Machine
 from src.data.machine_storage import MachineStorage
@@ -40,7 +41,8 @@ class ServiceEntity:
                                 int(working_robot_stats["robot_size_x"]),
                                 int(working_robot_stats["robot_size_y"])),
                             working_robot_stats["driving_speed"],
-                            working_robot_stats["product_transfer_rate_units_per_minute"])
+                            working_robot_stats["product_transfer_rate_units_per_minute"],
+                            EntityWorkingStatus())
 
     def generate_wr_list(self) -> list[WorkingRobot]:
 

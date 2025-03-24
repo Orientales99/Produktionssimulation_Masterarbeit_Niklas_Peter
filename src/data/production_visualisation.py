@@ -25,7 +25,7 @@ class ProductionVisualisation:
     def visualize_production_layout_in_terminal(self):
         print(self.print_layout_in_command_box())
         #print(self.print_legend())
-        self.get_cell_information()
+        #self.get_cell_information()
 
     def print_layout_in_command_box(self) -> str:
         """Build a string and every cell in the list production_layouts gets a UTF-8 code Symbol"""

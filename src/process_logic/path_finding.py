@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from queue import PriorityQueue
 
 from src.data.production import Production
@@ -16,8 +16,19 @@ class PathFinding:
     production_layout = production.production_layout
     path_line_list = []
 
+    def get_path_for_entity(self, entity: Machine | WorkingRobot | TransportRobot, end_coordinate: Coordinates):
+        start_coordinate = self.get_start_coordinates_from_entity(entity)
+        print(f" Start: {start_coordinate}, End: {end_coordinate}")
+        start_cell = self.production.get_cell(start_coordinate)
+        end_cell = self.production.get_cell(end_coordinate)
+        if self.run_a_star_algorithm(start_cell, end_cell, entity) is False:
+            return Exception(f"Path finding doesn't work. Entity: {entity}, Start: {start_coordinate}, End: {end_coordinate}")
+
+        return self.path_line_list
+
     def run_a_star_algorithm(self, start_cell: Cell, end_cell: Cell,
                              moving_entity: Machine | WorkingRobot | TransportRobot) -> bool:
+
         count = 0
         open_set = PriorityQueue()
         open_set.put((0, count, start_cell))  # item (0) = f_score, count = keep track, when it put into Queue
@@ -64,8 +75,7 @@ class PathFinding:
             current_cell_id = came_from[current_cell_id]  # Nächste Zelle auf dem Pfad
 
         path.reverse()  # Umkehren, damit der Pfad von Start → Ziel geht
-        self.path_line_list = path  # Speichern des rekonstruierten Pfads
-
+        self.path_line_list = path
         print("Rekonstruierter Pfad:", self.path_line_list)
 
     def calculate_h_score(self, start_coordinates: Coordinates, end_coordinates: Coordinates):
@@ -157,3 +167,12 @@ class PathFinding:
 
             cell = self.production.get_cell(Coordinates(x, y))
         v.visualize_layout()
+
+    def get_start_coordinates_from_entity(self, entity: Machine | WorkingRobot | TransportRobot) -> Coordinates:
+        """Starting point is the upper right corner of the entity"""
+        cell_list = self.production.entities_located.get(entity.identification_str, [])
+        horizontal_edges = self.production.get_horizontal_edges_of_coordinates(cell_list)
+        vertical_edges = self.production.get_vertical_edges_of_coordinates(cell_list)
+
+        return Coordinates(horizontal_edges[0], vertical_edges[1])
+

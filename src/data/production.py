@@ -490,7 +490,7 @@ class Production:
         else:
             return False
 
-    def get_horizontal_edges_of_coordinates(self, cell_list: list[Cell]) -> tuple:
+    def get_horizontal_edges_of_coordinates(self, cell_list: list[Cell]) -> tuple[Cell, Cell]:
         right_edge_cell = 0
         left_edge_cell = self.max_coordinate.x
         for cell in cell_list:
@@ -501,7 +501,7 @@ class Production:
         lowest_highest_x_coordinate = (left_edge_cell, right_edge_cell)
         return lowest_highest_x_coordinate
 
-    def get_vertical_edges_of_coordinates(self, cell_list: list[Cell]) -> tuple:
+    def get_vertical_edges_of_coordinates(self, cell_list: list[Cell]) -> tuple[Cell, Cell]:
         upper_edge_cell = 0
         lower_edge_cell = self.max_coordinate.y
 

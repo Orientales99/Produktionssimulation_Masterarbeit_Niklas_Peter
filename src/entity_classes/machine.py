@@ -18,6 +18,7 @@ class Machine:
     size: Coordinates
     machine_storage: MachineStorage
     working_robot_on_machine: bool
+
     producing_product: Product | None
     setting_up_time: float  # Rüstzeit
 
@@ -26,6 +27,7 @@ class Machine:
     required_material_list: list[(ProductionMaterial, int)] = field(
         default_factory=list)  # default: empty | list (ProductionMaterial, necessary quantity)
     processing_list_queue_length: float = 0
+    waiting_for_arriving_of_wr: bool = False
 
     @property  # only if identification_str is used; one time calculation -> is cached
     def identification_str(self) -> str:

@@ -1,27 +1,30 @@
 from collections import defaultdict
+from dataclasses import dataclass,field
 from datetime import date
 
 import pandas as pd
 
-from src.data.order import Order
 from src.data.production import Production
+from src.data.order import Order
 from src.data.production_material import ProductionMaterial
-from src.data.service_order import ServiceOrder
 from src.data.service_product_information import ServiceProductInformation
+from src.entity_classes.machine import Machine
 
 
+@dataclass
 class ManufacturingPlan:
-    service_order = ServiceOrder()
-    service_product_information = ServiceProductInformation()
-    production = Production()
-    summarised_order_list: list[Order] | None
-    dictionary_summarised_order_per_day: dict = {}
-    daily_manufacturing_plan: list[Order] = []
-    required_materials_for_every_machine: dict = {}
+    production: Production
+    service_product_information: ServiceProductInformation = ServiceProductInformation()
+    summarised_order_list: list[Order] | None = None
+    dictionary_summarised_order_per_day: dict = field(default_factory=dict)
+    daily_manufacturing_plan: list[Order] = field(default_factory=list)
+    process_list_for_every_machine: list[(Machine, Order, int)] = field(default_factory=list) #(machine.identification_str, Order, step of the process)
+    required_materials_for_every_machine: dict = field(default_factory=dict)
 
-    def __init__(self):
-        self.product_order_list = self.service_order.generate_order_list()
+    def __post_init__(self):
+        self.product_order_list = self.production.service_order.generate_order_list()
         self.product_information_list = self.service_product_information.create_product_information_list()
+
 
     def get_daily_manufacturing_plan(self, current_date: date):
         """calling methods -> creating daily_manufacturing_plan as a list"""
@@ -121,6 +124,7 @@ class ManufacturingPlan:
                         new_cell = self.production.find_cell_in_production_layout(cell)
                         if (order, 1) not in new_cell.placed_entity.processing_list:
                             new_cell.placed_entity.processing_list.append((order, 1))
+                            self.process_list_for_every_machine.append((cell.placed_entity, order, 1))
 
     def get_machine_str_with_shortest_queue_time(self, machine_type: int,
                                                  number_of_machines_per_machine_type: int) -> str:
@@ -146,7 +150,7 @@ class ManufacturingPlan:
         return identification_str_shortest_que_time
 
     def get_required_material_for_every_machine(self) -> dict[str: list[ProductionMaterial, int]]:
-        """Get a dictionary (key word: identification_str) with the required Materials"""
+        """Get a dictionary (key word: machine.identification_str) with the required Materials"""
 
         machine_type_list = self.production.service_entity.get_quantity_per_machine_types_list()
         for machine_type, number_of_machines_in_production in machine_type_list:
