@@ -1,5 +1,4 @@
 from src.command_line_service import CommandLineService
-from src.data.service_order import ServiceOrder
 import cProfile
 
 

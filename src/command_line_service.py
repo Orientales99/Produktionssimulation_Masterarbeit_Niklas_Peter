@@ -1,15 +1,10 @@
-from matplotlib import pyplot as plt
-
-from src.data.coordinates import Coordinates
-from src.data.production_visualisation import ProductionVisualisation
-from src.data.service_order import ServiceOrder
-from src.data.production import Production
-from src.data.simulation_environment import SimulationEnvironment
+from src.production.production_visualisation import ProductionVisualisation
+from src.production.production import Production
 
 
 class CommandLineService:
     production = Production()
-    production_visualisation = ProductionVisualisation()
+    production_visualisation = ProductionVisualisation(production)
 
     def create_production(self):
         self.production.create_production()

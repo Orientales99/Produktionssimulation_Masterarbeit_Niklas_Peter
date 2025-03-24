@@ -1,12 +1,12 @@
-from src.data.cell import Cell
-from src.data.constant import MachineQuality, ItemType
-from src.data.coordinates import Coordinates
-from src.data.machine_storage import MachineStorage
-from src.data.product import Product
-from src.data.production import Production
-from src.data.production_visualisation import ProductionVisualisation
-from src.entity_classes.machine import Machine
-from src.entity_classes.working_robot import WorkingRobot
+from src.production.base.cell import Cell
+from src.constant.constant import MachineQuality, ItemType
+from src.production.base.coordinates import Coordinates
+from src.entity.machine_storage import MachineStorage
+from src.gruppe_eins.product import Product
+from src.production.production import Production
+from src.production.production_visualisation import ProductionVisualisation
+from src.entity.machine import Machine
+from src.entity.working_robot import WorkingRobot
 
 
 def test_machine_can_drive_right__after_init():
@@ -468,7 +468,7 @@ def test_wr_drives_to_machine_for_collusion_from_every_side__after_init():
                 wr_coordinates_old.append(cell)
 
     # when
-    pv = ProductionVisualisation()
+    pv = ProductionVisualisation(production)
     #pv.visualize_layout()
 
     for x in range(0, 8):

@@ -3,14 +3,14 @@ import json
 from simpy import Store
 
 from src import RESOURCES
-from src.data.constant import MachineQuality
-from src.data.coordinates import Coordinates
-from src.data.entity_working_status import EntityWorkingStatus
-from src.data.simulation_environment import SimulationEnvironment
-from src.entity_classes.machine import Machine
-from src.data.machine_storage import MachineStorage
-from src.entity_classes.transport_robot import TransportRobot
-from src.entity_classes.working_robot import WorkingRobot
+from src.constant.constant import MachineQuality
+from src.production.base.coordinates import Coordinates
+from src.entity.entity_working_status import EntityWorkingStatus
+from src.production.simulation_environment import SimulationEnvironment
+from src.entity.machine import Machine
+from src.entity.machine_storage import MachineStorage
+from src.entity.transport_robot import TransportRobot
+from src.entity.working_robot import WorkingRobot
 
 
 class ServiceEntity:
@@ -94,11 +94,11 @@ class ServiceEntity:
                            int(machine_stats["robot_size_y"])),
                        MachineStorage(
                            Store(
-                               self.env,
+                               self.env.env,
                                capacity=int(machine_stats["max_loading_capacity_product_before_process"])),
                            None,
                            Store(
-                               self.env,
+                               self.env.env,
                                capacity=int(machine_stats["max_loading_capacity_product_after_process"])),
                            None),
                        False,

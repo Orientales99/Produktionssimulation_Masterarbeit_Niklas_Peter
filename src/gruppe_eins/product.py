@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
-from src.data.coordinates import Coordinates
+from src.production.base.coordinates import Coordinates
 
-from src.data.constant import ItemType, ProductGroup
-from src.data.production_material import ProductionMaterial
+from src.constant.constant import ItemType, ProductGroup
+from src.gruppe_eins.production_material import ProductionMaterial
 
 
 @dataclass

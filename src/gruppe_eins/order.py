@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from src.data.product import Product
-from src.data.constant import OrderPriority
+from src.gruppe_eins.product import Product
+from src.constant.constant import OrderPriority
 from datetime import date
 
 

@@ -1,14 +1,11 @@
-import cProfile
 from datetime import date
 
 from src.command_line_service import CommandLineService
-from src.data.coordinates import Coordinates
-from src.data.entity_working_status import EntityWorkingStatus
-from src.data.production import Production
-from src.data.service_product_information import ServiceProductInformation
-from src.entity_classes.machine import Machine
-from src.entity_classes.transport_robot import TransportRobot
-from src.entity_classes.working_robot import WorkingRobot
+from src.production.base.coordinates import Coordinates
+from src.entity.entity_working_status import EntityWorkingStatus
+from src.production.production import Production
+from src.entity.transport_robot import TransportRobot
+from src.entity.working_robot import WorkingRobot
 from src.process_logic.manufacturing_plan import ManufacturingPlan
 from src.process_logic.path_finding import PathFinding
 from src.process_logic.working_robot_manager import WorkingRobotManager
@@ -17,8 +14,8 @@ from src.process_logic.working_robot_manager import WorkingRobotManager
 def run_pathfinding():
     command_line_service = CommandLineService()
     command_line_service.create_production()
-    path_finding = PathFinding()
     production = Production()
+    path_finding = PathFinding(production)
     production.set_sink_in_production_layout()
     production.set_source_in_production_layout()
     start_cell = production.get_cell(Coordinates(0, 24))
@@ -82,7 +79,7 @@ def run_manufacturing_plan():
     command_line_service = CommandLineService()
     command_line_service.create_production()
     production = Production()
-    path_finding = PathFinding()
+    path_finding = PathFinding(production)
     production.set_sink_in_production_layout()
     production.set_source_in_production_layout()
 

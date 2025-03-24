@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from src.data.coordinates import Coordinates
-from src.entity_classes.machine import Machine
+from src.production.base.coordinates import Coordinates
+from src.entity.machine import Machine
 
 
 @dataclass

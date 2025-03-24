@@ -1,15 +1,15 @@
 from collections import defaultdict
 
-from src.data.cell import Cell
-from src.data.coordinates import Coordinates
-from src.data.service_entity import ServiceEntity
-from src.data.service_order import ServiceOrder
-from src.data.service_starting_condition import ServiceStartingConditions
-from src.entity_classes.machine import Machine
-from src.entity_classes.sink import Sink
-from src.entity_classes.source import Source
-from src.entity_classes.transport_robot import TransportRobot
-from src.entity_classes.working_robot import WorkingRobot
+from src.production.base.cell import Cell
+from src.production.base.coordinates import Coordinates
+from src.provide_input_data.service_entity import ServiceEntity
+from src.provide_input_data.service_order import ServiceOrder
+from src.provide_input_data.service_starting_condition import ServiceStartingConditions
+from src.entity.machine import Machine
+from src.entity.sink import Sink
+from src.entity.source import Source
+from src.entity.transport_robot import TransportRobot
+from src.entity.working_robot import WorkingRobot
 
 
 class Production:
@@ -437,7 +437,7 @@ class Production:
                     new_cell.placed_entity = entity
                     self.entities_located.setdefault(entity.identification_str, []).append(new_cell)
 
-            # right side of the cell get deleted
+            # down side of the cell get deleted
             if cell.cell_coordinates.y == lowest_highest_y_coordinate[0] and cell.cell_coordinates.x == \
                     lowest_highest_x_coordinate[0]:
                 for x in range(lowest_highest_x_coordinate[0], lowest_highest_x_coordinate[1] + 1):
@@ -476,7 +476,7 @@ class Production:
                     new_cell.placed_entity = entity
                     self.entities_located.setdefault(entity.identification_str, []).append(new_cell)
 
-            # right side of the cell get deleted
+            # upper side of the cell get deleted
             if cell.cell_coordinates.y == lowest_highest_y_coordinate[1] and cell.cell_coordinates.x == \
                     lowest_highest_x_coordinate[0]:
                 for x in range(lowest_highest_x_coordinate[0], lowest_highest_x_coordinate[1] + 1):
@@ -490,7 +490,7 @@ class Production:
         else:
             return False
 
-    def get_horizontal_edges_of_coordinates(self, cell_list: list[Cell]) -> tuple[Cell, Cell]:
+    def get_horizontal_edges_of_coordinates(self, cell_list: list[Cell]) -> tuple[int, int]:
         right_edge_cell = 0
         left_edge_cell = self.max_coordinate.x
         for cell in cell_list:
@@ -501,7 +501,7 @@ class Production:
         lowest_highest_x_coordinate = (left_edge_cell, right_edge_cell)
         return lowest_highest_x_coordinate
 
-    def get_vertical_edges_of_coordinates(self, cell_list: list[Cell]) -> tuple[Cell, Cell]:
+    def get_vertical_edges_of_coordinates(self, cell_list: list[Cell]) -> tuple[int, int]:
         upper_edge_cell = 0
         lower_edge_cell = self.max_coordinate.y
 

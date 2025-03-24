@@ -1,12 +1,10 @@
 import pandas as pd
 
 from src import RESOURCES, ANALYSIS_SOLUTION
-from src.data.coordinates import Coordinates
-from src.data.order import Order
-from src.data.product import Product
-from src.data.service_product_information import ServiceProductInformation
-from src.data.simulation_environment import SimulationEnvironment
-from src.data.constant import ProductGroup, ItemType
+from src.gruppe_eins.order import Order
+from src.provide_input_data.service_product_information import ServiceProductInformation
+from src.production.simulation_environment import SimulationEnvironment
+from src.constant.constant import ProductGroup
 from datetime import date
 
 

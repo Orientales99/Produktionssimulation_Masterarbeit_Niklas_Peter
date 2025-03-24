@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from src.data.coordinates import Coordinates
-from src.data.product import Product
+from src.production.base.coordinates import Coordinates
+from src.gruppe_eins.product import Product
 
 
 @dataclass

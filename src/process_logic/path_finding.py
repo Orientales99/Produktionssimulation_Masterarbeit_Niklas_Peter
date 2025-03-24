@@ -1,19 +1,18 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from queue import PriorityQueue
 
-from src.data.production import Production
-from src.data.coordinates import Coordinates
-from src.data.cell import Cell
-from src.entity_classes.machine import Machine
-from src.entity_classes.transport_robot import TransportRobot
-from src.entity_classes.working_robot import WorkingRobot
-from src.data.production_visualisation import ProductionVisualisation
+from src.production.production import Production
+from src.production.base.coordinates import Coordinates
+from src.production.base.cell import Cell
+from src.entity.machine import Machine
+from src.entity.transport_robot import TransportRobot
+from src.entity.working_robot import WorkingRobot
+from src.production.production_visualisation import ProductionVisualisation
 
 
 @dataclass
 class PathFinding:
-    production = Production()
-    production_layout = production.production_layout
+    production: Production
     path_line_list = []
 
     def get_path_for_entity(self, entity: Machine | WorkingRobot | TransportRobot, end_coordinate: Coordinates):
@@ -33,9 +32,9 @@ class PathFinding:
         open_set = PriorityQueue()
         open_set.put((0, count, start_cell))  # item (0) = f_score, count = keep track, when it put into Queue
         came_from = {}
-        g_score = {cell.cell_id: float("inf") for row in self.production_layout for cell in row}
+        g_score = {cell.cell_id: float("inf") for row in self.production.production_layout for cell in row}
         g_score[start_cell.cell_id] = 0
-        f_score = {cell.cell_id: float("inf") for row in self.production_layout for cell in row}
+        f_score = {cell.cell_id: float("inf") for row in self.production.production_layout for cell in row}
         f_score[start_cell.cell_id] = self.calculate_h_score(start_cell.cell_coordinates, end_cell.cell_coordinates)
 
         open_set_hash = {start_cell.cell_id}  # creating a hash to check if cell is in PriorityQueue
@@ -95,7 +94,7 @@ class PathFinding:
         return cell_neighbors_list
 
     def get_current_cell_neighbor_up(self, cell_position: Coordinates, current_cell: Cell, moving_entity) -> Cell:
-        if current_cell.cell_coordinates.y < len(self.production_layout) - 1 and \
+        if current_cell.cell_coordinates.y < len(self.production.production_layout) - 1 and \
                 (self.production.get_cell(Coordinates(cell_position.x,
                                                       cell_position.y + 1)).placed_entity is None or self.production.get_cell(
                     Coordinates(cell_position.x, cell_position.y + 1)).placed_entity is moving_entity):
@@ -109,7 +108,7 @@ class PathFinding:
             return self.production.get_cell(Coordinates(cell_position.x, cell_position.y - 1))
 
     def get_current_cell_neighbor_right(self, cell_position: Coordinates, current_cell: Cell, moving_entity) -> Cell:
-        if current_cell.cell_coordinates.x < len(self.production_layout[cell_position.y]) - 1 and \
+        if current_cell.cell_coordinates.x < len(self.production.production_layout[cell_position.y]) - 1 and \
                 (self.production.get_cell(Coordinates(cell_position.x + 1,
                                                       cell_position.y)).placed_entity is None or self.production.get_cell(
                     Coordinates(cell_position.x + 1, cell_position.y)).placed_entity is moving_entity):
@@ -139,7 +138,7 @@ class PathFinding:
     def move_entity_along_path(self, start_cell, entity: Machine | WorkingRobot | TransportRobot):
         cell = start_cell
         print(self.path_line_list)
-        v = ProductionVisualisation()
+        v = ProductionVisualisation(self.production)
         v.visualize_layout()
         for step in self.path_line_list:
             x, y = map(int, step.split(":"))

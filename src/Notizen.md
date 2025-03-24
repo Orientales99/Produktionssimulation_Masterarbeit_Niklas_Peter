@@ -1,8 +1,9 @@
 # To-Dos
 
 - random machine zuordnung
-- Path finding -> validate move vereinheitlichen
-- Auftragsliste der einzelnen Maschinen (Berechnung der Queue length hinzufügen)
+- service_entity aufteilen
+- Service klassen umbennnen
+- Auftragsliste der einzelnen Maschinen in Logik packen und von Datenklassen separieren
 
 # Buck-List
 

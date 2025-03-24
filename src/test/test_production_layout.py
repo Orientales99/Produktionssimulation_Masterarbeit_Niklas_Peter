@@ -1,6 +1,6 @@
-from src.data.coordinates import Coordinates
-from src.data.production import Production
-from src.entity_classes.source import Source
+from src.production.base.coordinates import Coordinates
+from src.production.production import Production
+from src.entity.source import Source
 
 
 def test__set_source_in_production_layout__always__source_is_in_layout():

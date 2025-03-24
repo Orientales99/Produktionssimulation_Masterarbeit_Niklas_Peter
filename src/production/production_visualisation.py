@@ -1,19 +1,22 @@
-from src.data.coordinates import Coordinates
-from src.data.production import Production
-from src.data.service_starting_condition import ServiceStartingConditions
-from matplotlib import pyplot as plt
+from dataclasses import dataclass
+
 import numpy as np
+from matplotlib import pyplot as plt
 
-from src.entity_classes.transport_robot import TransportRobot
-from src.entity_classes.working_robot import WorkingRobot
-from src.entity_classes.machine import Machine
-from src.data.constant import ColorRGB
-from src.entity_classes.sink import Sink
-from src.entity_classes.source import Source
+from src.constant.constant import ColorRGB
+from src.entity.machine import Machine
+from src.entity.sink import Sink
+from src.entity.source import Source
+from src.entity.transport_robot import TransportRobot
+from src.entity.working_robot import WorkingRobot
+from src.production.base.coordinates import Coordinates
+from src.production.production import Production
+from src.provide_input_data.service_starting_condition import ServiceStartingConditions
 
 
+@dataclass
 class ProductionVisualisation:
-    production = Production()
+    production: Production
     service_starting_conditions = ServiceStartingConditions()
 
     def visualize_layout(self):
@@ -24,8 +27,8 @@ class ProductionVisualisation:
 
     def visualize_production_layout_in_terminal(self):
         print(self.print_layout_in_command_box())
-        #print(self.print_legend())
-        #self.get_cell_information()
+        # print(self.print_legend())
+        # self.get_cell_information()
 
     def print_layout_in_command_box(self) -> str:
         """Build a string and every cell in the list production_layouts gets a UTF-8 code Symbol"""
@@ -91,7 +94,7 @@ class ProductionVisualisation:
         required_cell = self.production.get_cell(coordinates)
         print('x: ', required_cell.cell_coordinates.x)
         print('y: ', required_cell.cell_coordinates.y)
-        #print('Cell type: ', required_cell.placed_entity)
+        # print('Cell type: ', required_cell.placed_entity)
 
         if required_cell.placed_entity is Source:
             print('Cell is Source')
@@ -103,7 +106,6 @@ class ProductionVisualisation:
             print(f'{required_cell.placed_entity.processing_list_queue_length}')
         elif required_cell.placed_entity is None:
             print('Cell is empty')
-
 
     def print_layout_as_a_field_in_extra_tab(self):
         """Generates a visual representation of the production layout as a 2D grid.

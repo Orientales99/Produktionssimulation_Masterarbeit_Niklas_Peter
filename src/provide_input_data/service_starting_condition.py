@@ -1,6 +1,6 @@
 import json
 from src import RESOURCES
-from src.data.coordinates import Coordinates
+from src.production.base.coordinates import Coordinates
 
 
 class ServiceStartingConditions:

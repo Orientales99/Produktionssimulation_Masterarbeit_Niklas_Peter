@@ -1,9 +1,9 @@
-from src.entity_classes.machine import Machine
-from src.data.order import Order
-from src.data.service_entity import ServiceEntity
-from src.data.service_order import ServiceOrder
-from src.entity_classes.transport_robot import TransportRobot
-from src.entity_classes.working_robot import WorkingRobot
+from src.entity.machine import Machine
+from src.gruppe_eins.order import Order
+from src.provide_input_data.service_entity import ServiceEntity
+from src.provide_input_data.service_order import ServiceOrder
+from src.entity.transport_robot import TransportRobot
+from src.entity.working_robot import WorkingRobot
 
 
 

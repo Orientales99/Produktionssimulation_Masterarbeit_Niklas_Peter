@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from src.data.coordinates import Coordinates
-from src.data.entity_working_status import EntityWorkingStatus
+from src.production.base.coordinates import Coordinates
+from src.entity.entity_working_status import EntityWorkingStatus
 
 
 @dataclass

@@ -1,8 +1,7 @@
 from dataclasses import dataclass, field
 
-from src.data.coordinates import Coordinates
-from src.data.production import Production
-from src.entity_classes.machine import Machine
+from src.production.base.coordinates import Coordinates
+from src.entity.machine import Machine
 from src.process_logic.manufacturing_plan import ManufacturingPlan
 from src.process_logic.path_finding import PathFinding
 

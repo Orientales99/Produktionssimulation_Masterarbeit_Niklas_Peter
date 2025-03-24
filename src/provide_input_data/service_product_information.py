@@ -1,9 +1,9 @@
 import json
 from src import RESOURCES
-from src.data.constant import ProductGroup, ItemType
-from src.data.coordinates import Coordinates
-from src.data.product import Product
-from src.data.production_material import ProductionMaterial
+from src.constant.constant import ProductGroup, ItemType
+from src.production.base.coordinates import Coordinates
+from src.gruppe_eins.product import Product
+from src.gruppe_eins.production_material import ProductionMaterial
 
 
 class ServiceProductInformation:

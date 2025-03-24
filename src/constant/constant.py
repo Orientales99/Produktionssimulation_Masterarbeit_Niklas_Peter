@@ -82,5 +82,3 @@ class ProductGroup(Enum):
             ProductGroup.FIFTEEN: "zwerge_gravur"
         }.get(self)
 
-    def building_random_groups_of_product(self):
-        pass

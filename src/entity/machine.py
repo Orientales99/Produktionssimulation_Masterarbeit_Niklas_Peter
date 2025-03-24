@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
 
-from src.data.constant import MachineQuality
-from src.data.order import Order
-from src.data.product import Product
-from src.data.coordinates import Coordinates
-from src.data.machine_storage import MachineStorage
-from src.data.production_material import ProductionMaterial
+from src.constant.constant import MachineQuality
+from src.gruppe_eins.order import Order
+from src.gruppe_eins.product import Product
+from src.production.base.coordinates import Coordinates
+from src.entity.machine_storage import MachineStorage
+from src.gruppe_eins.production_material import ProductionMaterial
 
 
 @dataclass

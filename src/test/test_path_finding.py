@@ -1,15 +1,15 @@
-from src.data.cell import Cell
-from src.data.coordinates import Coordinates
-from src.data.production import Production
-from src.data.production_visualisation import ProductionVisualisation
-from src.entity_classes.working_robot import WorkingRobot
+from src.production.base.cell import Cell
+from src.production.base.coordinates import Coordinates
+from src.production.production import Production
+from src.production.production_visualisation import ProductionVisualisation
+from src.entity.working_robot import WorkingRobot
 from src.process_logic.path_finding import PathFinding
 
 
 def test_neighbors_are_found__around_source_and_sink_after_layout_init():
     # given
-    pathfinding = PathFinding()
     production = Production()
+    pathfinding = PathFinding(production)
     production.max_coordinate = Coordinates(15, 15)
     production.build_layout()
     production.set_source_in_production_layout()
@@ -43,8 +43,8 @@ def test_neighbors_are_found__around_source_and_sink_after_layout_init():
 
 def test_finding_shortest_way__empty_layout_diagonal_start_and_end_point():
     # given
-    pathfinding = PathFinding()
     production = Production()
+    pathfinding = PathFinding(production)
     production.max_coordinate = Coordinates(15, 15)
     production.build_layout()
     start_cell = Cell(Coordinates(2, 2), None)
@@ -59,8 +59,8 @@ def test_finding_shortest_way__empty_layout_diagonal_start_and_end_point():
 
 def test_finding_shortest_way__layout_diagonal_start_and_end_point_with_three_barrier():
     # given
-    pathfinding = PathFinding()
     production = Production()
+    pathfinding = PathFinding(production)
     production.max_coordinate = Coordinates(18, 18)
     production.build_layout()
     start_cell = Cell(Coordinates(2, 2), None)
@@ -81,7 +81,7 @@ def test_finding_shortest_way__layout_diagonal_start_and_end_point_with_three_ba
 
     # when
     pathfinding.run_a_star_algorithm(start_cell, end_cell, test_entity)
-    v = ProductionVisualisation()
+    v = ProductionVisualisation(production)
     v.visualize_production_layout_in_terminal()
 
     # then
