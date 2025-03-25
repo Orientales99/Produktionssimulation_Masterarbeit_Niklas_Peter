@@ -3,6 +3,7 @@ from src.entity.transport_robot import TransportRobot
 from src.entity.working_robot import WorkingRobot
 from src.production.base.coordinates import Coordinates
 from src.production.production import Production
+from src.production.production_visualisation import ProductionVisualisation
 
 
 class EntityMovement:
@@ -10,8 +11,9 @@ class EntityMovement:
 
     def __init__(self, production):
         self.production = production
+        self.visualisation = ProductionVisualisation(production)
 
-    def move_entity_along_path(self, start_cell, entity: Machine | WorkingRobot | TransportRobot, path_line_list):
+    def move_entity_along_path(self, start_cell,  entity: Machine | WorkingRobot | TransportRobot, path_line_list):
         cell = start_cell
 
         for step in path_line_list:
@@ -21,21 +23,25 @@ class EntityMovement:
             if Coordinates(cell.cell_coordinates.x, cell.cell_coordinates.y + 1) == Coordinates(x, y):
                 if self.move_entity_upwards(entity) is False:
                     return Exception(f'move from {cell.cell_id} to {x}:{y} not possible')
+                #self.visualisation.visualize_layout()
 
             # down
             if Coordinates(cell.cell_coordinates.x, cell.cell_coordinates.y - 1) == Coordinates(x, y):
                 if self.move_entity_downwards(entity) is False:
                     return Exception(f'move from {cell.cell_id} to {x}:{y} not possible')
+                #self.visualisation.visualize_layout()
 
             # left
             if Coordinates(cell.cell_coordinates.x - 1, cell.cell_coordinates.y) == Coordinates(x, y):
                 if self.move_entity_left(entity) is False:
                     return Exception(f'move from {cell.cell_id} to {x}:{y} not possible')
+                #self.visualisation.visualize_layout()
 
             # right
             if Coordinates(cell.cell_coordinates.x + 1, cell.cell_coordinates.y) == Coordinates(x, y):
                 if self.move_entity_right(entity) is False:
                     return Exception(f'move from {cell.cell_id} to {x}:{y} not possible')
+                #self.visualisation.visualize_layout()
 
             cell = self.production.get_cell(Coordinates(x, y))
 

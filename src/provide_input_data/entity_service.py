@@ -13,7 +13,7 @@ from src.entity.transport_robot import TransportRobot
 from src.entity.working_robot import WorkingRobot
 
 
-class ServiceEntity:
+class EntityService:
 
     def __init__(self):
         self.data_production_working_robot = None

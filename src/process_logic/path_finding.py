@@ -24,7 +24,7 @@ class PathFinding:
     def get_path_for_entity(self, entity: Machine | WorkingRobot | TransportRobot, end_coordinate: Coordinates):
         start_coordinate = self.get_start_coordinates_from_entity(entity)
         print(f" Start: {start_coordinate}, End: {end_coordinate}")
-        start_cell = self.production.get_cell(start_coordinate)
+        start_cell = self.get_start_cell_from_entity(entity)
         end_cell = self.production.get_cell(end_coordinate)
         if self.run_a_star_algorithm(start_cell, end_cell, entity) is False:
             return Exception(f"Path finding doesn't work. Entity: {entity}, Start: {start_coordinate}, End: {end_coordinate}")
@@ -81,7 +81,6 @@ class PathFinding:
 
         path.reverse()  # Umkehren, damit der Pfad von Start → Ziel geht
         self.path_line_list = path
-        print("Rekonstruierter Pfad:", self.path_line_list)
 
     def calculate_h_score(self, start_coordinates: Coordinates, end_coordinates: Coordinates):
         return abs(start_coordinates.x - end_coordinates.x) + abs(start_coordinates.y - end_coordinates.y)
@@ -142,6 +141,11 @@ class PathFinding:
         return cell_neighbors_list
 
 
+    def get_start_cell_from_entity(self, entity: Machine | WorkingRobot | TransportRobot) -> Coordinates:
+        """Starting point is the upper right corner of the entity"""
+        start_coordinates = self.get_start_coordinates_from_entity(entity)
+        start_cell = self.production.get_cell(start_coordinates)
+        return start_cell
 
     def get_start_coordinates_from_entity(self, entity: Machine | WorkingRobot | TransportRobot) -> Coordinates:
         """Starting point is the upper right corner of the entity"""

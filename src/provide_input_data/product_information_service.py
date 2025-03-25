@@ -6,7 +6,7 @@ from src.order_data.product import Product
 from src.order_data.production_material import ProductionMaterial
 
 
-class ServiceProductInformation:
+class ProductInformationService:
 
     def __init__(self):
         self.data_product_information = None

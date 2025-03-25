@@ -10,6 +10,7 @@ from src.entity.working_robot import WorkingRobot
 from src.process_logic.manufacturing_plan import ManufacturingPlan
 from src.process_logic.path_finding import PathFinding
 from src.process_logic.working_robot_manager import WorkingRobotManager
+from src.production.production_visualisation import ProductionVisualisation
 
 
 def run_pathfinding():
@@ -85,6 +86,7 @@ def run_manufacturing_plan():
     path_finding = PathFinding(production)
     production.set_sink_in_production_layout()
     production.set_source_in_production_layout()
+    visualisation = ProductionVisualisation(production)
 
     manufacturing_plan = ManufacturingPlan(production)
 
@@ -94,13 +96,14 @@ def run_manufacturing_plan():
     command_line_service.visualise_layout()
     working_robot_manager = WorkingRobotManager(manufacturing_plan, path_finding)
     working_robot_manager.start_working_robot_manager()
-    print(manufacturing_plan.process_list_for_every_machine)
+    visualisation.visualize_layout()
+
 
 
 if __name__ == '__main__':
-    move_entity()
-    #run_pathfinding()
+    # move_entity()
+    # run_pathfinding()
     # cProfile.run('run_pathfinding()')
-    #run_manufacturing_plan()
+    run_manufacturing_plan()
     # service_product_information = ServiceProductInformation()
     # service_product_information.create_product_information_list()

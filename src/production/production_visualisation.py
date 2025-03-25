@@ -1,6 +1,5 @@
-from dataclasses import dataclass
-
 import numpy as np
+
 from matplotlib import pyplot as plt
 
 from src.constant.constant import ColorRGB
@@ -11,13 +10,15 @@ from src.entity.transport_robot import TransportRobot
 from src.entity.working_robot import WorkingRobot
 from src.production.base.coordinates import Coordinates
 from src.production.production import Production
-from src.provide_input_data.service_starting_condition import ServiceStartingConditions
+from src.provide_input_data.starting_condition_service import StartingConditionsService
 
 
-@dataclass
 class ProductionVisualisation:
     production: Production
-    service_starting_conditions = ServiceStartingConditions()
+    service_starting_conditions = StartingConditionsService()
+
+    def __init__(self, production):
+        self.production = production
 
     def visualize_layout(self):
         if self.service_starting_conditions.set_visualising_via_matplotlib() is True:

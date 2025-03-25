@@ -24,7 +24,18 @@ class WorkingRobotManager:
         self.get_next_working_location_for_order()
         for wr in self.list_wr_in_production:
             path_line_list = self.path_finding.get_path_for_entity(wr, wr.working_status.driving_destination)
+            wr.working_status.driving_route = path_line_list
+            wr.working_status.driving_to_new_location = True
             print(path_line_list)
+        self.wr_drive_through_production()
+
+    def wr_drive_through_production(self):
+        for wr in self.list_wr_in_production:
+            if wr.working_status.driving_to_new_location is True and len(wr.working_status.driving_route) != 0:
+                start_cell = self.path_finding.get_start_cell_from_entity(wr)
+                self.path_finding.entity_movement.move_entity_along_path(start_cell, wr, wr.working_status.driving_route)
+
+
 
     def sort_process_order_list_for_wr(self):
         list_of_processes_for_every_machine = self.manufacturing_plan.process_list_for_every_machine

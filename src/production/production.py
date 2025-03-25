@@ -2,9 +2,9 @@ from collections import defaultdict
 
 from src.production.base.cell import Cell
 from src.production.base.coordinates import Coordinates
-from src.provide_input_data.service_entity import ServiceEntity
-from src.provide_input_data.service_order import ServiceOrder
-from src.provide_input_data.service_starting_condition import ServiceStartingConditions
+from src.provide_input_data.entity_service import EntityService
+from src.provide_input_data.order_service import OrderService
+from src.provide_input_data.starting_condition_service import StartingConditionsService
 from src.entity.machine import Machine
 from src.entity.sink import Sink
 from src.entity.source import Source
@@ -14,9 +14,9 @@ from src.entity.working_robot import WorkingRobot
 
 class Production:
     production_layout: list[list[Cell]] = []
-    service_order = ServiceOrder()
-    service_entity = ServiceEntity()
-    service_starting_conditions = ServiceStartingConditions()
+    service_order = OrderService()
+    service_entity = EntityService()
+    service_starting_conditions = StartingConditionsService()
     source_coordinates: Coordinates
     sink_coordinates: Coordinates
     wr_list = []

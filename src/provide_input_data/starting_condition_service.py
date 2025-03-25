@@ -3,7 +3,7 @@ from src import RESOURCES
 from src.production.base.coordinates import Coordinates
 
 
-class ServiceStartingConditions:
+class StartingConditionsService:
 
     def __init__(self):
         self.data_process_starting_conditions = None

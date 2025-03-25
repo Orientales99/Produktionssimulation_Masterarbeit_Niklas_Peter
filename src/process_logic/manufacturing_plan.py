@@ -7,14 +7,14 @@ import pandas as pd
 from src.production.production import Production
 from src.order_data.order import Order
 from src.order_data.production_material import ProductionMaterial
-from src.provide_input_data.service_product_information import ServiceProductInformation
+from src.provide_input_data.product_information_service import ProductInformationService
 from src.entity.machine import Machine
 
 
 @dataclass
 class ManufacturingPlan:
     production: Production
-    service_product_information: ServiceProductInformation = ServiceProductInformation()
+    service_product_information: ProductInformationService = ProductInformationService()
     summarised_order_list: list[Order] | None = None
     dictionary_summarised_order_per_day: dict = field(default_factory=dict)
     daily_manufacturing_plan: list[Order] = field(default_factory=list)

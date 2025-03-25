@@ -1,7 +1,7 @@
 from src.entity.machine import Machine
 from src.order_data.order import Order
-from src.provide_input_data.service_entity import ServiceEntity
-from src.provide_input_data.service_order import ServiceOrder
+from src.provide_input_data.entity_service import EntityService
+from src.provide_input_data.order_service import OrderService
 from src.entity.transport_robot import TransportRobot
 from src.entity.working_robot import WorkingRobot
 
@@ -9,7 +9,7 @@ from src.entity.working_robot import WorkingRobot
 
 def test_wr_list__always__wr_list_is_correct_init(order_service):
     # given
-    service_entity = ServiceEntity()
+    service_entity = EntityService()
 
     # when
     wr_list = service_entity.generate_wr_list()
@@ -23,7 +23,7 @@ def test_wr_list__always__wr_list_is_correct_init(order_service):
 
 def test_tr_list__always__wr_list_is_correct_init(order_service):
     # given
-    service_entity = ServiceEntity()
+    service_entity = EntityService()
 
     # when
     tr_list = service_entity.generate_tr_list()
@@ -37,7 +37,7 @@ def test_tr_list__always__wr_list_is_correct_init(order_service):
 
 def test_machine_list__always__wr_list_is_correct_init():
     # given
-    service_entity = ServiceEntity()
+    service_entity = EntityService()
 
     # when
     machine_list = service_entity.generate_machine_list()
@@ -50,7 +50,7 @@ def test_machine_list__always__wr_list_is_correct_init():
 
 def test_order_list__always__order_list_is_correct_init():
     # given
-    service_order = ServiceOrder()
+    service_order = OrderService()
 
     # when
     order_list = service_order.generate_order_list()

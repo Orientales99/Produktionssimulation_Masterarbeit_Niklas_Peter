@@ -2,20 +2,20 @@ import pandas as pd
 
 from src import RESOURCES, ANALYSIS_SOLUTION
 from src.order_data.order import Order
-from src.provide_input_data.service_product_information import ServiceProductInformation
+from src.provide_input_data.product_information_service import ProductInformationService
 from src.production.simulation_environment import SimulationEnvironment
 from src.constant.constant import ProductGroup
 from datetime import date
 
 
-class ServiceOrder:
+class OrderService:
 
     def __init__(self):
         self.df_order_list = None
         self.env = SimulationEnvironment()
         self.get_order_files_for_init()
         self.product_order_list = []
-        self.service_product_information = ServiceProductInformation()
+        self.service_product_information = ProductInformationService()
         self.service_product_information.create_product_information_list()
 
     def get_order_files_for_init(self):
