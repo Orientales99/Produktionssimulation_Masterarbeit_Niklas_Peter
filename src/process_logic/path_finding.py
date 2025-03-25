@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from queue import PriorityQueue
 
+from src.production.entity_movement import EntityMovement
 from src.production.production import Production
 from src.production.base.coordinates import Coordinates
 from src.production.base.cell import Cell
@@ -10,10 +11,15 @@ from src.entity.working_robot import WorkingRobot
 from src.production.production_visualisation import ProductionVisualisation
 
 
-@dataclass
+
 class PathFinding:
     production: Production
     path_line_list = []
+
+    def __init__(self, production: Production):
+        self.production = production
+        self.entity_movement = EntityMovement(self.production)
+        self.path_line_list = []
 
     def get_path_for_entity(self, entity: Machine | WorkingRobot | TransportRobot, end_coordinate: Coordinates):
         start_coordinate = self.get_start_coordinates_from_entity(entity)
@@ -135,37 +141,7 @@ class PathFinding:
 
         return cell_neighbors_list
 
-    def move_entity_along_path(self, start_cell, entity: Machine | WorkingRobot | TransportRobot):
-        cell = start_cell
-        print(self.path_line_list)
-        v = ProductionVisualisation(self.production)
-        v.visualize_layout()
-        for step in self.path_line_list:
-            x, y = map(int, step.split(":"))
 
-            # up
-            if Coordinates(cell.cell_coordinates.x, cell.cell_coordinates.y + 1) == Coordinates(x, y):
-                if self.production.move_entity_upwards(entity) is False:
-                    return Exception(f'move from {cell.cell_id} to {x}:{y} not possible')
-                v.visualize_layout()
-            # down
-            if Coordinates(cell.cell_coordinates.x, cell.cell_coordinates.y - 1) == Coordinates(x, y):
-                if self.production.move_entity_downwards(entity) is False:
-                    return Exception(f'move from {cell.cell_id} to {x}:{y} not possible')
-                v.visualize_layout()
-            # left
-            if Coordinates(cell.cell_coordinates.x - 1, cell.cell_coordinates.y) == Coordinates(x, y):
-                if self.production.move_entity_left(entity) is False:
-                    return Exception(f'move from {cell.cell_id} to {x}:{y} not possible')
-                v.visualize_layout()
-            # right
-            if Coordinates(cell.cell_coordinates.x + 1, cell.cell_coordinates.y) == Coordinates(x, y):
-                if self.production.move_entity_right(entity) is False:
-                    return Exception(f'move from {cell.cell_id} to {x}:{y} not possible')
-                v.visualize_layout()
-
-            cell = self.production.get_cell(Coordinates(x, y))
-        v.visualize_layout()
 
     def get_start_coordinates_from_entity(self, entity: Machine | WorkingRobot | TransportRobot) -> Coordinates:
         """Starting point is the upper right corner of the entity"""

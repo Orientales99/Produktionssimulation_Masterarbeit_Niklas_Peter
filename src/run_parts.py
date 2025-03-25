@@ -3,6 +3,7 @@ from datetime import date
 from src.command_line_service import CommandLineService
 from src.production.base.coordinates import Coordinates
 from src.entity.entity_working_status import EntityWorkingStatus
+from src.production.entity_movement import EntityMovement
 from src.production.production import Production
 from src.entity.transport_robot import TransportRobot
 from src.entity.working_robot import WorkingRobot
@@ -23,7 +24,8 @@ def run_pathfinding():
     test_wr = WorkingRobot(1, Coordinates(4, 4), 1, 10, EntityWorkingStatus())
     test_tr = TransportRobot(1, None, Coordinates(4, 4), 1, 10, 10)
     funktioniert = path_finding.run_a_star_algorithm(start_cell, end_cell, test_tr)
-    path_finding.move_entity_along_path(start_cell, test_tr)
+    path = path_finding.path_line_list
+    path_finding.entity_movement.move_entity_along_path(start_cell, test_tr, path)
 
     if funktioniert is True:
         print("Funktioniert")
@@ -43,35 +45,36 @@ def move_entity():
     production = Production()
     production.set_sink_in_production_layout()
     production.set_source_in_production_layout()
+    entity_movement = EntityMovement(production)
     # production.set_entities()
     command_line_service.visualise_layout()
 
     for x in range(0, 100):
-        production.move_entity_right(WorkingRobot(1, Coordinates(2, 2), 1, 10))
+        entity_movement.move_entity_right(WorkingRobot(1, Coordinates(2, 2), 1, 10, EntityWorkingStatus()))
     command_line_service.visualise_layout()
 
     for x in range(0, 3):
-        production.move_entity_upwards(WorkingRobot(1, Coordinates(2, 2), 1, 10))
+        entity_movement.move_entity_upwards(WorkingRobot(1, Coordinates(2, 2), 1, 10, EntityWorkingStatus()))
     command_line_service.visualise_layout()
 
     for x in range(0, 3):
-        production.move_entity_right(WorkingRobot(1, Coordinates(2, 2), 1, 10))
+        entity_movement.move_entity_right(WorkingRobot(1, Coordinates(2, 2), 1, 10, EntityWorkingStatus()))
     command_line_service.visualise_layout()
 
     for x in range(0, 100):
-        production.move_entity_downwards(WorkingRobot(1, Coordinates(2, 2), 1, 10))
+        entity_movement.move_entity_downwards(WorkingRobot(1, Coordinates(2, 2), 1, 10, EntityWorkingStatus()))
     command_line_service.visualise_layout()
 
     for x in range(0, 100):
-        production.move_entity_left(WorkingRobot(1, Coordinates(2, 2), 1, 10))
+        entity_movement.move_entity_left(WorkingRobot(1, Coordinates(2, 2), 1, 10, EntityWorkingStatus()))
     command_line_service.visualise_layout()
 
     for x in range(0, 100):
-        production.move_entity_upwards(WorkingRobot(1, Coordinates(2, 2), 1, 10))
+        entity_movement.move_entity_upwards(WorkingRobot(1, Coordinates(2, 2), 1, 10, EntityWorkingStatus()))
     command_line_service.visualise_layout()
 
     for x in range(0, 100):
-        production.move_entity_downwards(WorkingRobot(1, Coordinates(2, 2), 1, 10))
+        entity_movement.move_entity_downwards(WorkingRobot(1, Coordinates(2, 2), 1, 10, EntityWorkingStatus()))
     command_line_service.visualise_layout()
 
 
@@ -95,9 +98,9 @@ def run_manufacturing_plan():
 
 
 if __name__ == '__main__':
-    # move_entity()
-    # run_pathfinding()
+    move_entity()
+    #run_pathfinding()
     # cProfile.run('run_pathfinding()')
-    run_manufacturing_plan()
+    #run_manufacturing_plan()
     # service_product_information = ServiceProductInformation()
     # service_product_information.create_product_information_list()

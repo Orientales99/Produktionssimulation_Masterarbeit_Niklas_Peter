@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from simpy import Store
-from src.gruppe_eins.product import Product
+from src.order_data.product import Product
 
 
 @dataclass

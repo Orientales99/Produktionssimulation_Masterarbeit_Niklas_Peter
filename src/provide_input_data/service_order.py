@@ -1,7 +1,7 @@
 import pandas as pd
 
 from src import RESOURCES, ANALYSIS_SOLUTION
-from src.gruppe_eins.order import Order
+from src.order_data.order import Order
 from src.provide_input_data.service_product_information import ServiceProductInformation
 from src.production.simulation_environment import SimulationEnvironment
 from src.constant.constant import ProductGroup

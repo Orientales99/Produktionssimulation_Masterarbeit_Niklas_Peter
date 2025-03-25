@@ -2,8 +2,8 @@ import json
 from src import RESOURCES
 from src.constant.constant import ProductGroup, ItemType
 from src.production.base.coordinates import Coordinates
-from src.gruppe_eins.product import Product
-from src.gruppe_eins.production_material import ProductionMaterial
+from src.order_data.product import Product
+from src.order_data.production_material import ProductionMaterial
 
 
 class ServiceProductInformation:

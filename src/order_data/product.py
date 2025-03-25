@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from src.production.base.coordinates import Coordinates
 
 from src.constant.constant import ItemType, ProductGroup
-from src.gruppe_eins.production_material import ProductionMaterial
+from src.order_data.production_material import ProductionMaterial
 
 
 @dataclass
