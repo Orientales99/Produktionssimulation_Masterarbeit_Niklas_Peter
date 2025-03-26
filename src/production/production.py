@@ -15,7 +15,7 @@ from src.entity.working_robot import WorkingRobot
 class Production:
     production_layout: list[list[Cell]] = []
     service_order = OrderService()
-    service_entity = EntityService()
+
     service_starting_conditions = StartingConditionsService()
     source_coordinates: Coordinates
     sink_coordinates: Coordinates
@@ -25,10 +25,16 @@ class Production:
     machine_list = []
     max_coordinate: Coordinates
 
-    def __init__(self):
+    def __init__(self, simulation_environment):
+        self.simulation_environment = simulation_environment
+        self.service_entity = EntityService(simulation_environment)
         self.get_data_from_service_order()
 
     def create_production(self):
+        self.create_production_layout()
+        self.set_entities()
+
+    def create_production_layout(self):
         self.build_layout()
         self.set_source_in_production_layout()
         self.set_sink_in_production_layout()

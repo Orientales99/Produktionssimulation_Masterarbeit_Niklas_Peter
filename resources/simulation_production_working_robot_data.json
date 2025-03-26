@@ -4,7 +4,7 @@
       "number_of_robots_in_production": "3",
       "robot_size_x": "2",
       "robot_size_y":"3",
-      "driving_speed":  "1",
+      "driving_speed":  "3",
       "product_transfer_rate_units_per_minute": "10"
     }
   ]

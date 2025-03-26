@@ -11,6 +11,7 @@ from src.process_logic.manufacturing_plan import ManufacturingPlan
 from src.process_logic.path_finding import PathFinding
 from src.process_logic.working_robot_manager import WorkingRobotManager
 from src.production.production_visualisation import ProductionVisualisation
+from src.simulation_environmnent.simulation_environment import SimulationEnvironment
 
 
 def run_pathfinding():
@@ -26,7 +27,7 @@ def run_pathfinding():
     test_tr = TransportRobot(1, None, Coordinates(4, 4), 1, 10, 10)
     funktioniert = path_finding.run_a_star_algorithm(start_cell, end_cell, test_tr)
     path = path_finding.path_line_list
-    path_finding.entity_movement.move_entity_along_path(start_cell, test_tr, path)
+    path_finding.entity_movement.move_entity_one_step(start_cell, test_tr, path)
 
     if funktioniert is True:
         print("Funktioniert")
@@ -80,9 +81,10 @@ def move_entity():
 
 
 def run_manufacturing_plan():
+    simulation_environment = SimulationEnvironment()
     command_line_service = CommandLineService()
     command_line_service.create_production()
-    production = Production()
+    production = Production(simulation_environment)
     path_finding = PathFinding(production)
     production.set_sink_in_production_layout()
     production.set_source_in_production_layout()
@@ -98,12 +100,21 @@ def run_manufacturing_plan():
     working_robot_manager.start_working_robot_manager()
     visualisation.visualize_layout()
 
+def run_simulation():
+    command_line_service = CommandLineService()
+    command_line_service.start_simulation()
+
+
+
+
+
 
 
 if __name__ == '__main__':
+    run_simulation()
     # move_entity()
     # run_pathfinding()
     # cProfile.run('run_pathfinding()')
-    run_manufacturing_plan()
+    # run_manufacturing_plan()
     # service_product_information = ServiceProductInformation()
     # service_product_information.create_product_information_list()

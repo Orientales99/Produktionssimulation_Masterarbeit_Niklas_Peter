@@ -1,9 +1,9 @@
 import pandas as pd
 
+
 from src import RESOURCES, ANALYSIS_SOLUTION
 from src.order_data.order import Order
 from src.provide_input_data.product_information_service import ProductInformationService
-from src.production.simulation_environment import SimulationEnvironment
 from src.constant.constant import ProductGroup
 from datetime import date
 
@@ -12,7 +12,6 @@ class OrderService:
 
     def __init__(self):
         self.df_order_list = None
-        self.env = SimulationEnvironment()
         self.get_order_files_for_init()
         self.product_order_list = []
         self.service_product_information = ProductInformationService()
@@ -25,7 +24,6 @@ class OrderService:
         self.remove_quotes_from_order_list()
         self.set_head_as_column_name()
         self.create_new_column_for_product_group()
-        print(self.df_order_list)
         self.set_product_order_list()
         return self.product_order_list
 

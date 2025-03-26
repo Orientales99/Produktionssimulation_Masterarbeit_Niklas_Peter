@@ -2,6 +2,7 @@
 {
   "production_layout_size_x": "100",
   "production_layout_size_y": "100",
+  "starting_date_of_simulation": [2024, 5, 2],
   "simulation_duration_in_days": "7",
   "production_day_duration_in_h": "8",
   "visualising_via_terminal(y/n)": "n",

@@ -1,5 +1,5 @@
 from collections import defaultdict
-from dataclasses import dataclass,field
+from dataclasses import dataclass, field
 from datetime import date
 
 import pandas as pd
@@ -11,27 +11,30 @@ from src.provide_input_data.product_information_service import ProductInformatio
 from src.entity.machine import Machine
 
 
-@dataclass
 class ManufacturingPlan:
     production: Production
     service_product_information: ProductInformationService = ProductInformationService()
     summarised_order_list: list[Order] | None = None
-    dictionary_summarised_order_per_day: dict = field(default_factory=dict)
-    daily_manufacturing_plan: list[Order] = field(default_factory=list)
-    process_list_for_every_machine: list[(Machine, Order, int)] = field(default_factory=list) #(machine.identification_str, Order, step of the process)
-    required_materials_for_every_machine: dict = field(default_factory=dict)
+    dictionary_summarised_order_per_day: dict = {}
+    daily_manufacturing_plan: list[Order] = []
+    process_list_for_every_machine: list[(Machine, Order, int)] = []  # (machine.identification_str, Order, step of the process)
+    required_materials_for_every_machine: dict = {}
 
-    def __post_init__(self):
+    def __init__(self, production):
+        self.production = production
         self.product_order_list = self.production.service_order.generate_order_list()
         self.product_information_list = self.service_product_information.create_product_information_list()
 
+    def set_parameter_for_start_of_a_simulation_day(self, start_date):
+        self.get_daily_manufacturing_plan(start_date)
+        self.set_processing_machine_list__queue_length_estimation()
+        self.get_required_material_for_every_machine()
 
     def get_daily_manufacturing_plan(self, current_date: date):
         """calling methods -> creating daily_manufacturing_plan as a list"""
         self.analyse_orders()
         self.manufacturing_sequence_per_day(current_date)
         self.sort_by_highest_product_order_count()
-        print(self.daily_manufacturing_plan)
 
     def analyse_orders(self):
         """calling methods -> creating a list with summarised orders and sort them by day"""
@@ -50,8 +53,6 @@ class ManufacturingPlan:
                 order.priority
             )
             order_count[order_for_summarise] += int(order.number_of_products_per_order)
-
-        print("Keys in order_count:", list(order_count.keys()))  # Debugging-Ausgabe
 
         self.summarised_order_list = []
         for (product_id, order_date, priority), count in order_count.items():

@@ -6,7 +6,6 @@ from src import RESOURCES
 from src.constant.constant import MachineQuality
 from src.production.base.coordinates import Coordinates
 from src.entity.entity_working_status import EntityWorkingStatus
-from src.production.simulation_environment import SimulationEnvironment
 from src.entity.machine import Machine
 from src.entity.machine_storage import MachineStorage
 from src.entity.transport_robot import TransportRobot
@@ -15,11 +14,12 @@ from src.entity.working_robot import WorkingRobot
 
 class EntityService:
 
-    def __init__(self):
+    def __init__(self, simulation_environment):
+        self.env = simulation_environment
         self.data_production_working_robot = None
         self.data_production_transport_robot = None
         self.data_production_machine = None
-        self.env = SimulationEnvironment()
+
         self.get_entity_files_for_init()
 
     def get_entity_files_for_init(self):
@@ -94,11 +94,11 @@ class EntityService:
                            int(machine_stats["robot_size_y"])),
                        MachineStorage(
                            Store(
-                               self.env.env,
+                               self.env,
                                capacity=int(machine_stats["max_loading_capacity_product_before_process"])),
                            None,
                            Store(
-                               self.env.env,
+                               self.env,
                                capacity=int(machine_stats["max_loading_capacity_product_after_process"])),
                            None),
                        False,
