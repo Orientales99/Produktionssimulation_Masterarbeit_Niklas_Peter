@@ -15,13 +15,17 @@ class ManufacturingPlan:
     production: Production
     service_product_information: ProductInformationService = ProductInformationService()
     summarised_order_list: list[Order] | None = None
-    dictionary_summarised_order_per_day: dict = {}
-    daily_manufacturing_plan: list[Order] = []
-    process_list_for_every_machine: list[(Machine, Order, int)] = []  # (machine.identification_str, Order, step of the process)
+    dictionary_summarised_order_per_day: dict[date, list[Order]]
+    daily_manufacturing_plan: list[Order]
+    process_list_for_every_machine: list[(Machine, Order, int)] # (machine.identification_str, Order, step of the process)
     required_materials_for_every_machine: dict = {}
 
     def __init__(self, production):
         self.production = production
+
+        self.dictionary_summarised_order_per_day = {}
+        self.daily_manufacturing_plan = []
+        self.process_list_for_every_machine = []
         self.product_order_list = self.production.service_order.generate_order_list()
         self.product_information_list = self.service_product_information.create_product_information_list()
 

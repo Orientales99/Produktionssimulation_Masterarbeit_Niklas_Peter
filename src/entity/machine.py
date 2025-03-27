@@ -70,7 +70,7 @@ class Machine:
         return time_to_process_one_product
 
     def get_list_with_required_material(self) -> list[(ProductionMaterial, int)]:
-        """get a list with required material based on the processing_list"""
+        """get a list with required material and quantity based on the processing_list"""
         self.required_material_list = []
         for order, step_of_the_process in self.processing_list:
             data_processing_step = self.get_data_of_processing_step_for_machine(order)

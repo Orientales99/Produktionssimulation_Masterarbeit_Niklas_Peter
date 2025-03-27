@@ -66,7 +66,10 @@ class EntityService:
                                   int(transport_robot_stats["robot_size_y"])),
                               transport_robot_stats["driving_speed"],
                               transport_robot_stats["loaded_capacity"],
-                              transport_robot_stats["max_loading_capacity"])
+                              Store(
+                                  self.env,
+                                  capacity=int(transport_robot_stats["max_loading_capacity"])),
+                              EntityWorkingStatus())
 
     def generate_tr_list(self) -> list[TransportRobot]:
         tr_list = []

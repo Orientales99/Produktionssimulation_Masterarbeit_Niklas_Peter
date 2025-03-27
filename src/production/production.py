@@ -19,16 +19,23 @@ class Production:
     service_starting_conditions = StartingConditionsService()
     source_coordinates: Coordinates
     sink_coordinates: Coordinates
-    wr_list = []
-    entities_located = {}
-    tr_list = []
-    machine_list = []
+    wr_list: list[WorkingRobot]
+    entities_located: {str, list[Cell]}  # {entity.identification_str, list[Cell]}
+    tr_list: list[TransportRobot]
+    machine_list: list[Machine]
     max_coordinate: Coordinates
 
     def __init__(self, simulation_environment):
         self.simulation_environment = simulation_environment
         self.service_entity = EntityService(simulation_environment)
+
+        self.wr_list = []
+        self.entities_located = {}
+        self.tr_list = []
+        self.machine_list = []
+
         self.get_data_from_service_order()
+
 
     def create_production(self):
         self.create_production_layout()

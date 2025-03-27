@@ -100,14 +100,10 @@ def run_manufacturing_plan():
     working_robot_manager.start_working_robot_manager()
     visualisation.visualize_layout()
 
+
 def run_simulation():
     command_line_service = CommandLineService()
     command_line_service.start_simulation()
-
-
-
-
-
 
 
 if __name__ == '__main__':
@@ -115,6 +111,6 @@ if __name__ == '__main__':
     # move_entity()
     # run_pathfinding()
     # cProfile.run('run_pathfinding()')
-    # run_manufacturing_plan()
-    # service_product_information = ServiceProductInformation()
-    # service_product_information.create_product_information_list()
+    #run_manufacturing_plan()
+# service_product_information = ServiceProductInformation()
+# service_product_information.create_product_information_list()
