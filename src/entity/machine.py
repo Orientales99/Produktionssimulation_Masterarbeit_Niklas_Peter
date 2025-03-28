@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 
 from src.constant.constant import MachineQuality
+from src.entity.required_material import RequiredMaterial
 from src.order_data.order import Order
 from src.order_data.product import Product
 from src.production.base.coordinates import Coordinates
@@ -24,7 +25,7 @@ class Machine:
 
     processing_list: list[(Order, int)] = field(
         default_factory=list)  # default: empty | list (Order, step of the process)
-    required_material_list: list[(ProductionMaterial, int)] = field(
+    required_material_list: list[RequiredMaterial] = field(
         default_factory=list)  # default: empty | list (ProductionMaterial, necessary quantity)
     processing_list_queue_length: float = 0
     waiting_for_arriving_of_wr: bool = False
@@ -57,19 +58,22 @@ class Machine:
     def get_time_to_process_one_product(self, order, step_of_the_process) -> float:
         if step_of_the_process == 1:
             time_to_process_one_product = order.product.processing_time_step_1
+            return time_to_process_one_product
 
         if step_of_the_process == 2:
             time_to_process_one_product = order.product.processing_time_step_2
+            return time_to_process_one_product
 
         if step_of_the_process == 3:
             time_to_process_one_product = order.product.processing_time_step_3
+            return time_to_process_one_product
 
         if step_of_the_process == 4:
             time_to_process_one_product = order.product.processing_time_step_4
+            return time_to_process_one_product
 
-        return time_to_process_one_product
 
-    def get_list_with_required_material(self) -> list[(ProductionMaterial, int)]:
+    def get_list_with_required_material(self) -> list[RequiredMaterial]:
         """get a list with required material and quantity based on the processing_list"""
         self.required_material_list = []
         for order, step_of_the_process in self.processing_list:
@@ -79,7 +83,7 @@ class Machine:
                                     if item.identification_str == required_material.identification_str)
             quantity_of_necessary_material = order.number_of_products_per_order - quantity_in_store
 
-            self.required_material_list.append((required_material, quantity_of_necessary_material))
+            self.required_material_list.append(RequiredMaterial(required_material, quantity_of_necessary_material))
 
         return self.required_material_list
 

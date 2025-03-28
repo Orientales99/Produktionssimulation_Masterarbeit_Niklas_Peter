@@ -13,35 +13,37 @@ class EntityMovement:
         self.production = production
         self.visualisation = ProductionVisualisation(production)
 
-    def move_entity_one_step(self, start_cell, entity: Machine | WorkingRobot | TransportRobot, path):
+    def move_entity_one_step(self, start_cell, entity: Machine | WorkingRobot | TransportRobot, path) -> bool:
         cell = start_cell
 
         x, y = map(int, path.split(":"))
 
         # up
         if Coordinates(cell.cell_coordinates.x, cell.cell_coordinates.y + 1) == Coordinates(x, y):
-            if self.move_entity_upwards(entity) is False:
-                raise Exception(f'move from {cell.cell_id} to {x}:{y} not possible')
+            if self.move_entity_upwards(entity) is True:
+                return True
+
 
 
         # down
         if Coordinates(cell.cell_coordinates.x, cell.cell_coordinates.y - 1) == Coordinates(x, y):
-            if self.move_entity_downwards(entity) is False:
-                raise Exception(f'move from {cell.cell_id} to {x}:{y} not possible')
+            if self.move_entity_downwards(entity) is True:
+                return True
 
 
         # left
         if Coordinates(cell.cell_coordinates.x - 1, cell.cell_coordinates.y) == Coordinates(x, y):
-            if self.move_entity_left(entity) is False:
-                raise Exception(f'move from {cell.cell_id} to {x}:{y} not possible')
+            if self.move_entity_left(entity) is True:
+                return True
+
 
 
         # right
         if Coordinates(cell.cell_coordinates.x + 1, cell.cell_coordinates.y) == Coordinates(x, y):
-            if self.move_entity_right(entity) is False:
-                raise Exception(f'move from {cell.cell_id} to {x}:{y} not possible')
+            if self.move_entity_right(entity) is True:
+                return True
 
-        return True
+        return False
 
 
     def check_move_possible(self, new_coordinates: Coordinates) -> bool:

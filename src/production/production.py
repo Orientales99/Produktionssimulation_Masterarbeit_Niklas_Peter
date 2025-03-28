@@ -21,8 +21,10 @@ class Production:
     sink_coordinates: Coordinates
     wr_list: list[WorkingRobot]
     entities_located: {str, list[Cell]}  # {entity.identification_str, list[Cell]}
+    entities_init_located: dict[str, list[Cell]]  # {entity.identification_str, list[Cell]} position of initialisation
     tr_list: list[TransportRobot]
     machine_list: list[Machine]
+
     max_coordinate: Coordinates
 
     def __init__(self, simulation_environment):
@@ -31,11 +33,11 @@ class Production:
 
         self.wr_list = []
         self.entities_located = {}
+        self.entities_init_located = {}
         self.tr_list = []
         self.machine_list = []
 
         self.get_data_from_service_order()
-
 
     def create_production(self):
         self.create_production_layout()
@@ -104,6 +106,7 @@ class Production:
                 else:
                     avoiding_collision_parameter += self.wr_list[i].size.y + 1
             self.entities_located[self.wr_list[i].identification_str] = location_list
+            self.entities_init_located[self.wr_list[i].identification_str] = location_list
 
     def get_transport_robot_placed_in_production(self):
         """Places transport robots in the production layout and stores their locations in a dictionary"""
@@ -129,6 +132,7 @@ class Production:
                 else:
                     avoiding_collision_parameter += self.tr_list[i].size.y + 1
             self.entities_located[self.tr_list[i].identification_str] = location_list
+            self.entities_init_located[self.tr_list[i].identification_str] = location_list
 
     def get_max_length_of_tr_or_wr(self):
         """Finds max. length of size.x or size.y from TR and WR"""
@@ -180,7 +184,7 @@ class Production:
         space_between_machine = (
                 self.get_max_length_of_tr_or_wr() * 2)  # *2 because two robots should drive between machines simultaneously
         y_start = self.sink_coordinates.y + int(
-            (machine_list_static[0].size.y) / 2) + 1
+            machine_list_static[0].size.y / 2) + 1
         y_parameter = y_start
         y_upwards = y_start
         y_downwards = y_start
@@ -230,6 +234,7 @@ class Production:
                         y_upwards = y_start
                         y_downwards = y_start
             self.entities_located[machine_list_static[i].identification_str] = location_list
+            self.entities_init_located[machine_list_static[i].identification_str] = location_list
 
     def get_flexible_machine_placed_in_production(self, machine_list_flexible: list):
         """sets flexible machine in the production_layout. Alternate between one machine above source and one below. All
@@ -240,7 +245,7 @@ class Production:
         space_between_machine = (
                 self.get_max_length_of_tr_or_wr() * 2)  # *2 because two robots should drive between machines simultaneously
         y_start = self.source_coordinates.y + int(
-            (machine_list_flexible[0].size.y) / 2) + 1
+            machine_list_flexible[0].size.y / 2) + 1
         y_parameter = y_start
         y_upwards = y_start
         y_downwards = y_start
@@ -286,6 +291,7 @@ class Production:
                             raise Exception(
                                 'An error occurred when initialising flexible machines in the production_layout.')
             self.entities_located[machine_list_flexible[i].identification_str] = location_list
+            self.entities_init_located[machine_list_flexible[i].identification_str] = location_list
 
     def check_area_of_cells_is_free_for_entity(self, cell: Cell, free_area_size: Coordinates,
                                                free_condition_entity: Machine | WorkingRobot | TransportRobot | None) -> \
@@ -330,7 +336,8 @@ class Production:
 
     def coordinates_in_layout(self, testing_coordinates: Coordinates) -> bool:
         """Is checking if the coordinates are in the production_layout"""
-        if testing_coordinates.x < 0 or testing_coordinates.x >= self.max_coordinate.x or testing_coordinates.y < 0 or testing_coordinates.y >= self.max_coordinate.y:
+        if testing_coordinates.x < 0 or testing_coordinates.x >= self.max_coordinate.x or testing_coordinates.y < 0 or \
+                testing_coordinates.y >= self.max_coordinate.y:
             return False
         else:
             return True
