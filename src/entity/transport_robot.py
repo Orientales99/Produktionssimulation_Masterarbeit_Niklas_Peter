@@ -13,11 +13,12 @@ class TransportRobot:
     identification_number: int
     loaded_material: list[ProductionMaterial] | None
     size: Coordinates
+    loading_speed: int
     driving_speed: int
     loaded_capacity: int
     max_loading_capacity: Store
     working_status: EntityWorkingStatus
-    transport_order: list[TransportOrder] = field(
+    transport_order_list: list[TransportOrder] = field(
         default_factory=list)  # default: empty | list (destination Machine, transport Material, quantity)
 
     @property  # only if identification_str is used; one time calculation -> is cached

@@ -64,6 +64,7 @@ class EntityService:
                               Coordinates(
                                   int(transport_robot_stats["robot_size_x"]),
                                   int(transport_robot_stats["robot_size_y"])),
+                              int(transport_robot_stats["loading_speed"]),
                               transport_robot_stats["driving_speed"],
                               transport_robot_stats["loaded_capacity"],
                               Store(

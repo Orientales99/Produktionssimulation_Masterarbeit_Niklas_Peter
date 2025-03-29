@@ -319,6 +319,32 @@ class Production:
                     list_of_checked_cells.append(checked_cell)
         return list_of_checked_cells
 
+    def check_area_of_cells_is_free_for_entity_movement(self, cell: Cell, free_area_size: Coordinates,
+                                               free_condition_entity: Machine | WorkingRobot | TransportRobot | None) -> \
+            list[Cell]:
+        """get a cell and is checking if the area downwards and to the right is free; if free
+        -> return list with free cells; if not free -> if not free -> return empty list"""
+        list_of_checked_cells = []
+        y_range_min = max(0, cell.cell_coordinates.y - free_area_size.y)
+        y_range_max = cell.cell_coordinates.y + 2
+        x_range_min = cell.cell_coordinates.x
+        x_range_max = cell.cell_coordinates.x + free_area_size.x
+
+        for y in range(y_range_min, y_range_max):
+            for x in range(x_range_min, x_range_max):
+
+                if self.coordinates_in_layout(Coordinates(x, y)) is False:
+                    break
+                checked_cell = self.get_cell(Coordinates(x, y))
+
+                if self.check_cell_is_free(checked_cell, free_condition_entity) is False:
+                    list_of_checked_cells = []
+                    return list_of_checked_cells
+
+                else:
+                    list_of_checked_cells.append(checked_cell)
+        return list_of_checked_cells
+
     def check_cell_is_free(self, cell: Cell,
                            free_condition_entity: Machine | WorkingRobot | TransportRobot | None) -> bool:
         """Checks if the cell is empty or has an entity that is allowed to be in the cell."""

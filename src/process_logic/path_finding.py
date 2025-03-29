@@ -132,7 +132,7 @@ class PathFinding:
         cell_neighbors_list_copy = cell_neighbors_list
 
         for cell in cell_neighbors_list_copy:
-            entity_cell_list = self.production.check_area_of_cells_is_free_for_entity(cell, Coordinates(
+            entity_cell_list = self.production.check_area_of_cells_is_free_for_entity_movement(cell, Coordinates(
                 entity.size.x + 1, entity.size.y + 1), entity)
             if len(entity_cell_list) == 0:
                 cell_neighbors_list.remove(cell)
