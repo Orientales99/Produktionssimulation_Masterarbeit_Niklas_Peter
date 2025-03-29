@@ -11,22 +11,29 @@ from src.entity.required_material import RequiredMaterial
 from src.process_logic.path_finding import PathFinding
 from src.production.base.cell import Cell
 from src.production.base.coordinates import Coordinates
+from src.production.production_visualisation import ProductionVisualisation
 
 
 @dataclass
 class TransportRobotManager:
     manufacturing_plan: ManufacturingPlan
+
     path_finding: PathFinding
     material_transport_request_list = list[TransportOrder]
     tr_list = list[TransportRobot]
     entities_located_after_init = dict[str, list[Cell]]  # dict[tr.identification_str, list[Cell]
+    waiting_time: int
 
     def __init__(self, manufacturing_plan, path_finding):
         self.manufacturing_plan = manufacturing_plan
         self.path_finding = path_finding
+        self.v = ProductionVisualisation(self.manufacturing_plan.production)
+
         self.tr_list = self.manufacturing_plan.production.tr_list
         self.machine_list = self.manufacturing_plan.production.machine_list
         self.entities_located_after_init = self.manufacturing_plan.production.entities_init_located
+        self.waiting_time = self.tr_list[0].working_status.waiting_time_on_path - 3
+
         self.material_transport_request_list = []
 
     def start_transport_robot_manager(self, current_date):
@@ -117,11 +124,11 @@ class TransportRobotManager:
         """moving the tr one step further through the production. When a tr cannot move it's waiting for waiting_time
         period until in calculates a new path. Return a list of TransportRobots who are on the right place."""
 
-        waiting_time = self.tr_list[0].working_status.waiting_time_on_path
         arrived_tr_on_pick_up_destination = []
 
         for tr in self.tr_list:
-            if tr.working_status.waiting_for_order is False and tr.working_status.pick_up_location_entity is not None:
+            if tr.working_status.waiting_for_order is False and tr.working_status.pick_up_location_entity is not None \
+                    and len(tr.working_status.driving_route_pick_up_material) != 0:
 
                 start_cell = self.path_finding.get_start_cell_from_entity(tr)
 
@@ -129,7 +136,7 @@ class TransportRobotManager:
                                                                           tr.working_status.driving_route_pick_up_material[
                                                                               0]) is True:
                     tr.working_status.driving_route_pick_up_material.pop(0)
-                    tr.working_status.waiting_time_on_path = waiting_time
+                    tr.working_status.waiting_time_on_path = self.waiting_time
 
                 else:
                     tr.working_status.waiting_time_on_path -= 1
@@ -147,11 +154,14 @@ class TransportRobotManager:
         """moving the tr one step further through the production to unload_destination.
            When a tr cannot move it's waiting for waiting_time period until in calculates a new path.
            Return a list of TransportRobots who are on the right place."""
-        waiting_time = self.tr_list[0].working_status.waiting_time_on_path + 15
         arrived_tr_on_unload_destination = []
-
         for tr in self.tr_list:
-            if tr.working_status.waiting_for_order is False and tr.working_status.unload_location_entity is not None:
+            if isinstance(tr.working_status.driving_route_unload_material, Exception):
+                self.v.visualize_layout()
+                print(f'{tr.identification_str}:{self.path_finding.get_start_cell_from_entity(tr)}, {tr.working_status.driving_route_unload_material}')
+
+            if tr.working_status.waiting_for_order is False and tr.working_status.unload_location_entity is not None\
+                    and len(tr.working_status.driving_route_unload_material) != 0:
 
                 start_cell = self.path_finding.get_start_cell_from_entity(tr)
 
@@ -159,7 +169,7 @@ class TransportRobotManager:
                                                                           tr.working_status.driving_route_unload_material[
                                                                               0]) is True:
                     tr.working_status.driving_route_unload_material.pop(0)
-                    tr.working_status.waiting_time_on_path = waiting_time
+                    tr.working_status.waiting_time_on_path = self.waiting_time
 
                 else:
                     tr.working_status.waiting_time_on_path -= 1
@@ -170,6 +180,7 @@ class TransportRobotManager:
 
             elif len(tr.working_status.driving_route_unload_material) == 0:
                 arrived_tr_on_unload_destination.append(tr)
+                print(f'{tr.identification_str} has arrived')
 
         return arrived_tr_on_unload_destination
 
@@ -187,7 +198,11 @@ class TransportRobotManager:
                     tr.working_status.pick_up_location_entity = pick_up_destination
                     tr.working_status.driving_destination_pick_up_material = pick_up_coordinates
                     tr.working_status.driving_route_pick_up_material = path_line_list
+
                 print(f'{index}, {tr.identification_str}: {path_line_list}')
+                print(f'Pick_Up Destination: {pick_up_destination.identification_str}')
+                print()
+
 
                 # calculate_path_for_unload
 
@@ -200,6 +215,8 @@ class TransportRobotManager:
                     tr.working_status.driving_route_unload_material = path_line_list
 
                 print(f'Unload:{index}, {tr.identification_str}: {path_line_list} ')
+                print(f'Unload Destination: {unload_destination.identification_str}')
+                print()
 
     def get_coordinates_from_pick_up_destination(self, transport_robot: TransportRobot,
                                                  entity: Machine | Source) -> Coordinates:
@@ -277,9 +294,9 @@ class TransportRobotManager:
             horizontal_edges_of_tr = self.manufacturing_plan.production.get_horizontal_edges_of_coordinates(
                 list_transport_robot_cells)
 
-        return Coordinates(
-            horizontal_edges_of_machine[0] - (horizontal_edges_of_tr[1] - horizontal_edges_of_tr[0] + 2),
-            vertical_edges_of_machine[0] + (vertical_edges_of_tr[1] - vertical_edges_of_tr[0]))
+            return Coordinates(
+                horizontal_edges_of_machine[0] - (horizontal_edges_of_tr[1] - horizontal_edges_of_tr[0] + 2),
+                vertical_edges_of_machine[0] + (vertical_edges_of_tr[1] - vertical_edges_of_tr[0]) - 1)
 
     def get_driving_speed_per_cell(self):
         return int(self.tr_list[0].driving_speed)

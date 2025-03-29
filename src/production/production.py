@@ -306,12 +306,15 @@ class Production:
 
         for y in range(y_range_min, y_range_max):
             for x in range(x_range_min, x_range_max):
+
                 if self.coordinates_in_layout(Coordinates(x, y)) is False:
                     break
                 checked_cell = self.get_cell(Coordinates(x, y))
+
                 if self.check_cell_is_free(checked_cell, free_condition_entity) is False:
                     list_of_checked_cells = []
                     return list_of_checked_cells
+
                 else:
                     list_of_checked_cells.append(checked_cell)
         return list_of_checked_cells

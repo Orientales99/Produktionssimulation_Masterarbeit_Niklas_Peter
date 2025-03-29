@@ -27,7 +27,7 @@ class SimulationEnvironment:
 
 
     def run_simulation(self, until: int):
-        self.env.process(self.test())
+        # self.env.process(self.test())
         self.env.run(until=until)
 
     def test(self):
@@ -48,18 +48,19 @@ class SimulationEnvironment:
         driving_speed = self.working_robot_manager.get_driving_speed_per_cell()
         while True:
             self.working_robot_manager.wr_drive_through_production()
-            print(self.env.now)
             yield self.env.timeout(1 / driving_speed)
 
     def tr_driving_through_production(self):
         driving_speed = self.transport_robot_manager.get_driving_speed_per_cell()
+        x = 0
         while True:
+            x += 1
+            print(f'Runde: {x}')
             self.transport_robot_manager.tr_drive_through_production_to_unload_destination()
-            self.visualize_production.visualize_layout()
             yield self.env.timeout(1/ driving_speed)
 
 
     def visualize_layout(self):
         while True:
             self.visualize_production.visualize_layout()
-            yield self.env.timeout(100)
+            yield self.env.timeout(1000)

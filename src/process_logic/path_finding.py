@@ -11,7 +11,6 @@ from src.entity.working_robot import WorkingRobot
 from src.production.production_visualisation import ProductionVisualisation
 
 
-
 class PathFinding:
     production: Production
     path_line_list = []
@@ -27,7 +26,8 @@ class PathFinding:
         start_cell = self.get_start_cell_from_entity(entity)
         end_cell = self.production.get_cell(end_coordinate)
         if self.run_a_star_algorithm(start_cell, end_cell, entity) is False:
-            return Exception(f"Path finding doesn't work. Entity: {entity}, Start: {start_coordinate}, End: {end_coordinate}")
+            return Exception(
+                f"Path finding doesn't work. Entity: {entity}, Start: {start_coordinate}, End: {end_coordinate}")
 
         return self.path_line_list
 
@@ -54,7 +54,6 @@ class PathFinding:
                 self.reconstruct_path(came_from, end_cell.cell_id)
                 return True
 
-            # current_cell.neighbors_list = self.get_current_cell_neighbors(current_cell.cell_coordinates)
             current_cell.neighbors_list = self.check_neighbor_cells_complete_wide(current_cell.cell_coordinates,
                                                                                   moving_entity)
             for neighbor in current_cell.neighbors_list:
@@ -140,7 +139,6 @@ class PathFinding:
 
         return cell_neighbors_list
 
-
     def get_start_cell_from_entity(self, entity: Machine | WorkingRobot | TransportRobot) -> Coordinates:
         """Starting point is the upper right corner of the entity"""
         start_coordinates = self.get_start_coordinates_from_entity(entity)
@@ -154,4 +152,3 @@ class PathFinding:
         vertical_edges = self.production.get_vertical_edges_of_coordinates(cell_list)
 
         return Coordinates(horizontal_edges[0], vertical_edges[1])
-

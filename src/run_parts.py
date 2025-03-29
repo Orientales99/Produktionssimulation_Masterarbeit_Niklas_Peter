@@ -101,6 +101,8 @@ def run_manufacturing_plan():
     visualisation.visualize_layout()
 
 
+
+
 def run_simulation():
     command_line_service = CommandLineService()
     command_line_service.start_simulation()

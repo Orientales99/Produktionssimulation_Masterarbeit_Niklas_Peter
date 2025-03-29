@@ -15,6 +15,7 @@ class WorkingRobotManager:
     list_wr_in_production: list[WorkingRobot] = []
     dict_of_working_wr: dict[str, list[Cell]] = {}  # str= wr.identification_str
     list_wr_working_on_machine: list[WorkingRobot]
+    waiting_time: int
 
     def __init__(self, manufacturing_plan: ManufacturingPlan, path_finding: PathFinding):
         self.manufacturing_plan = manufacturing_plan
@@ -23,6 +24,7 @@ class WorkingRobotManager:
         self.list_wr_working_on_machine = []
 
         self.list_wr_in_production = self.manufacturing_plan.production.wr_list
+        self.waiting_time = self.list_wr_in_production[0].working_status.waiting_time_on_path
 
     def start_working_robot_manager(self):
         self.sort_process_order_list_for_wr()
@@ -39,8 +41,11 @@ class WorkingRobotManager:
         """moving the wr one step further through the production. When a wr cannot move it's waiting for waiting_time
         period until in calculates a new path"""
 
-        waiting_time = self.list_wr_in_production[0].working_status.waiting_time_on_path
         for wr in self.list_wr_in_production:
+            if isinstance(wr.working_status.driving_route_work_on_machine, Exception):
+                self.v.visualize_layout()
+                print(f'{wr.identification_str}:{self.path_finding.get_start_cell_from_entity(wr)}, {wr.working_status.driving_route_work_on_machine}')
+
             if wr.working_status.driving_to_new_location is True and len(wr.working_status.driving_route_work_on_machine) != 0:
 
                 start_cell = self.path_finding.get_start_cell_from_entity(wr)
@@ -48,7 +53,7 @@ class WorkingRobotManager:
                 if self.path_finding.entity_movement.move_entity_one_step(start_cell, wr,
                                                                           wr.working_status.driving_route_work_on_machine[0]) is True:
                     wr.working_status.driving_route_work_on_machine.pop(0)
-                    wr.working_status.waiting_time_on_path = waiting_time
+                    wr.working_status.waiting_time_on_path = self.waiting_time
                 else:
                     wr.working_status.waiting_time_on_path -= 1
                     if wr.working_status.waiting_time_on_path == 0:
