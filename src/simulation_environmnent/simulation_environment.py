@@ -24,6 +24,7 @@ class SimulationEnvironment:
         self.env.process(self.visualize_layout())
         self.env.process(self.wr_driving_through_production())
         self.env.process(self.tr_pick_up_process())
+        self.env.process(self.tr_unload_process())
         self.env.process(self.tr_driving_through_production())
 
 
@@ -42,7 +43,6 @@ class SimulationEnvironment:
         start_date = self.production.service_starting_conditions.set_starting_date_of_simulation()
         self.manufacturing_plan.set_parameter_for_start_of_a_simulation_day(start_date)
         self.transport_robot_manager.start_transport_robot_manager(start_date)
-
         self.working_robot_manager.start_working_robot_manager()
 
 
@@ -54,13 +54,15 @@ class SimulationEnvironment:
 
 
 
-    #def tr_management(self):
-    #    self.tr_driving_through_production()
-    #    self.tr_pick_up_process()
 
     def tr_pick_up_process(self):
         while True:
             self.transport_robot_manager.pick_up_material_on_tr()
+            yield self.env.timeout(1)
+
+    def tr_unload_process(self):
+        while True:
+            self.transport_robot_manager.unload_material_from_tr()
             yield self.env.timeout(1)
 
     def tr_driving_through_production(self):

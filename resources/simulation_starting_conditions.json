@@ -6,5 +6,5 @@
   "simulation_duration_in_days": "7",
   "production_day_duration_in_h": "8",
   "visualising_via_terminal(y/n)": "n",
-  "visualising_via_matplotlib(y/n)": "n"
+  "visualising_via_matplotlib(y/n)": "y"
 }

@@ -16,7 +16,7 @@ class TransportRobot:
     loading_speed: int
     driving_speed: int
     loaded_capacity: int
-    max_loading_capacity: Store
+    material_store: Store
     working_status: EntityWorkingStatus
     transport_order_list: list[TransportOrder] = field(
         default_factory=list)  # default: empty | list (destination Machine, transport Material, quantity)
