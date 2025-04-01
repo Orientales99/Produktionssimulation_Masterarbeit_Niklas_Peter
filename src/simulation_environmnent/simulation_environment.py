@@ -20,14 +20,13 @@ class SimulationEnvironment:
         self.transport_robot_manager = TransportRobotManager(self.env, self.manufacturing_plan, self.path_finding)
         self.machine_execution = MachineExecution(self.manufacturing_plan)
 
-        #starting processes
+        # starting processes
         self.env.process(self.visualize_layout())
         self.env.process(self.wr_driving_through_production())
+        self.env.process(self.tr_calculate_path())
         self.env.process(self.tr_pick_up_process())
         self.env.process(self.tr_unload_process())
         self.env.process(self.tr_driving_through_production())
-
-
 
     def run_simulation(self, until: int):
         # self.env.process(self.test())
@@ -45,15 +44,16 @@ class SimulationEnvironment:
         self.transport_robot_manager.start_transport_robot_manager(start_date)
         self.working_robot_manager.start_working_robot_manager()
 
-
     def wr_driving_through_production(self):
         driving_speed = self.working_robot_manager.get_driving_speed_per_cell()
         while True:
             self.working_robot_manager.wr_drive_through_production()
             yield self.env.timeout(1 / driving_speed)
 
-
-
+    def tr_calculate_path(self):
+        while True:
+            self.transport_robot_manager.path_calculation_for_every_requesting_tr()
+            yield self.env.timeout(1)
 
     def tr_pick_up_process(self):
         while True:
@@ -70,8 +70,8 @@ class SimulationEnvironment:
         while True:
             self.transport_robot_manager.tr_drive_through_production_to_pick_up_destination()
             self.transport_robot_manager.tr_drive_through_production_to_unload_destination()
-            yield self.env.timeout(1/ driving_speed)
-
+            self.visualize_production.visualize_layout()
+            yield self.env.timeout(1 / driving_speed)
 
     def visualize_layout(self):
         while True:

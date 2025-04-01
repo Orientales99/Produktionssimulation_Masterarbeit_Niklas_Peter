@@ -69,6 +69,7 @@ class PathFinding:
                         count += 1
                         open_set.put((f_score[neighbor.cell_id], count, neighbor))
                         open_set_hash.add(neighbor.cell_id)
+
         return False
 
     def reconstruct_path(self, came_from, current_cell_id):
@@ -148,6 +149,14 @@ class PathFinding:
     def get_start_coordinates_from_entity(self, entity: Machine | WorkingRobot | TransportRobot) -> Coordinates:
         """Starting point is the upper right corner of the entity"""
         cell_list = self.production.entities_located.get(entity.identification_str, [])
+        horizontal_edges = self.production.get_horizontal_edges_of_coordinates(cell_list)
+        vertical_edges = self.production.get_vertical_edges_of_coordinates(cell_list)
+
+        return Coordinates(horizontal_edges[0], vertical_edges[1])
+
+    def get_init_coordinates_from_entity(self, entity: Machine | WorkingRobot | TransportRobot) -> Coordinates:
+        """Starting point from the initialisation position is the upper right corner of the entity"""
+        cell_list = self.production.entities_init_located.get(entity.identification_str, [])
         horizontal_edges = self.production.get_horizontal_edges_of_coordinates(cell_list)
         vertical_edges = self.production.get_vertical_edges_of_coordinates(cell_list)
 

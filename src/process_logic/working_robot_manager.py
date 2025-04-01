@@ -68,7 +68,7 @@ class WorkingRobotManager:
 
     def wr_arrived_on_destination(self, working_robot):
 
-        self.v.visualize_layout()
+        #self.v.visualize_layout()
 
         machine_identification_str = working_robot.working_status.working_for_machine.identification_str
 
@@ -81,7 +81,7 @@ class WorkingRobotManager:
         self.dict_of_working_wr[working_robot.identification_str] = cell_list_wr
 
         self.list_wr_working_on_machine.append(working_robot)
-        self.v.visualize_layout()
+        #self.v.visualize_layout()
 
     def change__working_robot_on_machine_status(self, machine_identification_str: str, status: bool):
         cell_list_machine = self.manufacturing_plan.production.entities_located[machine_identification_str]

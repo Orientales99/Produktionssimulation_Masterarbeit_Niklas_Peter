@@ -5,7 +5,6 @@ from src.production.base.coordinates import Coordinates
 from src.constant.constant import ItemType, ProductGroup
 
 
-
 @dataclass
 class ProductionMaterial:
     identification_str: str

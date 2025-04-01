@@ -17,3 +17,16 @@ class StoreManager:
         quantity_of_stored_item = len(store.items)
         return (store_capacity - quantity_of_stored_item)
 
+    def get_material_out_of_store(self, store: Store, material: ProductionMaterial) -> Store:
+        list_store_items: list[ProductionMaterial]
+        list_store_items = store.items
+        material_identification_str = material.identification_str
+        for item in list_store_items:
+            if item.identification_str == material_identification_str:
+                list_store_items.remove(item)
+                break
+        store.items = list_store_items
+        return store
+
+
+
