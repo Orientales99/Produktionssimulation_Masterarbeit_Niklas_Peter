@@ -6,7 +6,7 @@ from src.process_logic.transport_robot_manager import TransportRobotManager
 from src.process_logic.working_robot_manager import WorkingRobotManager
 from src.production.production import Production
 from src.process_logic.manufacturing_plan import ManufacturingPlan
-from src.production.production_visualisation import ProductionVisualisation
+from src.production.visualisation.production_visualisation import ProductionVisualisation
 
 
 class SimulationEnvironment:

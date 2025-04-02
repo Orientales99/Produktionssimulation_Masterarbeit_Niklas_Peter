@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from queue import PriorityQueue
 
 from src.production.entity_movement import EntityMovement
@@ -8,7 +7,6 @@ from src.production.base.cell import Cell
 from src.entity.machine import Machine
 from src.entity.transport_robot import TransportRobot
 from src.entity.working_robot import WorkingRobot
-from src.production.production_visualisation import ProductionVisualisation
 
 
 class PathFinding:

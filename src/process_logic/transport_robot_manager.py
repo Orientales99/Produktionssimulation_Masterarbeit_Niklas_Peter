@@ -10,7 +10,7 @@ from src.entity.required_material import RequiredMaterial
 from src.process_logic.path_finding import PathFinding
 from src.production.base.cell import Cell
 from src.production.base.coordinates import Coordinates
-from src.production.production_visualisation import ProductionVisualisation
+from src.production.visualisation.production_visualisation import ProductionVisualisation
 from src.production.store_manager import StoreManager
 
 

@@ -5,7 +5,7 @@ from src.entity.machine import Machine
 from src.process_logic.manufacturing_plan import ManufacturingPlan
 from src.process_logic.path_finding import PathFinding
 from src.production.base.cell import Cell
-from src.production.production_visualisation import ProductionVisualisation
+from src.production.visualisation.production_visualisation import ProductionVisualisation
 
 
 class WorkingRobotManager:

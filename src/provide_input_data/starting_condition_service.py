@@ -40,3 +40,10 @@ class StartingConditionsService:
             return True
         else:
             return False
+
+    def set_visualising_via_pygames(self):
+        if self.data_process_starting_conditions["visualising_via_pygame(y/n)"] == "y":
+            return True
+        else:
+            return False
+

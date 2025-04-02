@@ -4,7 +4,7 @@ from src.production.base.coordinates import Coordinates
 from src.entity.machine_storage import MachineStorage
 from src.order_data.product import Product
 from src.production.production import Production
-from src.production.production_visualisation import ProductionVisualisation
+from src.production.visualisation.production_visualisation import ProductionVisualisation
 from src.entity.machine import Machine
 from src.entity.working_robot import WorkingRobot
 

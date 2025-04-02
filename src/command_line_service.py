@@ -1,4 +1,4 @@
-from src.production.production_visualisation import ProductionVisualisation
+from src.production.visualisation.production_visualisation import ProductionVisualisation
 from src.production.production import Production
 from src.simulation_environmnent.simulation_environment import SimulationEnvironment
 

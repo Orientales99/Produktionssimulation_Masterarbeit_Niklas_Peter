@@ -3,7 +3,7 @@ from src.entity.transport_robot import TransportRobot
 from src.entity.working_robot import WorkingRobot
 from src.production.base.coordinates import Coordinates
 from src.production.production import Production
-from src.production.production_visualisation import ProductionVisualisation
+from src.production.visualisation.production_visualisation import ProductionVisualisation
 
 
 class EntityMovement:
