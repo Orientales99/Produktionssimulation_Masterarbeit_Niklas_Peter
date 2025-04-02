@@ -34,6 +34,26 @@ class PygameVisualisation:
         self.make_grid()
         self.draw_grid_lines()
         self.draw_everything()
+        run = True
+        started = False
+
+        # while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
+
+                if started:
+                    continue
+
+                if pygame.mouse.get_pressed()[0]:   # Left Mouse button
+                    position = pygame.mouse.get_pos()
+                    row, col = self.get_clicked_pos(position)
+                    print(f"Reihe: {row}")
+                    print(f"Col: {col}")
+
+                elif pygame.mouse.get_pressed()[2]: # Right Mouse button
+                    pass
+        # pygame.quit()
 
     def set_display(self):
         self.window = pygame.display.set_mode((self.width_x, self.width_y))
@@ -74,13 +94,24 @@ class PygameVisualisation:
         self.draw_grid_lines()
         pygame.display.update()
 
+    def get_clicked_pos(self, position):
+        gap_x = self.width_x // self.rows
+        gap_y = self.width_y // self.col
+
+        y, x = position
+
+        row = y // gap_y
+        col = self.max_coordinates.y - x // gap_x - 1
+
+        return row, col
+
 
 class PygameSpot:
 
     def __init__(self, row, col, width_x, width_y, total_rows, cell):
         self.row = row
         self.col = col
-        self.y = row * width_x
+        self.y = row * width_x              #Pygames switches x and y axis.
         self.x = col * width_y
         self.color = ColorRGB.WHITE.value
         self.width_x = width_x
