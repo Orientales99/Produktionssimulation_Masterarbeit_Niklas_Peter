@@ -5,13 +5,16 @@ from src.entity.transport_robot import TransportRobot
 from src.entity.working_robot import WorkingRobot
 from src.production.base.coordinates import Coordinates
 from src.production.production import Production
+from src.production.visualisation.cell_information import CellInformation
 
 
 class TerminalVisualisation:
     production: Production
+    cell_information: CellInformation
 
     def __init__(self, production):
         self.production = production
+        cell_information = CellInformation(self.production)
 
     def visualize_production_layout_in_terminal(self):
         print(self.print_layout_in_command_box())
@@ -79,18 +82,4 @@ class TerminalVisualisation:
         pass
 
     def print_cell_information(self, coordinates: Coordinates):
-        required_cell = self.production.get_cell(coordinates)
-        print('x: ', required_cell.cell_coordinates.x)
-        print('y: ', required_cell.cell_coordinates.y)
-        # print('Cell type: ', required_cell.placed_entity)
-
-        if required_cell.placed_entity is Source:
-            print('Cell is Source')
-        elif required_cell.placed_entity is Sink:
-            print('Cell is Sink')
-        elif required_cell.placed_entity is Machine or TransportRobot or WorkingRobot:
-            print(f'{required_cell.placed_entity.identification_str}')
-            print(f'{required_cell.placed_entity.processing_list}')
-            print(f'{required_cell.placed_entity.processing_list_queue_length}')
-        elif required_cell.placed_entity is None:
-            print('Cell is empty')
+        self.cell_information.run_cell_information_printed(coordinates)

@@ -7,17 +7,21 @@ from src.entity.source import Source
 from src.entity.transport_robot import TransportRobot
 from src.entity.working_robot import WorkingRobot
 from src.production.base.cell import Cell
+from src.production.base.coordinates import Coordinates
 from src.production.production import Production
 from src.constant.constant import ColorRGB
+from src.production.visualisation.cell_information import CellInformation
 
 
 class PygameVisualisation:
     production: Production
+    cell_information: CellInformation
     production_layout: list[list[Cell]]
     grid: list[list]
 
     def __init__(self, production):
         self.production = production
+        self.cell_information = CellInformation(self.production)
         self.max_coordinates = self.production.service_starting_conditions.set_max_coordinates_for_production_layout()
         self.production_layout = self.production.production_layout
 
@@ -38,21 +42,19 @@ class PygameVisualisation:
         started = False
 
         # while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
-
-                if started:
-                    continue
-
-                if pygame.mouse.get_pressed()[0]:   # Left Mouse button
-                    position = pygame.mouse.get_pos()
-                    row, col = self.get_clicked_pos(position)
-                    print(f"Reihe: {row}")
-                    print(f"Col: {col}")
-
-                elif pygame.mouse.get_pressed()[2]: # Right Mouse button
-                    pass
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if started:
+                continue
+            if pygame.mouse.get_pressed()[0]:   # Left Mouse button
+                position = pygame.mouse.get_pos()
+                row, col = self.get_clicked_pos(position)
+                self.cell_information.run_cell_information_printed(Coordinates(row, col))
+                print(f"Reihe: {row}")
+                print(f"Col: {col}")
+            elif pygame.mouse.get_pressed()[2]: # Right Mouse button
+                pass
         # pygame.quit()
 
     def set_display(self):

@@ -60,13 +60,11 @@ class EntityService:
     def create_tr(self, identification_number) -> TransportRobot:
         transport_robot_stats = self.data_production_transport_robot["transport_robot"][0]
         return TransportRobot(identification_number,
-                              None,
                               Coordinates(
                                   int(transport_robot_stats["robot_size_x"]),
                                   int(transport_robot_stats["robot_size_y"])),
                               int(transport_robot_stats["loading_speed"]),
                               transport_robot_stats["driving_speed"],
-                              transport_robot_stats["loaded_capacity"],
                               Store(
                                   self.env,
                                   capacity=int(transport_robot_stats["max_loading_capacity"])),

@@ -11,11 +11,9 @@ from src.order_data.product import Product
 @dataclass
 class TransportRobot:
     identification_number: int
-    loaded_material: list[ProductionMaterial] | None
     size: Coordinates
     loading_speed: int
     driving_speed: int
-    loaded_capacity: int
     material_store: Store
     working_status: EntityWorkingStatus
     transport_order_list: list[TransportOrder] = field(
