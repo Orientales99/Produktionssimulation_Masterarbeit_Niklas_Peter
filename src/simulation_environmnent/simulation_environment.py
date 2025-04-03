@@ -36,14 +36,12 @@ class SimulationEnvironment:
             print(f"Aktuelle Simulationszeit: {self.env.now}")
             yield self.env.timeout(100)
 
-
     def initialise_simulation_start(self):
         self.production.create_production()
         start_date = self.production.service_starting_conditions.set_starting_date_of_simulation()
         self.manufacturing_plan.set_parameter_for_start_of_a_simulation_day(start_date)
         self.transport_robot_manager.start_transport_robot_manager(start_date)
         self.working_robot_manager.start_working_robot_manager()
-
 
     def wr_driving_through_production(self):
         driving_speed = self.working_robot_manager.get_driving_speed_per_cell()
@@ -78,3 +76,4 @@ class SimulationEnvironment:
         while True:
             self.visualize_production.visualize_layout()
             yield self.env.timeout(1000)
+

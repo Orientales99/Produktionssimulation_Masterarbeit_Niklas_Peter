@@ -355,7 +355,11 @@ class CellInformation:
         text_area.pack(expand=True, fill="both")
 
         def on_close():
-            currently_open_windows.remove(title)
+            try:
+                currently_open_windows.remove(title)
+            except KeyError:
+                pass
+
             root.destroy()
 
         root.protocol("WM_DELETE_WINDOW", on_close)
