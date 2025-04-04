@@ -22,7 +22,6 @@ class ManufacturingPlan:
 
     def __init__(self, production):
         self.production = production
-
         self.dictionary_summarised_order_per_day = {}
         self.daily_manufacturing_plan = []
         self.process_list_for_every_machine = []
