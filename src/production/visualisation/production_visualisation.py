@@ -25,7 +25,7 @@ class ProductionVisualisation:
         if self.service_starting_conditions.set_visualising_via_terminal() is True:
             self.terminal_visualisation.visualize_production_layout_in_terminal()
         if self.service_starting_conditions.set_visualising_via_pygames() is True:
-            self.pygames_visualisation.visualize_production_layout_in_pygame()
+            return self.pygames_visualisation.visualize_production_layout_in_pygame()
 
 
 

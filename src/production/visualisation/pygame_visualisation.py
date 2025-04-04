@@ -64,6 +64,7 @@ class PygameVisualisation:
                 elif button_pressed == "stop":
                     # Aktion für Stop-Button, z.B. Simulation stoppen
                     started = False
+                return started
 
 
 

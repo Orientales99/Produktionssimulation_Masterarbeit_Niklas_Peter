@@ -69,11 +69,14 @@ class SimulationEnvironment:
         while True:
             self.transport_robot_manager.tr_drive_through_production_to_pick_up_destination()
             self.transport_robot_manager.tr_drive_through_production_to_unload_destination()
-            self.visualize_production.visualize_layout()
+            #self.visualize_production.visualize_layout()
             yield self.env.timeout(1 / driving_speed)
 
     def visualize_layout(self):
+        driving_speed = self.transport_robot_manager.get_driving_speed_per_cell()
         while True:
-            self.visualize_production.visualize_layout()
-            yield self.env.timeout(1000)
+            started = self.visualize_production.visualize_layout()
+            if started == False:
+                pass
+            yield self.env.timeout(1/driving_speed)
 
