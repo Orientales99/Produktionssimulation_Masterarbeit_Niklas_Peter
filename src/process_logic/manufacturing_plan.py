@@ -4,6 +4,7 @@ from datetime import date
 
 import pandas as pd
 
+from src.process_logic.machine_execution import MachineExecution
 from src.production.production import Production
 from src.order_data.order import Order
 from src.order_data.production_material import ProductionMaterial
@@ -13,6 +14,7 @@ from src.entity.machine import Machine
 
 class ManufacturingPlan:
     production: Production
+    machine_execution: MachineExecution
     service_product_information: ProductInformationService = ProductInformationService()
     summarised_order_list: list[Order] | None = None
     dictionary_summarised_order_per_day: dict[date, list[Order]]
@@ -20,8 +22,9 @@ class ManufacturingPlan:
     process_list_for_every_machine: list[(Machine, Order, int)] # (machine.identification_str, Order, step of the process)
     required_materials_for_every_machine: dict = {}
 
-    def __init__(self, production):
+    def __init__(self, production, machine_execution):
         self.production = production
+        self.machine_execution = machine_execution
         self.dictionary_summarised_order_per_day = {}
         self.daily_manufacturing_plan = []
         self.process_list_for_every_machine = []
@@ -142,7 +145,8 @@ class ManufacturingPlan:
 
             new_cell = self.production.find_cell_in_production_layout(
                 self.production.entities_located[identification_str][1])
-            shortest_que_time = new_cell.placed_entity.calculating_processing_list_queue_length()
+            machine = new_cell.placed_entity
+            shortest_que_time = self.machine_execution.calculating_processing_list_queue_length(machine)
 
             if shortest_que_time < total_shortest_que_time:
                 total_shortest_que_time = shortest_que_time
@@ -164,7 +168,8 @@ class ManufacturingPlan:
                 cell = self.production.find_cell_in_production_layout(
                     self.production.entities_located[identification_str][1])
 
-                list_with_required_material_for_one_machine = cell.placed_entity.get_list_with_required_material()
+                machine = cell.placed_entity
+                list_with_required_material_for_one_machine = self.machine_execution.get_list_with_required_material(machine)
                 if len(list_with_required_material_for_one_machine) != 0:
                     self.required_materials_for_every_machine.update({identification_str:
                                                                           list_with_required_material_for_one_machine})

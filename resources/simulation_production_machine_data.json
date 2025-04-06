@@ -16,7 +16,7 @@
     },
     {
       "machine_type": "1",
-      "number_of_machines_in_production": "2",
+      "number_of_machines_in_production": "5",
       "number_of_new_machines": "1",
       "driving_speed":  "3",
       "working_speed":  "1",

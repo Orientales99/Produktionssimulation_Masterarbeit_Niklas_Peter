@@ -13,6 +13,7 @@ class WorkingRobotManager:
     path_finding: PathFinding
     sorted_list_of_processes: list[tuple[Machine, Order, int]] = []
     list_wr_in_production: list[WorkingRobot] = []
+    list_driving_wr: list[WorkingRobot]
     dict_of_working_wr: dict[str, list[Cell]] = {}  # str= wr.identification_str
     list_wr_working_on_machine: list[WorkingRobot]
     waiting_time: int
@@ -22,8 +23,10 @@ class WorkingRobotManager:
         self.v = ProductionVisualisation(self.manufacturing_plan.production)
         self.path_finding = path_finding
         self.list_wr_working_on_machine = []
+        self.list_driving_wr = []
 
         self.list_wr_in_production = self.manufacturing_plan.production.wr_list
+
         self.waiting_time = self.list_wr_in_production[0].working_status.waiting_time_on_path
 
     def start_working_robot_manager(self):
@@ -33,42 +36,43 @@ class WorkingRobotManager:
 
     def get_path_for_wr(self):
         for wr in self.list_wr_in_production:
-            path_line_list = self.path_finding.get_path_for_entity(wr, wr.working_status.driving_destination_work_on_machine)
-            wr.working_status.driving_route_work_on_machine = path_line_list
-            wr.working_status.driving_to_new_location = True
+            if wr.working_status.driving_destination_work_on_machine is not None:
+                path_line_list = self.path_finding.get_path_for_entity(wr, wr.working_status.driving_destination_work_on_machine)
+                wr.working_status.driving_route_work_on_machine = path_line_list
+                wr.working_status.driving_to_new_location = True
+                self.list_driving_wr.append(wr)
 
     def wr_drive_through_production(self):
         """moving the wr one step further through the production. When a wr cannot move it's waiting for waiting_time
         period until in calculates a new path"""
 
-        for wr in self.list_wr_in_production:
+        for wr in self.list_driving_wr:
             if isinstance(wr.working_status.driving_route_work_on_machine, Exception):
                 self.v.visualize_layout()
                 print(f'{wr.identification_str}:{self.path_finding.get_start_cell_from_entity(wr)}, {wr.working_status.driving_route_work_on_machine}')
+            else:
 
-            if wr.working_status.driving_to_new_location is True and len(wr.working_status.driving_route_work_on_machine) != 0:
+                if wr.working_status.driving_to_new_location is True and len(wr.working_status.driving_route_work_on_machine) != 0:
 
-                start_cell = self.path_finding.get_start_cell_from_entity(wr)
+                    start_cell = self.path_finding.get_start_cell_from_entity(wr)
 
-                if self.path_finding.entity_movement.move_entity_one_step(start_cell, wr,
-                                                                          wr.working_status.driving_route_work_on_machine[0]) is True:
-                    wr.working_status.driving_route_work_on_machine.pop(0)
-                    wr.working_status.waiting_time_on_path = self.waiting_time
-                else:
-                    wr.working_status.waiting_time_on_path -= 1
-                    if wr.working_status.waiting_time_on_path == 0:
-                        path_line_list = self.path_finding.get_path_for_entity(wr,
-                                                                               wr.working_status.driving_destination_work_on_machine)
-                        wr.working_status.driving_route_work_on_machine = path_line_list
+                    if self.path_finding.entity_movement.move_entity_one_step(start_cell, wr,
+                                                                              wr.working_status.driving_route_work_on_machine[0]) is True:
+                        wr.working_status.driving_route_work_on_machine.pop(0)
+                        wr.working_status.waiting_time_on_path = self.waiting_time
+                    else:
+                        wr.working_status.waiting_time_on_path -= 1
+                        if wr.working_status.waiting_time_on_path == 0:
+                            path_line_list = self.path_finding.get_path_for_entity(wr,
+                                                                                   wr.working_status.driving_destination_work_on_machine)
+                            wr.working_status.driving_route_work_on_machine = path_line_list
 
-            elif len(wr.working_status.driving_route_work_on_machine) == 0 and wr.working_status.driving_to_new_location is True \
-                    and wr.working_status.working_for_machine is not None:
-                if wr not in self.list_wr_working_on_machine:
-                    self.wr_arrived_on_destination(wr)
+                elif len(wr.working_status.driving_route_work_on_machine) == 0 and wr.working_status.driving_to_new_location is True \
+                        and wr.working_status.working_for_machine is not None:
+                    if wr not in self.list_wr_working_on_machine:
+                        self.wr_arrived_on_destination(wr)
 
     def wr_arrived_on_destination(self, working_robot):
-
-        #self.v.visualize_layout()
 
         machine_identification_str = working_robot.working_status.working_for_machine.identification_str
 
@@ -79,9 +83,9 @@ class WorkingRobotManager:
         for cell in cell_list_wr:
             cell.placed_entity = None
         self.dict_of_working_wr[working_robot.identification_str] = cell_list_wr
-
+        self.list_driving_wr.remove(working_robot)
         self.list_wr_working_on_machine.append(working_robot)
-        #self.v.visualize_layout()
+
 
     def change__working_robot_on_machine_status(self, machine_identification_str: str, status: bool):
         cell_list_machine = self.manufacturing_plan.production.entities_located[machine_identification_str]
@@ -96,39 +100,23 @@ class WorkingRobotManager:
         self.sorted_list_of_processes = sorted(list_of_processes_for_every_machine, key=lambda x: x[1].priority,
                                                reverse=False)
 
-
-    # def get_list_of_all_wr(self) -> list[WorkingRobot]:
-    #     number_of_wr = self.manufacturing_plan.production.service_entity.get_quantity_of_wr()
-    #     self.list_wr_in_production = []
-#
-    #     for x in range(1, number_of_wr + 1):
-    #         identification_str = f"WR: {x}"
-#
-    #         cell = self.manufacturing_plan.production.find_cell_in_production_layout(
-    #             self.manufacturing_plan.production.entities_located[identification_str][1])
-    #         self.list_wr_in_production.append(cell.placed_entity)
-#
-    #     return self.list_wr_in_production
-
     def get_next_working_location_for_order(self):
         """process_order = (Machine, Order, int) int is an indicator for the process_step in order"""
         for wr in self.list_wr_in_production:
             if wr.working_status.waiting_for_order is True:
-                process_order = self.sorted_list_of_processes[0]
+                sorted_list_of_processes_local = self.sorted_list_of_processes[:]
+                for process_order in sorted_list_of_processes_local:
 
-                if process_order[0].waiting_for_arriving_of_wr is False and process_order[
-                    0].working_robot_on_machine is False:
-                    wr.working_status.waiting_for_order = False
-                    process_order[0].waiting_for_arriving_of_wr = True
-                    wr.working_status.working_for_machine = process_order[0]
-                    wr.working_status.driving_destination_work_on_machine = self.calculate_coordinates_of_new_driving_destination(
-                        process_order[0], wr)
+                    if process_order[0].waiting_for_arriving_of_wr is False and process_order[
+                        0].working_robot_on_machine is False:
+                        wr.working_status.waiting_for_order = False
+                        process_order[0].waiting_for_arriving_of_wr = True
+                        wr.working_status.working_for_machine = process_order[0]
+                        wr.working_status.driving_destination_work_on_machine = self.calculate_coordinates_of_new_driving_destination(
+                            process_order[0], wr)
 
-                    self.sorted_list_of_processes.remove(process_order)
-
-            # print(wr.identification_str)
-            # print(process_order[1])
-            # print(wr.working_status.driving_destination)
+                        self.sorted_list_of_processes.remove(process_order)
+                        break
 
     def calculate_coordinates_of_new_driving_destination(self, destination_machine: Machine,
                                                          working_robot) -> Coordinates:

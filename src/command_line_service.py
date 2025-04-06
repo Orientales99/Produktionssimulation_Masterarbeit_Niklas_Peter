@@ -16,7 +16,7 @@ class CommandLineService:
     def start_simulation(self):
         simulation_duration = self.production.service_starting_conditions.set_simulation_duration_per_day()
         self.simulation_environment.initialise_simulation_start()
-        self.simulation_environment.run_simulation(until=50)
+        self.simulation_environment.run_simulation(until=2000)
 
 
     def visualise_layout(self):

@@ -5,6 +5,7 @@ from src.entity.sink import Sink
 from src.entity.source import Source
 from src.entity.transport_order import TransportOrder
 from src.entity.transport_robot import TransportRobot
+from src.process_logic.machine_execution import MachineExecution
 from src.process_logic.manufacturing_plan import ManufacturingPlan
 from src.entity.required_material import RequiredMaterial
 from src.process_logic.path_finding import PathFinding
@@ -19,6 +20,7 @@ class TransportRobotManager:
     manufacturing_plan: ManufacturingPlan
     path_finding: PathFinding
     store_manager: StoreManager
+    machine_execution: MachineExecution
     material_transport_request_list = list[TransportOrder]
     tr_list = list[TransportRobot]
     entities_located_after_init = dict[str, list[Cell]]  # dict[tr.identification_str, list[Cell]
@@ -30,10 +32,11 @@ class TransportRobotManager:
 
     current_date: date
 
-    def __init__(self, simulation_environment, manufacturing_plan, path_finding):
+    def __init__(self, simulation_environment, manufacturing_plan, path_finding, machine_execution):
         self.env = simulation_environment
         self.manufacturing_plan = manufacturing_plan
         self.path_finding = path_finding
+        self.machine_execution = machine_execution
 
         self.v = ProductionVisualisation(self.manufacturing_plan.production)
         self.store_manager = StoreManager(self.env)
@@ -407,7 +410,8 @@ class TransportRobotManager:
 
                     if transport_order.quantity == 0:
                         tr.transport_order_list.remove(transport_order)
-                        transport_order.unload_destination.get_list_with_required_material()
+                        machine = transport_order.unload_destination
+                        self.machine_execution.get_list_with_required_material(machine)
 
                         tr.working_status.driving_to_new_location = False
                         tr.working_status.waiting_for_order = True

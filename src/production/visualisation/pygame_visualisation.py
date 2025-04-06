@@ -41,30 +41,29 @@ class PygameVisualisation:
         self.draw_grid_lines()
         self.draw_everything()
         run = True
-        started = False
 
-        # while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-            if started:
-                continue
+
             if pygame.mouse.get_pressed()[0]:  # Left Mouse button
                 position = pygame.mouse.get_pos()
                 row, col = self.get_clicked_pos(position)
-                if col < self.grid_off_set:
-                    self.cell_information.run_cell_information_printed(Coordinates(row, col))
-                    print(f"Reihe: {row}")
-                    print(f"Col: {col}")
+
+                self.cell_information.run_cell_information_printed(Coordinates(row, col))
+                print(f"Reihe: {row}")
+                print(f"Col: {col}")
+
                 button_pressed = self.check_button_click(position)
 
                 if button_pressed == "start":
                     # Aktion für Start-Button, z.B. Simulation starten
-                    started = True
+                    stop_event = False
+                    return stop_event
                 elif button_pressed == "stop":
                     # Aktion für Stop-Button, z.B. Simulation stoppen
-                    started = False
-                return started
+                    stop_event = True
+                    return stop_event
 
 
 
@@ -102,7 +101,7 @@ class PygameVisualisation:
             pygame.draw.line(self.window, ColorRGB.DARK_GRAY.value, (0, index * gap_y + self.grid_off_set),
                              (self.width_x, index * gap_y + self.grid_off_set))
             for j in range(self.rows):
-                pygame.draw.line(self.window, ColorRGB.DARK_GRAY.value, (j * gap_x, 56), (j * gap_x, self.width_y))
+                pygame.draw.line(self.window, ColorRGB.DARK_GRAY.value, (j * gap_x, self.grid_off_set), (j * gap_x, self.width_y))
 
 
     def draw_buttons(self):
@@ -156,7 +155,7 @@ class PygameVisualisation:
         y, x = position
 
         row = y // gap_y
-        col = self.max_coordinates.y - x // gap_x - 1
+        col = (self.max_coordinates.y - x // gap_x) + 4
 
         return row, col
 

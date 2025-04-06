@@ -13,12 +13,15 @@ class SimulationEnvironment:
     def __init__(self):
         self.env = simpy.Environment()
         self.production = Production(self.env)
-        self.manufacturing_plan = ManufacturingPlan(self.production)
+
         self.path_finding = PathFinding(self.production)
+        self.machine_execution = MachineExecution(self.production)
+        self.manufacturing_plan = ManufacturingPlan(self.production, self.machine_execution)
         self.working_robot_manager = WorkingRobotManager(self.manufacturing_plan, self.path_finding)
         self.visualize_production = ProductionVisualisation(self.production)
-        self.transport_robot_manager = TransportRobotManager(self.env, self.manufacturing_plan, self.path_finding)
-        self.machine_execution = MachineExecution(self.manufacturing_plan)
+        self.transport_robot_manager = TransportRobotManager(self.env, self.manufacturing_plan, self.path_finding, self.machine_execution)
+
+        self.stop_event = False
 
         # starting processes
         self.env.process(self.visualize_layout())
@@ -46,37 +49,45 @@ class SimulationEnvironment:
     def wr_driving_through_production(self):
         driving_speed = self.working_robot_manager.get_driving_speed_per_cell()
         while True:
-            self.working_robot_manager.wr_drive_through_production()
+            if self.stop_event is False:
+                self.working_robot_manager.wr_drive_through_production()
             yield self.env.timeout(1 / driving_speed)
 
     def tr_calculate_path(self):
         while True:
-            self.transport_robot_manager.path_calculation_for_every_requesting_tr()
+            if self.stop_event is False:
+                self.transport_robot_manager.path_calculation_for_every_requesting_tr()
             yield self.env.timeout(1)
 
     def tr_pick_up_process(self):
         while True:
-            self.transport_robot_manager.pick_up_material_on_tr()
+            if self.stop_event is False:
+                self.transport_robot_manager.pick_up_material_on_tr()
             yield self.env.timeout(1)
 
     def tr_unload_process(self):
         while True:
-            self.transport_robot_manager.unload_material_from_tr()
+            if self.stop_event is False:
+                self.transport_robot_manager.unload_material_from_tr()
             yield self.env.timeout(1)
 
     def tr_driving_through_production(self):
         driving_speed = self.transport_robot_manager.get_driving_speed_per_cell()
         while True:
-            self.transport_robot_manager.tr_drive_through_production_to_pick_up_destination()
-            self.transport_robot_manager.tr_drive_through_production_to_unload_destination()
-            #self.visualize_production.visualize_layout()
+            if self.stop_event is False:
+                self.transport_robot_manager.tr_drive_through_production_to_pick_up_destination()
+                self.transport_robot_manager.tr_drive_through_production_to_unload_destination()
+
             yield self.env.timeout(1 / driving_speed)
 
     def visualize_layout(self):
         driving_speed = self.transport_robot_manager.get_driving_speed_per_cell()
         while True:
-            started = self.visualize_production.visualize_layout()
-            if started == False:
-                pass
+            stop_event = self.visualize_production.visualize_layout()
+            if stop_event is False:
+                self.stop_event = False
+            if stop_event is True:
+                self.stop_event = True
             yield self.env.timeout(1/driving_speed)
+
 

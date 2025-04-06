@@ -67,7 +67,7 @@ class CellInformation:
         title = f"Cell: {machine.identification_str}"
 
         info_text = (
-            f"Cell Coordinates: X:{self.current_cell.cell_coordinates.x}, Y{self.current_cell.cell_coordinates.y}\n"
+            f"Cell Coordinates:   X: {self.current_cell.cell_coordinates.x}, Y: {self.current_cell.cell_coordinates.y}\n"
             "\n"
             f"Maschinen-ID:       {machine.identification_str}\n"
             f"\n"
@@ -165,9 +165,13 @@ class CellInformation:
         """Opens a window with information about the WorkingRobot."""
 
         title = f"Cell: {working_robot.identification_str}"
+        machine_id = (working_robot.working_status.working_for_machine.identification_str
+                      if working_robot.working_status.working_for_machine is not None
+                      else "None")
+        destination = (working_robot.working_status.driving_destination_work_on_machine if working_robot.working_status.driving_destination_work_on_machine is not None else "None")
 
         info_text = (
-            f"Cell Coordinates: X:   {self.current_cell.cell_coordinates.x}, Y{self.current_cell.cell_coordinates.y}\n"
+            f"Cell Coordinates:      X: {self.current_cell.cell_coordinates.x}, Y: {self.current_cell.cell_coordinates.y}\n"
             "\n"
             f"WorkingRobot-ID:       {working_robot.identification_str}\n"
             "\n"
@@ -180,8 +184,8 @@ class CellInformation:
             f"Working Status:\n"
             f"         Driving To New Location: {working_robot.working_status.driving_to_new_location}\n"
             f"         Waiting For Order:       {working_robot.working_status.waiting_for_order}\n"
-            f"         Machine:                 {working_robot.working_status.working_for_machine.identification_str}\n"
-            f"         Destination Machine:     {working_robot.working_status.driving_destination_work_on_machine}\n"
+            f"         Machine:                 {machine_id}\n"
+            f"         Destination Machine:     {destination}\n"
             f"         Waiting Time On Path:    {working_robot.working_status.waiting_time_on_path} sec.\n"
             f"\n"
             f"         Driving Route:           {working_robot.working_status.driving_route_work_on_machine}\n"
@@ -201,7 +205,7 @@ class CellInformation:
         title = f"Cell: {transport_robot.identification_str} "
 
         info_text = (
-            f"Cell Coordinates: X:     {self.current_cell.cell_coordinates.x}, Y{self.current_cell.cell_coordinates.y}\n"
+            f"Cell Coordinates:        X:{self.current_cell.cell_coordinates.x}, Y:{self.current_cell.cell_coordinates.y}\n"
             "\n"
             f"TransportRobot-ID:       {transport_robot.identification_str}\n"
             "\n"
@@ -222,7 +226,7 @@ class CellInformation:
             f"              Waiting Time On Path:    {transport_robot.working_status.waiting_time_on_path} sec.\n"
             "\n"
             f"      Transport Destination:\n"
-            f"              Pick-Up                   {pick_up_destination}\n"
+            f"              Pick-Up                  {pick_up_destination}\n"
             f"              Pick-Up Coordinates:     {transport_robot.working_status.driving_destination_pick_up_material}\n"
             f"              Pick-Up Route:           {transport_robot.working_status.driving_route_pick_up_material}\n"
             "\n"
@@ -258,10 +262,10 @@ class CellInformation:
                 unload_destination = Sink
 
             transport_order_str = f"           Transport Order {transport_order_number}:\n" \
-                                  f"                    Transporting Product:{transport_order.transporting_product.identification_str}\n" \
-                                  f"                    Pick Up Destination: {pick_up_station}\n" \
-                                  f"                    Unload Destination:  {unload_destination}\n" \
-                                  f"                    Quantity:            {transport_order.quantity}"
+                                  f"                    Transporting Product: {transport_order.transporting_product.identification_str}\n" \
+                                  f"                    Pick Up Destination:  {pick_up_station}\n" \
+                                  f"                    Unload Destination:   {unload_destination}\n" \
+                                  f"                    Quantity:             {transport_order.quantity}"
 
             transport_order_list_str += transport_order_str
 
