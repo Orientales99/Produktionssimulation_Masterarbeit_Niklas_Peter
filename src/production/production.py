@@ -104,7 +104,7 @@ class Production:
                         location_list.append(new_cell)
                     break
                 else:
-                    avoiding_collision_parameter += self.wr_list[i].size.y + 1
+                    avoiding_collision_parameter += self.wr_list[i].size.y + 2
             self.entities_located[self.wr_list[i].identification_str] = location_list
             self.entities_init_located[self.wr_list[i].identification_str] = location_list
 
@@ -130,7 +130,7 @@ class Production:
                         location_list.append(new_cell)
                     break
                 else:
-                    avoiding_collision_parameter += self.tr_list[i].size.y + 1
+                    avoiding_collision_parameter += self.tr_list[i].size.y + 2
             self.entities_located[self.tr_list[i].identification_str] = location_list
             self.entities_init_located[self.tr_list[i].identification_str] = location_list
 

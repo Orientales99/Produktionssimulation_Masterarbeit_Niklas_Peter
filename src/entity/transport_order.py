@@ -8,7 +8,7 @@ from src.order_data.production_material import ProductionMaterial
 
 @dataclass
 class TransportOrder:
-    unload_destination: Machine | Sink
+    unload_destination: Machine | Sink| Source
     pick_up_station: Machine | Source
     transporting_product: ProductionMaterial
     quantity: int

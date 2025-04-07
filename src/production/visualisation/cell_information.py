@@ -265,7 +265,7 @@ class CellInformation:
                                   f"                    Transporting Product: {transport_order.transporting_product.identification_str}\n" \
                                   f"                    Pick Up Destination:  {pick_up_station}\n" \
                                   f"                    Unload Destination:   {unload_destination}\n" \
-                                  f"                    Quantity:             {transport_order.quantity}"
+                                  f"                    Quantity:             {transport_order.quantity}\n"
 
             transport_order_list_str += transport_order_str
 

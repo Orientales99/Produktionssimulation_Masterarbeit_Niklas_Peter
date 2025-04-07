@@ -21,8 +21,8 @@ class EntityWorkingStatus:
     # TransportMachine
     driving_destination_pick_up_material: Coordinates | None = None
     driving_route_pick_up_material: list[Coordinates] | None = None
-    pick_up_location_entity: Machine | Sink | None = None
+    pick_up_location_entity: Machine | Source | None = None
 
     driving_destination_unload_material: Coordinates | None = None
     driving_route_unload_material: list[Coordinates] | None = None
-    unload_location_entity: Machine | Source | None = None
+    unload_location_entity: Machine | Source | Sink | None = None
