@@ -31,7 +31,11 @@ class ColorRGB(Enum):
 
 class OrderPriority(Enum):
     EXPRESS_ORDER = 0
-    STANDARD_ORDER = 1
+    STANDARD_ORDER_1 = 1
+    STANDARD_ORDER_2 = 2
+    STANDARD_ORDER_3 = 3
+    STANDARD_ORDER_4 = 4
+    STANDARD_ORDER_5 = 5
 
 
 class MachineQuality(Enum):

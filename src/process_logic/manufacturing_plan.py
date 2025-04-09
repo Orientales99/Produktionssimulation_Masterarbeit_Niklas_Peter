@@ -4,7 +4,7 @@ from datetime import date
 
 import pandas as pd
 
-from src.process_logic.machine_execution import MachineExecution
+from src.process_logic.machine_manager import Machine_Manager
 from src.production.production import Production
 from src.order_data.order import Order
 from src.order_data.production_material import ProductionMaterial
@@ -14,7 +14,7 @@ from src.entity.machine import Machine
 
 class ManufacturingPlan:
     production: Production
-    machine_execution: MachineExecution
+    machine_execution: Machine_Manager
     service_product_information: ProductInformationService = ProductInformationService()
     summarised_order_list: list[Order] | None = None
     dictionary_summarised_order_per_day: dict[date, list[Order]]
@@ -25,6 +25,7 @@ class ManufacturingPlan:
     def __init__(self, production, machine_execution):
         self.production = production
         self.machine_execution = machine_execution
+
         self.dictionary_summarised_order_per_day = {}
         self.daily_manufacturing_plan = []
         self.process_list_for_every_machine = []

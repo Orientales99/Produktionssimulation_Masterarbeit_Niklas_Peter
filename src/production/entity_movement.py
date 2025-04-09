@@ -3,7 +3,7 @@ from src.entity.transport_robot import TransportRobot
 from src.entity.working_robot import WorkingRobot
 from src.production.base.coordinates import Coordinates
 from src.production.production import Production
-from src.production.visualisation.production_visualisation import ProductionVisualisation
+
 
 
 class EntityMovement:
@@ -11,7 +11,7 @@ class EntityMovement:
 
     def __init__(self, production):
         self.production = production
-        self.visualisation = ProductionVisualisation(production)
+
 
     def move_entity_one_step(self, start_cell, entity: Machine | WorkingRobot | TransportRobot, path) -> bool:
         cell = start_cell

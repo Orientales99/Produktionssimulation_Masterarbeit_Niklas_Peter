@@ -18,9 +18,11 @@ class PygameVisualisation:
     production_layout: list[list[Cell]]
     grid: list[list]
     grid_off_set: int
+    start: bool
 
-    def __init__(self, production):
+    def __init__(self, production, env):
         pygame.init()
+        self.env = env
         self.production = production
         self.cell_information = CellInformation(self.production)
         self.max_coordinates = self.production.service_starting_conditions.set_max_coordinates_for_production_layout()
@@ -31,6 +33,7 @@ class PygameVisualisation:
         self.window = None
         self.grid = []
         self.grid_off_set = 45
+        self.start = False
 
         self.get_width_of_layout()
         self.set_display()
@@ -50,10 +53,6 @@ class PygameVisualisation:
                 position = pygame.mouse.get_pos()
                 row, col = self.get_clicked_pos(position)
 
-                self.cell_information.run_cell_information_printed(Coordinates(row, col))
-                print(f"Reihe: {row}")
-                print(f"Col: {col}")
-
                 button_pressed = self.check_button_click(position)
 
                 if button_pressed == "start":
@@ -65,21 +64,24 @@ class PygameVisualisation:
                     stop_event = True
                     return stop_event
 
+                self.cell_information.run_cell_information_printed(Coordinates(row, col))
+                print(f"Reihe: {row}")
+                print(f"Col: {col}")
 
-
+            if self.start is True:
+                self.start = False
+                stop_event = True
+                return stop_event
 
     def set_display(self):
         self.window = pygame.display.set_mode((self.width_x, self.width_y))
 
-
     def caption_for_display(self):
         pygame.display.set_caption("Production Simulation", "Masterthesis: Niklas Peter")
-
 
     def get_width_of_layout(self):
         self.width_x = self.max_coordinates.x * 9
         self.width_y = self.max_coordinates.y * 9 + self.grid_off_set
-
 
     def make_grid(self):
         self.rows = self.max_coordinates.x
@@ -93,7 +95,6 @@ class PygameVisualisation:
                 spot = PygameSpot(y, x, gap_x, gap_y, self.rows, cell)
                 self.grid[y].append(spot)
 
-
     def draw_grid_lines(self):
         gap_x = self.width_x // self.rows
         gap_y = self.width_y // self.col
@@ -101,10 +102,10 @@ class PygameVisualisation:
             pygame.draw.line(self.window, ColorRGB.DARK_GRAY.value, (0, index * gap_y + self.grid_off_set),
                              (self.width_x, index * gap_y + self.grid_off_set))
             for j in range(self.rows):
-                pygame.draw.line(self.window, ColorRGB.DARK_GRAY.value, (j * gap_x, self.grid_off_set), (j * gap_x, self.width_y))
+                pygame.draw.line(self.window, ColorRGB.DARK_GRAY.value, (j * gap_x, self.grid_off_set),
+                                 (j * gap_x, self.width_y))
 
-
-    def draw_buttons(self):
+    def draw_start_stop_buttons(self):
         """Zeichnet rechteckige Buttons mit den Beschriftungen 'Start' und 'Stop'."""
         font = pygame.font.SysFont('Arial', 24)  # Verwenden einer Standard-Schriftart
 
@@ -130,15 +131,39 @@ class PygameVisualisation:
         pygame.draw.rect(self.window, (0, 0, 0), self.stop_button_rect, 3)  # Schwarzer Rand
         stop_text = font.render("Stop", True, (0, 0, 0))  # Text für 'Stop' in Schwarz
         self.window.blit(stop_text, (
-            stop_x + (button_width - stop_text.get_width()) // 2, start_y + (button_height - stop_text.get_height()) // 2))
+            stop_x + (button_width - stop_text.get_width()) // 2,
+            start_y + (button_height - stop_text.get_height()) // 2))
 
+    def draw_simulation_time(self):
+        """Zeigt SimPy-Zeit als Tag, Stunde, Minute und Sekunde rechts neben den Buttons an."""
+        font = pygame.font.SysFont('Arial', 20)
+        sim_time = int(self.env.now)
+
+        tage = sim_time // (24 * 3600)
+        rest = sim_time % (24 * 3600)
+        stunden = rest // 3600
+        rest %= 3600
+        minuten = rest // 60
+        sekunden = rest % 60
+
+        labels = [("Tag", tage), ("Std", stunden), ("Min", minuten), ("Sek", sekunden)]
+
+        start_x = self.stop_button_rect.right + 30
+        start_y = 15
+        spacing = 90
+
+        for i, (label, value) in enumerate(labels):
+            text = f"{label}: {value:02d}"
+            text_surface = font.render(text, True, (0, 0, 0))
+            self.window.blit(text_surface, (start_x + i * spacing, start_y))
 
     def draw_everything(self):
         """Zeichnet das gesamte Layout und verschiebt das Grid nach unten."""
-        self.window.fill(ColorRGB.WHITE.value)  # Hintergrund des Fensters
-        self.draw_buttons()  # Buttons zeichnen
+        self.window.fill(ColorRGB.WHITE.value)
+        self.draw_start_stop_buttons()
+        self.draw_simulation_time()
 
-        grid_offset_y = self.grid_off_set  # Der Platz, den die Buttons oben beanspruchen
+        grid_offset_y = self.grid_off_set
 
         for row in self.grid:
             for spot in row:
@@ -146,7 +171,6 @@ class PygameVisualisation:
 
         self.draw_grid_lines()
         pygame.display.update()
-
 
     def get_clicked_pos(self, position):
         gap_x = self.width_x // self.rows
@@ -158,7 +182,6 @@ class PygameVisualisation:
         col = (self.max_coordinates.y - x // gap_x) + 4
 
         return row, col
-
 
     def check_button_click(self, position):
         """Überprüft, ob einer der Buttons (Start oder Stop) angeklickt wurde."""

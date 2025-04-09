@@ -12,6 +12,7 @@ from src.order_data.production_material import ProductionMaterial
 @dataclass
 class Machine:
     machine_type: int
+    is_working: bool
     identification_number: int
     machine_quality: MachineQuality
     driving_speed: int
@@ -20,7 +21,7 @@ class Machine:
     machine_storage: MachineStorage
     working_robot_on_machine: bool
 
-    producing_product: Product | None
+    producing_production_material: ProductionMaterial | None
     setting_up_time: float  # Rüstzeit
 
     processing_list: list[(Order, int)] = field(

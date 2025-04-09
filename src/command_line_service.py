@@ -6,7 +6,7 @@ from src.simulation_environmnent.simulation_environment import SimulationEnviron
 class CommandLineService:
     simulation_environment = SimulationEnvironment()
     production = Production(simulation_environment)
-    production_visualisation = ProductionVisualisation(production)
+    production_visualisation = ProductionVisualisation(production, simulation_environment)
 
 
     def create_production(self):

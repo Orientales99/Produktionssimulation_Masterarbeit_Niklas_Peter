@@ -33,24 +33,24 @@ class ProductInformationService:
                 processing_step_3 = product['processing_step_3']
                 processing_step_4 = product['processing_step_4']
 
-                required_product_type_step_1 = ProductionMaterial(f'{product_id}.0', product_id, product_size, 0)
+                required_product_type_step_1 = ProductionMaterial(f'{product_id}.0', product_id, product_size, ItemType(0))
                 processing_time_step_1 = product['processing_time_step_1']
 
                 if processing_step_2 is not None:
-                    required_product_type_step_2 = ProductionMaterial(f'{product_id}.1', product_id, product_size, 1)
+                    required_product_type_step_2 = ProductionMaterial(f'{product_id}.1', product_id, product_size, ItemType(1))
                     processing_time_step_2 = product['processing_time_step_2']
                 else:
                     required_product_type_step_2 = None
                     processing_time_step_2 = None
 
                 if processing_step_3 is not None:
-                    required_product_type_step_3 = ProductionMaterial(f'{product_id}.2', product_id, product_size, 2)
+                    required_product_type_step_3 = ProductionMaterial(f'{product_id}.2', product_id, product_size, ItemType(2))
                     processing_time_step_3 = product['processing_time_step_3']
                 else:
                     required_product_type_step_3 = None
                     processing_time_step_3 = None
 
-                required_product_type_step_4 = ProductionMaterial(f'{product_id}.3', product_id, product_size, 3)
+                required_product_type_step_4 = ProductionMaterial(f'{product_id}.3', product_id, product_size, ItemType(3))
                 processing_time_step_4 = product['processing_time_step_4']
 
                 self.product_list.append(

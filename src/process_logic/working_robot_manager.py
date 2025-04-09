@@ -5,7 +5,6 @@ from src.entity.machine import Machine
 from src.process_logic.manufacturing_plan import ManufacturingPlan
 from src.process_logic.path_finding import PathFinding
 from src.production.base.cell import Cell
-from src.production.visualisation.production_visualisation import ProductionVisualisation
 
 
 class WorkingRobotManager:
@@ -20,7 +19,6 @@ class WorkingRobotManager:
 
     def __init__(self, manufacturing_plan: ManufacturingPlan, path_finding: PathFinding):
         self.manufacturing_plan = manufacturing_plan
-        self.v = ProductionVisualisation(self.manufacturing_plan.production)
         self.path_finding = path_finding
         self.list_wr_working_on_machine = []
         self.list_driving_wr = []
@@ -48,7 +46,6 @@ class WorkingRobotManager:
 
         for wr in self.list_driving_wr:
             if isinstance(wr.working_status.driving_route_work_on_machine, Exception):
-                self.v.visualize_layout()
                 print(f'{wr.identification_str}:{self.path_finding.get_start_cell_from_entity(wr)}, {wr.working_status.driving_route_work_on_machine}')
             else:
 
@@ -97,7 +94,7 @@ class WorkingRobotManager:
 
         self.sorted_list_of_processes = sorted(list_of_processes_for_every_machine,
                                                key=lambda x: x[1].daily_manufacturing_sequence, reverse=False)
-        self.sorted_list_of_processes = sorted(list_of_processes_for_every_machine, key=lambda x: x[1].priority,
+        self.sorted_list_of_processes = sorted(list_of_processes_for_every_machine, key=lambda x: x[1].priority.value,
                                                reverse=False)
 
     def get_next_working_location_for_order(self):

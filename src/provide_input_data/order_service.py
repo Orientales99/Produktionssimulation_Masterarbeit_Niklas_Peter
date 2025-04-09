@@ -4,7 +4,7 @@ import pandas as pd
 from src import RESOURCES, ANALYSIS_SOLUTION
 from src.order_data.order import Order
 from src.provide_input_data.product_information_service import ProductInformationService
-from src.constant.constant import ProductGroup
+from src.constant.constant import ProductGroup, OrderPriority
 from datetime import date
 
 
@@ -60,7 +60,7 @@ class OrderService:
             order = Order(
                 product,
                 row["AnzahlProArtikel"],
-                date.fromisoformat(row["datum"]), 1
+                date.fromisoformat(row["datum"]), OrderPriority(5)
             )
             self.product_order_list.append(order)
 

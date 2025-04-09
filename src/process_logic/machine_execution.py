@@ -1,119 +1,121 @@
-from datetime import date
-
-from src.constant.constant import MachineQuality
+from src.constant.constant import ItemType, OrderPriority
 from src.entity.machine import Machine
-from src.entity.required_material import RequiredMaterial
 from src.order_data.order import Order
 from src.order_data.production_material import ProductionMaterial
+from src.process_logic.manufacturing_plan import ManufacturingPlan
+
 
 class MachineExecution:
-    machine_list: list[Machine]
-    list_full_store_after_process = list[Machine]
+    def __init__(self, env, manufacturing_plan):
+        self.env = env
+        self.manufacturing_plan = manufacturing_plan
 
+    def run_machine_production(self, machine):
+        working_speed = int(machine.working_speed)
+        new_product_produced = False
+        while True:
+            if machine.working_robot_on_machine:
+                input_store = machine.machine_storage.storage_before_process
+                output_store = machine.machine_storage.storage_after_process
+                item = self.check_processing_list_input_store(machine)
 
-    def __init__(self, production):
-        self.production = production
-        self.machine_list = self.production.machine_list
+                if item is not False:
+                    if item.production_material_id != machine.producing_production_material:
+                        yield self.env.timeout(machine.setting_up_time)  # Umrüstzeit
+                        new_product_produced = True
+                        self.get_production_prodution_material_on_machine(machine)
 
-        self.list_full_store_after_process = []
-        self.material_transport_request_list = []
+                    machine.is_working = True
+                    input_store.items.remove(item)
+                    yield self.env.timeout(working_speed)
+                    new_item = self.create_new_item_after_process(item)
+                    yield output_store.put(new_item)
 
-    def create_tr_process_order_list(self):
-
-        pass
-
-    def check_any_machine_store_after_process_full(self):
-        for machine in self.machine_list:
-            if len(machine.machine_storage.storage_after_process.items) >= machine.machine_storage.storage_after_process.capacity:
-                self.list_full_store_after_process.append(machine)
-
-    def check_for_starting_machine_process(self):
-        """Checking if the machine can start the production of production"""
-        for machine in self.machine_list:
-            if machine not in self.list_full_store_after_process:
-                if machine.processing_list > 0:
-                    if machine.working_robot_on_machine is True or machine.waiting_for_arriving_of_wr is True:
-                        order, step = machine.processing_list[0]
-                        required_material = f'required_product_type_step_{step}'
-                        if required_material in machine.machine_storage.storage_before_process.items:
-                            self.start_process(machine)
-
-
-                        else:  # request_tr
-                            pass
-                    else:  # request wr
-                        pass
-            else:  # check for new orders
-                pass
-
-    def start_process_of_machine(self, machine):
-        pass
-
-    def calculating_processing_list_queue_length(self, machine: Machine):
-        if len(machine.processing_list) != 0:
-            machine.processing_list_queue_length = float(0)
-            for order, step_of_the_process in machine.processing_list:
-                number_of_required_products = order.number_of_products_per_order
-                time_to_process_one_product = self.get_time_to_process_one_product(order, step_of_the_process)
-                if order.product != machine.producing_product:
-                    machine.processing_list_queue_length += (
-                                                                 int(number_of_required_products) * time_to_process_one_product) + \
-                                                         machine.setting_up_time
-                elif order.product == machine.producing_product:
-                    machine.processing_list_queue_length += (
-                            int(number_of_required_products) * time_to_process_one_product)
+                    if new_product_produced is True:
+                        self.give_order_to_next_machine(new_item, machine)
+                        new_product_produced = False
                 else:
-                    return Exception("Queue length cannot be calculated probably")
+                    # Wenn kein Produkt da, kurz warten und neu prüfen
+                    machine.is_working = False
+                    yield self.env.timeout(1)
+            else:
+                machine.is_working = False
+                # Kein WR zugewiesen → warten und später wieder prüfen
+                yield self.env.timeout(1)
 
-        if machine.machine_quality == MachineQuality.OLD_MACHINE:
-            machine.processing_list_queue_length += machine.processing_list_queue_length * 0.2
+    def get_production_prodution_material_on_machine(self, machine: Machine):
+        for item in machine.machine_storage.storage_before_process.items:
+            for order, quantity in machine.processing_list:
+                if item.production_material_id == order.product.product_id:
+                    machine.producing_production_material = item
 
-        return machine.processing_list_queue_length
+    def check_processing_list_input_store(self, machine: Machine) -> ProductionMaterial | bool:
+        """ Checks if the machine's input store contains an item matching any order in the processing list.
+            Returns: Matching item if found, else None."""
+        for item in machine.machine_storage.storage_before_process.items:
+            for order, quantity in machine.processing_list:
+                if item.production_material_id == order.product.product_id:
+                    return item
+        return False
 
-    def get_time_to_process_one_product(self, order, step_of_the_process) -> float:
-        if step_of_the_process == 1:
-            time_to_process_one_product = order.product.processing_time_step_1
-            return time_to_process_one_product
+    def create_new_item_after_process(self, item: ProductionMaterial) -> ProductionMaterial:
+        """Creating a new ProductionMaterial, identification_str gets an update (ex:# Example: ProductGroup.SEVEN.0 ->
+         Example: ProductGroup.SEVEN.1, and item_type (+1).
+         Return: new ProductionMaterial"""
+        parts = item.identification_str.rsplit(".", 1)
+        parts[-1] = str(int(parts[-1]) + 1)
+        new_identification_str = ".".join(parts)
 
-        if step_of_the_process == 2:
-            time_to_process_one_product = order.product.processing_time_step_2
-            return time_to_process_one_product
+        new_item_type = ItemType(item.item_type.value + 1)
 
-        if step_of_the_process == 3:
-            time_to_process_one_product = order.product.processing_time_step_3
-            return time_to_process_one_product
+        return ProductionMaterial(new_identification_str, item.production_material_id, item.size, new_item_type)
 
-        if step_of_the_process == 4:
-            time_to_process_one_product = order.product.processing_time_step_4
-            return time_to_process_one_product
+    def give_order_to_next_machine(self, new_item: ProductionMaterial, machine: Machine):
+        """Takes the item and gives the order to the next machine."""
+        for order, quantity in machine.processing_list:
+            if new_item.production_material_id == order.product.product_id:
 
+                # get processing step of the material
+                parts = new_item.identification_str.rsplit(".", 1)
+                parts[1] = int(parts[-1])
 
-    def get_list_with_required_material(self, machine: Machine) -> list[RequiredMaterial]:
-        """get a list with required material and quantity based on the processing_list"""
-        machine.required_material_list = []
-        for order, step_of_the_process in machine.processing_list:
-            data_processing_step = self.get_data_of_processing_step_for_machine(order, machine)
-            required_material = data_processing_step[0]
-            quantity_in_store = sum(1 for item in machine.machine_storage.storage_before_process.items
-                                    if item.identification_str == required_material.identification_str)
-            quantity_of_necessary_material = order.number_of_products_per_order - quantity_in_store
+                if parts[1] == 1:
+                    identification_str_shortest_que_time = self.get_shortest_que_time_for_machine_type(
+                        2)  # 2 -> because it is processing step 2 if ProductionMaterial.1 is required
+                    self.decrease_order_priority(order)
+                    self.append_existing_order(identification_str_shortest_que_time, order)
 
-            machine.required_material_list.append(RequiredMaterial(required_material, quantity_of_necessary_material))
+                elif parts[1] == 2:
+                    identification_str_shortest_que_time = self.get_shortest_que_time_for_machine_type(3)
+                    self.decrease_order_priority(order)
+                    self.append_existing_order(identification_str_shortest_que_time, order)
 
-        return machine.required_material_list
+                elif parts[1] == 3:
+                    identification_str_shortest_que_time = self.get_shortest_que_time_for_machine_type(5)
+                    self.decrease_order_priority(order)
+                    self.append_existing_order(identification_str_shortest_que_time, order)
 
-    def get_data_of_processing_step_for_machine(self, order: Order, machine: Machine) -> tuple[ProductionMaterial, int]:
-        """gives a tuple with required product type for this step and the processing_time_per_product"""
-        if order.product.processing_step_1 == machine.machine_type:
-            processing_step = (order.product.required_product_type_step_1, order.product.processing_time_step_1)
+    def decrease_order_priority(self, order):
+        """decrease the priority_number but increasing the importance of the Order"""
+        priorities = list(OrderPriority)
+        current_index = priorities.index(order.priority)
+        new_index = max(0, current_index - 1)
+        order.priority = priorities[new_index]
 
-        if order.product.processing_step_2 == machine.machine_type:
-            processing_step = (order.product.required_product_type_step_2, order.product.processing_time_step_2)
+    def get_shortest_que_time_for_machine_type(self, executing_machine_type: int) -> str:
+        machine_type_list = self.manufacturing_plan.production.service_entity.get_quantity_per_machine_types_list()
 
-        if order.product.processing_step_3 == machine.machine_type:
-            processing_step = (order.product.required_product_type_step_3, order.product.processing_time_step_3)
+        for machine_type, number_of_machines_in_production in machine_type_list:
+            if executing_machine_type == machine_type:
+                identification_str_shortest_que_time = self.manufacturing_plan.get_machine_str_with_shortest_queue_time(
+                    machine_type,
+                    number_of_machines_in_production)
+                return identification_str_shortest_que_time
 
-        if order.product.processing_step_4 == machine.machine_type:
-            processing_step = (order.product.required_product_type_step_4, order.product.processing_time_step_4)
-
-        return processing_step
+    def append_existing_order(self, identification_str_shortest_que_time: str, order: Order):
+        """takes the str from the machine with the shortest_que_time and gives it the new order"""
+        for cell in self.manufacturing_plan.production.entities_located[identification_str_shortest_que_time]:
+            new_cell = self.manufacturing_plan.production.find_cell_in_production_layout(cell)
+            if (order, 1) not in new_cell.placed_entity.processing_list:
+                new_cell.placed_entity.processing_list.append((order, 1))
+                self.manufacturing_plan.process_list_for_every_machine.append((cell.placed_entity, order, 1))

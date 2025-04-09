@@ -9,11 +9,11 @@ from src.order_data.production_material import ProductionMaterial
 @dataclass
 class Product:
     product_id: ProductGroup
-    size: Coordinates  # Europalette = 100 units
+    size: Coordinates               # Europalette = 100 units
     item_type: ItemType
 
     required_product_type_step_1: ProductionMaterial | None
-    processing_step_1: int | None
+    processing_step_1: int | None                          # Machine Type which is required to produce the next product
     processing_time_step_1: float | None
 
     required_product_type_step_2: ProductionMaterial | None

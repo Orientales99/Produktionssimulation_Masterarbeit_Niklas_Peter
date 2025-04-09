@@ -7,8 +7,8 @@ from src.constant.constant import ItemType, ProductGroup
 
 @dataclass
 class ProductionMaterial:
-    identification_str: str
+    identification_str: str                 # Example: ProductGroup.SEVEN.0
     production_material_id: ProductGroup
-    size: Coordinates  # Europalette = 100 units
+    size: Coordinates
     item_type: ItemType
 

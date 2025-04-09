@@ -87,6 +87,7 @@ class EntityService:
     def create_machine(self, machine_type, identification_number, machine_quality) -> Machine:
         machine_stats = self.data_production_machine["production_machine"][machine_type]
         return Machine(machine_type,
+                       False,
                        identification_number,
                        MachineQuality(machine_quality),
                        machine_stats["driving_speed"],

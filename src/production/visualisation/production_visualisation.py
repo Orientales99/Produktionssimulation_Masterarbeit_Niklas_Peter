@@ -13,11 +13,12 @@ class ProductionVisualisation:
     terminal_visualisation: TerminalVisualisation
     pygames_visualisation: PygameVisualisation
 
-    def __init__(self, production):
+    def __init__(self, production, env):
         self.production = production
+        self.env = env
         self.matplotlib_visualisation = MatplotlibVisualisation(self.production)
         self.terminal_visualisation = TerminalVisualisation(self.production)
-        self.pygames_visualisation = PygameVisualisation(self.production)
+        self.pygames_visualisation = PygameVisualisation(self.production, self.env)
 
     def visualize_layout(self):
         if self.service_starting_conditions.set_visualising_via_matplotlib() is True:

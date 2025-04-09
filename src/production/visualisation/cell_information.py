@@ -63,6 +63,7 @@ class CellInformation:
         items_in_store_after_process = self.get_str_products_in_store(machine.machine_storage.storage_after_process)
         processing_list_str = self.get_str_order_list(machine.processing_list)
         required_material_list_str = self.get_str_required_material_list(machine.required_material_list)
+        produced_product = (machine.producing_production_material.identification_str if machine.producing_production_material is not None else "None")
 
         title = f"Cell: {machine.identification_str}"
 
@@ -71,9 +72,12 @@ class CellInformation:
             "\n"
             f"Maschinen-ID:       {machine.identification_str}\n"
             f"\n"
+            f"Machine is working: {machine.is_working}\n"
+            f"Produced Product:   {produced_product}\n"
+            f"\n"
             f"Machine Qualität:   {machine.machine_quality}\n"
             f"Driving Speed:      {machine.driving_speed} field/sec.\n"
-            f"Working Speed:      {self.current_cell_coordinates} sec./unit\n"
+            f"Working Speed:      {machine.working_speed} sec./unit\n"
             f"Setting Up Time:    {machine.setting_up_time} sec.\n"
             f"Size:\n"
             f"   width:           {machine.size.x}\n"
@@ -149,10 +153,11 @@ class CellInformation:
 
         for order, int in order_list:
             order_int = f"           Order:                         {order.product.identification_str}\n" \
-                        f"           order_date:                    {order.order_date}\n" \
-                        f"           Number of Products:            {order.number_of_products_per_order}\n" \
-                        f"           priority:                      {order.priority}\n" \
-                        f"           daily_manufacturing_sequence:  {order.daily_manufacturing_sequence} "
+                        f"               order_date:                    {order.order_date}\n" \
+                        f"               Number of Products:            {order.number_of_products_per_order}\n" \
+                        f"               priority:                      {order.priority}\n" \
+                        f"               daily_manufacturing_sequence:  {order.daily_manufacturing_sequence} \n"\
+                        f"\n"
 
             order_list_str += order_int
 
@@ -214,7 +219,7 @@ class CellInformation:
             f"   height:               {transport_robot.size.y}\n"
             "\n"
             f"Driving Speed:           {transport_robot.driving_speed} field/sec.\n"
-            f"Loading Speed:           {transport_robot.loading_speed} units/sec.\n"
+            f"Loading Speed:           {transport_robot.loading_speed} pallet/sec.\n"
             f"\n"
             f"Numbers of Transport Orders:    {len(transport_robot.transport_order_list)}\n"
             f"Transport Orders:\n"
