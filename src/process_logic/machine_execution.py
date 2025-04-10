@@ -1,4 +1,5 @@
 from src.constant.constant import ItemType, OrderPriority
+from src.entity.Process_material import ProcessMaterial
 from src.entity.machine import Machine
 from src.entity.processing_order import ProcessingOrder
 from src.order_data.order import Order
@@ -32,7 +33,7 @@ class MachineExecution:
                     machine.is_working = True
                     input_store.items.remove(item)
                     # yield self.env.timeout(working_speed)
-                    yield self.env.timeout(0)
+                    # yield self.env.timeout(0)
 
                     new_item = self.machine_manager.create_new_item_after_process(machine, item)
                     yield output_store.put(new_item)
@@ -42,9 +43,9 @@ class MachineExecution:
 
                     if new_product_produced is True:
                         self.give_order_to_next_machine(new_item, machine)
-                        self.machine_manager.sort_machine_processing_list(machine)
+
                         print(f"{machine.identification_str}: {machine.processing_list}")
-                        self.manufacturing_plan.get_required_material_for_every_machine()
+                        # self.manufacturing_plan.get_required_material_for_every_machine()
                         new_product_produced = False
                 else:
                     # Wenn kein Produkt da, kurz warten und neu prüfen
@@ -101,7 +102,6 @@ class MachineExecution:
                         self.append_existing_order(machine_identification_str_shortest_que_time, processing_order.order,
                                                    step_of_the_process)
 
-
     def get_shortest_que_time_for_machine_type(self, executing_machine_type: int) -> str:
         """Get the identification str of the machine with the shortest que time. It is a selection of all
          machine with the same type."""
@@ -124,3 +124,20 @@ class MachineExecution:
             if processing_order not in new_cell.placed_entity.processing_list:
                 new_cell.placed_entity.processing_list.append(processing_order)
                 self.manufacturing_plan.process_list_for_every_machine.append((cell.placed_entity, processing_order))
+                self.append_existing_process_material_list(cell.placed_entity, processing_order)
+                self.machine_manager.sort_machine_processing_list(cell.placed_entity)
+
+    def append_existing_process_material_list(self, machine: Machine, processing_order: ProcessingOrder):
+        """append required material and quantity based on the processing_list"""
+
+        # required material
+        data_processing_step = self.machine_manager.get_data_of_processing_step_for_machine(processing_order.order,
+                                                                                            machine)
+        required_material = data_processing_step[0]
+        quantity_of_necessary_material = processing_order.order.number_of_products_per_order
+        # producing material
+        producing_material = self.machine_manager.create_new_item_after_process(machine, required_material)
+        quantity_of_producing_material = quantity_of_necessary_material
+        machine.process_material_list.append(ProcessMaterial(required_material, quantity_of_necessary_material,
+                                                             producing_material,
+                                                             quantity_of_producing_material))

@@ -66,7 +66,6 @@ class TransportRobotManager:
 
         if len(self.list_tr_rdy_to_calculate_path) != 0:
             for tr in self.list_tr_rdy_to_calculate_path[:]:
-                self.get_transport_order_for_tr(tr)
                 self.get_path_for_tr(tr)
         pass
 
@@ -307,9 +306,9 @@ class TransportRobotManager:
 
         for tr in list_tr_drive_to_pick_up_local:
             if isinstance(tr.working_status.driving_route_pick_up_material, Exception):
-                self.v.visualize_layout()
                 print(
-                    f'{tr.identification_str}:{self.path_finding.get_start_cell_from_entity(tr)}, {tr.working_status.driving_route_pick_up_material}')
+                    f'{tr.identification_str}:{self.path_finding.get_start_cell_from_entity(tr)}, '
+                    f'{tr.working_status.driving_route_pick_up_material}')
 
             if tr.working_status.waiting_for_order is False and \
                     tr.working_status.driving_to_new_location is True and \
@@ -318,9 +317,8 @@ class TransportRobotManager:
 
                 start_cell = self.path_finding.get_start_cell_from_entity(tr)
 
-                if self.path_finding.entity_movement.move_entity_one_step(start_cell, tr,
-                                                                          tr.working_status.driving_route_pick_up_material[
-                                                                              0]) is True:
+                if self.path_finding.entity_movement.move_entity_one_step(
+                        start_cell, tr, tr.working_status.driving_route_pick_up_material[0]) is True:
                     tr.working_status.driving_route_pick_up_material.pop(0)
                     tr.working_status.waiting_time_on_path = self.waiting_time
 
