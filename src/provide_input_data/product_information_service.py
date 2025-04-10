@@ -7,6 +7,7 @@ from src.order_data.production_material import ProductionMaterial
 
 
 class ProductInformationService:
+    product_list: list[Product]
 
     def __init__(self):
         self.data_product_information = None
@@ -54,8 +55,9 @@ class ProductInformationService:
                 processing_time_step_4 = product['processing_time_step_4']
 
                 self.product_list.append(
-                    Product(product_id, product_size, item_type,
-                            required_product_type_step_1, processing_step_1, processing_time_step_1,
-                            required_product_type_step_2, processing_step_2, processing_time_step_2,
-                            required_product_type_step_3, processing_step_3, processing_time_step_3,
-                            required_product_type_step_4, processing_step_4, processing_time_step_4))
+                        Product(product_id, product_size, item_type,
+                                required_product_type_step_1, processing_step_1, processing_time_step_1,
+                                required_product_type_step_2, processing_step_2, processing_time_step_2,
+                                required_product_type_step_3, processing_step_3, processing_time_step_3,
+                                required_product_type_step_4, processing_step_4, processing_time_step_4))
+        return self.product_list

@@ -4,6 +4,7 @@ from datetime import date
 
 import pandas as pd
 
+from src.entity.processing_order import ProcessingOrder
 from src.process_logic.machine_manager import Machine_Manager
 from src.production.production import Production
 from src.order_data.order import Order
@@ -15,17 +16,17 @@ from src.entity.machine import Machine
 class ManufacturingPlan:
     production: Production
     machine_execution: Machine_Manager
-    service_product_information: ProductInformationService = ProductInformationService()
+    service_product_information: ProductInformationService
     summarised_order_list: list[Order] | None = None
     dictionary_summarised_order_per_day: dict[date, list[Order]]
     daily_manufacturing_plan: list[Order]
-    process_list_for_every_machine: list[(Machine, Order, int)] # (machine.identification_str, Order, step of the process)
+    process_list_for_every_machine: list[(Machine, ProcessingOrder)] # (machine.identification_str, Order, step of the process)
     required_materials_for_every_machine: dict = {}
 
     def __init__(self, production, machine_execution):
         self.production = production
         self.machine_execution = machine_execution
-
+        self.service_product_information = ProductInformationService()
         self.dictionary_summarised_order_per_day = {}
         self.daily_manufacturing_plan = []
         self.process_list_for_every_machine = []
@@ -130,9 +131,28 @@ class ManufacturingPlan:
                                                                                                          number_of_machines_in_production)
                     for cell in self.production.entities_located[identification_str_shortest_que_time]:
                         new_cell = self.production.find_cell_in_production_layout(cell)
-                        if (order, 1) not in new_cell.placed_entity.processing_list:
-                            new_cell.placed_entity.processing_list.append((order, 1))
-                            self.process_list_for_every_machine.append((cell.placed_entity, order, 1))
+                        step_of_the_process = self.get_processing_step_on_machine(cell.placed_entity, order)
+                        priority = max(0, order.priority.value - step_of_the_process)
+
+                        processing_order = ProcessingOrder(order, step_of_the_process, priority)
+
+                        if processing_order not in new_cell.placed_entity.processing_list:
+                            new_cell.placed_entity.processing_list.append(processing_order)
+                            self.process_list_for_every_machine.append((cell.placed_entity, processing_order))
+
+    def get_processing_step_on_machine(self, machine: Machine, order: Order) -> int:
+        """gets the processing step of the order."""
+        for product in self.product_information_list:
+            if order.product.identification_str == product.identification_str:
+                if product.processing_step_1 == machine.machine_type:
+                    return machine.machine_type
+                elif product.processing_step_2 == machine.machine_type:
+                    return machine.machine_type
+                elif product.processing_step_3 == machine.machine_type:
+                    return machine.machine_type
+                elif product.processing_step_4 == machine.machine_type:
+                    return machine.machine_type
+
 
     def get_machine_str_with_shortest_queue_time(self, machine_type: int,
                                                  number_of_machines_per_machine_type: int) -> str:
@@ -170,7 +190,7 @@ class ManufacturingPlan:
                     self.production.entities_located[identification_str][1])
 
                 machine = cell.placed_entity
-                list_with_required_material_for_one_machine = self.machine_execution.get_list_with_required_material(machine)
+                list_with_required_material_for_one_machine = self.machine_execution.get_list_with_process_material(machine)
                 if len(list_with_required_material_for_one_machine) != 0:
                     self.required_materials_for_every_machine.update({identification_str:
                                                                           list_with_required_material_for_one_machine})

@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
 
 from src.constant.constant import MachineQuality
-from src.entity.required_material import RequiredMaterial
+from src.entity.Process_material import ProcessMaterial
+from src.entity.processing_order import ProcessingOrder
 from src.order_data.order import Order
 from src.order_data.product import Product
 from src.production.base.coordinates import Coordinates
@@ -24,9 +25,9 @@ class Machine:
     producing_production_material: ProductionMaterial | None
     setting_up_time: float  # Rüstzeit
 
-    processing_list: list[(Order, int)] = field(
+    processing_list: list[ProcessingOrder] = field(
         default_factory=list)  # default: empty | list (Order, step of the process)
-    required_material_list: list[RequiredMaterial] = field(
+    process_material_list: list[ProcessMaterial] = field(
         default_factory=list)  # default: empty | list (ProductionMaterial, necessary quantity)
     processing_list_queue_length: float = 0
     waiting_for_arriving_of_wr: bool = False

@@ -6,7 +6,8 @@ from typing import Set
 from simpy import Store
 
 from src.entity.machine import Machine
-from src.entity.required_material import RequiredMaterial
+from src.entity.Process_material import ProcessMaterial
+from src.entity.processing_order import ProcessingOrder
 from src.entity.sink import Sink
 from src.entity.source import Source
 from src.entity.transport_order import TransportOrder
@@ -62,7 +63,7 @@ class CellInformation:
         items_in_store_before_process = self.get_str_products_in_store(machine.machine_storage.storage_before_process)
         items_in_store_after_process = self.get_str_products_in_store(machine.machine_storage.storage_after_process)
         processing_list_str = self.get_str_order_list(machine.processing_list)
-        required_material_list_str = self.get_str_required_material_list(machine.required_material_list)
+        process_material_list_str = self.get_str_process_material_list(machine.process_material_list)
         produced_product = (machine.producing_production_material.identification_str if machine.producing_production_material is not None else "None")
 
         title = f"Cell: {machine.identification_str}"
@@ -97,7 +98,7 @@ class CellInformation:
             f"\n"
             f"Processing List:\n{processing_list_str}\n"
             "\n"
-            f"Required Material:  {required_material_list_str}\n"
+            f"{process_material_list_str}\n"
             f"WR On Machine:      {machine.working_robot_on_machine}\n"
             f"Waiting For WR:     {machine.waiting_for_arriving_of_wr}"
         )
@@ -135,28 +136,31 @@ class CellInformation:
 
         return item_count_str
 
-    def get_str_required_material_list(self, required_material_list: list[RequiredMaterial]) -> str:
+    def get_str_process_material_list(self, process_material_list: list[ProcessMaterial]) -> str:
         """Get a str with different RequiredMaterial.identification_str and counts their quantity."""
         required_material_list_str = ""
 
-        for required_material in required_material_list:
-            required_material_str = f"{required_material.required_material.identification_str}, Quantity: {required_material.quantity}\n"
-            required_material_list_str += required_material_str
+        for process_material in process_material_list:
+            required_material_str = f"Required Material:   {process_material.required_material.identification_str}, Quantity: {process_material.quantity_required}\n"
+            producing_material_str = f"Producing Material:  {process_material.produceing_material.identification_str}, Quantity: {process_material.quantity_producing}\n"
+            paragraph = f"\n"
+            required_material_list_str += (required_material_str + producing_material_str + paragraph)
 
         if required_material_list_str == "":
             required_material_list_str = "0"
 
         return required_material_list_str
 
-    def get_str_order_list(self, order_list: list[Order, int]) -> str:
+
+    def get_str_order_list(self, order_list: list[ProcessingOrder]) -> str:
         order_list_str = ""
 
-        for order, int in order_list:
-            order_int = f"           Order:                         {order.product.identification_str}\n" \
-                        f"               order_date:                    {order.order_date}\n" \
-                        f"               Number of Products:            {order.number_of_products_per_order}\n" \
-                        f"               priority:                      {order.priority}\n" \
-                        f"               daily_manufacturing_sequence:  {order.daily_manufacturing_sequence} \n"\
+        for processing_order in order_list:
+            order_int = f"           Order:                         {processing_order.order.product.identification_str}\n" \
+                        f"               order_date:                    {processing_order.order.order_date}\n" \
+                        f"               Number of Products:            {processing_order.order.number_of_products_per_order}\n" \
+                        f"               priority:                      {processing_order.order.priority}\n" \
+                        f"               daily_manufacturing_sequence:  {processing_order.order.daily_manufacturing_sequence} \n"\
                         f"\n"
 
             order_list_str += order_int

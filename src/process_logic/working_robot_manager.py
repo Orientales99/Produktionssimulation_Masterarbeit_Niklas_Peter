@@ -93,8 +93,8 @@ class WorkingRobotManager:
         list_of_processes_for_every_machine = self.manufacturing_plan.process_list_for_every_machine
 
         self.sorted_list_of_processes = sorted(list_of_processes_for_every_machine,
-                                               key=lambda x: x[1].daily_manufacturing_sequence, reverse=False)
-        self.sorted_list_of_processes = sorted(list_of_processes_for_every_machine, key=lambda x: x[1].priority.value,
+                                               key=lambda x: x[1].order.daily_manufacturing_sequence, reverse=False)
+        self.sorted_list_of_processes = sorted(list_of_processes_for_every_machine, key=lambda x: x[1].order.priority.value,
                                                reverse=False)
 
     def get_next_working_location_for_order(self):

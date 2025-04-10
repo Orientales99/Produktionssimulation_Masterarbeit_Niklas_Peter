@@ -19,7 +19,7 @@ class SimulationEnvironment:
         self.path_finding = PathFinding(self.production)
         self.machine_manager = Machine_Manager(self.production)
         self.manufacturing_plan = ManufacturingPlan(self.production, self.machine_manager)
-        self.machine_execution = MachineExecution(self.env, self.manufacturing_plan)
+        self.machine_execution = MachineExecution(self.env, self.manufacturing_plan, self.machine_manager)
         self.working_robot_manager = WorkingRobotManager(self.manufacturing_plan, self.path_finding)
         self.visualize_production = ProductionVisualisation(self.production, self.env)
         self.transport_robot_manager = TransportRobotManager(self.env, self.manufacturing_plan, self.path_finding, self.machine_manager)

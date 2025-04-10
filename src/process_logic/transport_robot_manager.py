@@ -8,7 +8,7 @@ from src.entity.transport_robot import TransportRobot
 
 from src.process_logic.machine_manager import Machine_Manager
 from src.process_logic.manufacturing_plan import ManufacturingPlan
-from src.entity.required_material import RequiredMaterial
+from src.entity.Process_material import ProcessMaterial
 from src.process_logic.path_finding import PathFinding
 from src.production.base.cell import Cell
 from src.production.base.coordinates import Coordinates
@@ -75,15 +75,17 @@ class TransportRobotManager:
         machines for one day."""
         self.material_transport_request_list = []
         for machine in self.machine_list:
-            if len(machine.required_material_list) > 0:
-                request_material = machine.required_material_list[0]
+            if len(machine.process_material_list) > 0:
+                request_material = machine.process_material_list[0]
+
                 pick_up_station = self.get_pick_up_station(request_material)
                 self.material_transport_request_list.append(
                     TransportOrder(machine, pick_up_station, request_material.required_material,
-                                   request_material.quantity))
+                                   request_material.quantity_required))
+
         self.sort_tr_transport_request_list_by_order_priority(current_date)
 
-    def get_pick_up_station(self, request_material: RequiredMaterial) -> Machine | Source:
+    def get_pick_up_station(self, request_material: ProcessMaterial) -> Machine | Source:
         """Determines the pickup station (Machine or Source) for the requested material"""
         if request_material.required_material.item_type.value == 0:
             source_coordinates = self.manufacturing_plan.production.source_coordinates
@@ -137,6 +139,7 @@ class TransportRobotManager:
                     if len(tr.transport_order_list) != 0:
                         total_quantity_of_transport_order = self.calculate_total_quantity_of_transport_orders(tr) + \
                                                             transport_request.quantity
+
                     if total_quantity_of_transport_order <= tr.material_store.capacity - len(
                             tr.material_store.items):
                         tr.transport_order_list.append(transport_request)
@@ -431,15 +434,18 @@ class TransportRobotManager:
 
                     items_to_unload = min(empty_space_machine_store, loaded_product_on_tr)
 
+                    # reduce number of required elements on machine
+                    machine = transport_order.unload_destination
+                    for process_material in machine.process_material_list:
+                        if process_material.required_material.identification_str == unload_product.identification_str:
+                            process_material.quantity_required -= items_to_unload
+
+                    # unload product
                     for _ in range(items_to_unload):
                         machine_store.put(transport_order.transporting_product)
                         tr.material_store = self.store_manager.get_material_out_of_store(
                             tr.material_store, transport_order.transporting_product)
                         transport_order.quantity -= 1
-
-                    machine = transport_order.unload_destination
-                    self.machine_execution.get_list_with_required_material(machine)
-                    self.machine_execution.get_list_with_required_material(machine)
 
                 if transport_order.quantity == 0:
                     tr.transport_order_list.remove(transport_order)
