@@ -23,7 +23,8 @@ class MachineExecution:
 
                 if item is not False:
 
-                    if item.production_material_id != machine.producing_production_material:
+                    if machine.producing_production_material is None \
+                            or item.production_material_id != machine.producing_production_material.production_material_id:
                         yield self.env.timeout(machine.setting_up_time)  # Umrüstzeit
                         new_product_produced = True
                         self.machine_manager.get_producing_production_material_on_machine(machine)
@@ -32,13 +33,18 @@ class MachineExecution:
                     input_store.items.remove(item)
                     # yield self.env.timeout(working_speed)
                     yield self.env.timeout(0)
-                    new_item = self.machine_manager.create_new_item_after_process(item)
+
+                    new_item = self.machine_manager.create_new_item_after_process(machine, item)
                     yield output_store.put(new_item)
                     self.reduce_producing_material_by_one(machine, new_item)
+
                     self.machine_manager.check_if_order_is_finished(machine, new_item)
 
                     if new_product_produced is True:
                         self.give_order_to_next_machine(new_item, machine)
+                        self.machine_manager.sort_machine_processing_list(machine)
+                        print(f"{machine.identification_str}: {machine.processing_list}")
+                        self.manufacturing_plan.get_required_material_for_every_machine()
                         new_product_produced = False
                 else:
                     # Wenn kein Produkt da, kurz warten und neu prüfen
@@ -66,27 +72,39 @@ class MachineExecution:
 
     def give_order_to_next_machine(self, new_item: ProductionMaterial, machine: Machine):
         """Takes the item and gives the order to the next machine."""
+        executing_machine_type = None
+        step_of_the_process = None
+
         for processing_order in machine.processing_list:
             if new_item.production_material_id == processing_order.order.product.product_id:
+                if processing_order.order.product.required_product_type_step_1 == new_item:
+                    executing_machine_type = processing_order.order.product.processing_step_1
+                    step_of_the_process = 1
 
-                # get processing step of the material
-                parts = new_item.identification_str.rsplit(".", 1)
-                parts[1] = int(parts[-1])
+                if processing_order.order.product.required_product_type_step_2 == new_item:
+                    executing_machine_type = processing_order.order.product.processing_step_2
+                    step_of_the_process = 2
 
-                if parts[1] == 1:
-                    identification_str_shortest_que_time = self.get_shortest_que_time_for_machine_type(
-                        2)  # 2 -> because it is processing step 2 if ProductionMaterial.1 is required
-                    self.append_existing_order(identification_str_shortest_que_time, processing_order.order, 2)
+                if processing_order.order.product.required_product_type_step_3 == new_item:
+                    executing_machine_type = processing_order.order.product.processing_step_3
+                    step_of_the_process = 3
 
-                elif parts[1] == 2:
-                    identification_str_shortest_que_time = self.get_shortest_que_time_for_machine_type(3)
-                    self.append_existing_order(identification_str_shortest_que_time, processing_order.order, 3)
+                if processing_order.order.product.required_product_type_step_4 == new_item:
+                    executing_machine_type = processing_order.order.product.processing_step_4
+                    step_of_the_process = 4
 
-                elif parts[1] == 3:
-                    identification_str_shortest_que_time = self.get_shortest_que_time_for_machine_type(4)
-                    self.append_existing_order(identification_str_shortest_que_time, processing_order.order, 4)
+                if step_of_the_process is not None and executing_machine_type is not None:
+
+                    machine_identification_str_shortest_que_time = self.get_shortest_que_time_for_machine_type(
+                        executing_machine_type)
+                    if machine_identification_str_shortest_que_time is not None:
+                        self.append_existing_order(machine_identification_str_shortest_que_time, processing_order.order,
+                                                   step_of_the_process)
+
 
     def get_shortest_que_time_for_machine_type(self, executing_machine_type: int) -> str:
+        """Get the identification str of the machine with the shortest que time. It is a selection of all
+         machine with the same type."""
         machine_type_list = self.manufacturing_plan.production.service_entity.get_quantity_per_machine_types_list()
 
         for machine_type, number_of_machines_in_production in machine_type_list:

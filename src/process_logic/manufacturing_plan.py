@@ -145,13 +145,13 @@ class ManufacturingPlan:
         for product in self.product_information_list:
             if order.product.identification_str == product.identification_str:
                 if product.processing_step_1 == machine.machine_type:
-                    return machine.machine_type
+                    return 1
                 elif product.processing_step_2 == machine.machine_type:
-                    return machine.machine_type
+                    return 2
                 elif product.processing_step_3 == machine.machine_type:
-                    return machine.machine_type
+                    return 3
                 elif product.processing_step_4 == machine.machine_type:
-                    return machine.machine_type
+                    return 4
 
 
     def get_machine_str_with_shortest_queue_time(self, machine_type: int,

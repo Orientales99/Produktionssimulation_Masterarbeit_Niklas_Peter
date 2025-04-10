@@ -160,6 +160,7 @@ class CellInformation:
                         f"               order_date:                    {processing_order.order.order_date}\n" \
                         f"               Number of Products:            {processing_order.order.number_of_products_per_order}\n" \
                         f"               priority:                      {processing_order.order.priority}\n" \
+                        f"               step of the process:           {processing_order.step_of_the_process}\n" \
                         f"               daily_manufacturing_sequence:  {processing_order.order.daily_manufacturing_sequence} \n"\
                         f"\n"
 

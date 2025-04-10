@@ -73,7 +73,7 @@ class Machine_Manager:
             quantity_of_necessary_material = processing_order.order.number_of_products_per_order
 
             # producing material
-            producing_material = self.create_new_item_after_process(required_material)
+            producing_material = self.create_new_item_after_process(machine, required_material)
             quantity_of_producing_material = quantity_of_necessary_material
 
             machine.process_material_list.append(ProcessMaterial(required_material, quantity_of_necessary_material,
@@ -81,17 +81,40 @@ class Machine_Manager:
 
         return machine.process_material_list
 
-    def create_new_item_after_process(self, item: ProductionMaterial) -> ProductionMaterial:
+    def create_new_item_after_process(self, machine: Machine, item: ProductionMaterial) -> ProductionMaterial:
         """Creating a new ProductionMaterial, identification_str gets an update (ex:# Example: ProductGroup.SEVEN.0 ->
          Example: ProductGroup.SEVEN.1, and item_type (+1).
          Return: new ProductionMaterial"""
+
         parts = item.identification_str.rsplit(".", 1)
         parts[-1] = str(int(parts[-1]) + 1)
         new_identification_str = ".".join(parts)
-
         new_item_type = ItemType(item.item_type.value + 1)
 
+        for processing_order in machine.processing_list:
+            if processing_order.order.product.product_id == item.production_material_id:
+                product = processing_order.order.product
+
+                if (product.required_product_type_step_1 is not None and
+                        product.required_product_type_step_1.item_type == new_item_type):
+                    return ProductionMaterial(new_identification_str, item.production_material_id, item.size,
+                                              new_item_type)
+
+                if (product.required_product_type_step_2 is not None and
+                        product.required_product_type_step_2.item_type == new_item_type):
+                    return ProductionMaterial(new_identification_str, item.production_material_id, item.size,
+                                              new_item_type)
+
+                if (product.required_product_type_step_3 is not None and
+                        product.required_product_type_step_3.item_type == new_item_type):
+                    return ProductionMaterial(new_identification_str, item.production_material_id, item.size,
+                                              new_item_type)
+
+        parts[-1] = str(int(3))
+        new_identification_str = ".".join(parts)
+        new_item_type = ItemType(3)
         return ProductionMaterial(new_identification_str, item.production_material_id, item.size, new_item_type)
+
 
     def get_data_of_processing_step_for_machine(self, order: Order, machine: Machine) -> tuple[ProductionMaterial, int]:
         """gives a tuple with required product type for this step and the processing_time_per_product"""
@@ -130,3 +153,21 @@ class Machine_Manager:
                     for processing_order in machine.processing_list[:]:
                         if processing_order.order.product.product_id == new_item.production_material_id:
                             machine.processing_list.remove(processing_order)
+
+    def sort_machine_processing_list(self, machine: Machine):
+        """The processing list is sorted according to the following criteria:
+        1. If the product is currently being produced, it has the highest sorting priority.
+        2. What priority the order has.
+        3. How far the value-adding process has progressed."""
+        if machine.producing_production_material is not None:
+            machine.processing_list.sort(
+                key=lambda po: (
+                    po.order.product.product_id != machine.producing_production_material.production_material_id,
+                    po.priority,
+                    -po.step_of_the_process
+                )
+            )
+        else:
+            machine.processing_list.sort(
+                key=lambda po: (po.priority, -po.step_of_the_process)
+            )
