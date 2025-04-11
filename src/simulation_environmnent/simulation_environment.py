@@ -89,7 +89,7 @@ class SimulationEnvironment:
         arrived_tr: list[TransportRobot]
         while True:
             if self.stop_event is False:
-                arrived_tr = self.transport_robot_manager.arrived_tr_on_unload_destination[:]
+                arrived_tr = self.transport_robot_manager.list_arrived_tr_on_unload_destination[:]
                 unload_processes = []
 
                 for tr in arrived_tr:
@@ -98,12 +98,6 @@ class SimulationEnvironment:
 
                 yield self.env.timeout(loading_speed)
 
-                # After expiry: Remove all TR from the arrival list and add them to the path planning
-                for tr in arrived_tr:
-                    if tr in self.transport_robot_manager.arrived_tr_on_unload_destination:
-                        self.transport_robot_manager.arrived_tr_on_unload_destination.remove(tr)
-                        self.transport_robot_manager.list_tr_rdy_to_calculate_path.append(tr)
-                        tr.working_status.driving_to_new_location = True
             else:
                 yield self.env.timeout(loading_speed)
 
