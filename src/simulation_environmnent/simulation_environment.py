@@ -22,7 +22,8 @@ class SimulationEnvironment:
         self.machine_execution = MachineExecution(self.env, self.manufacturing_plan, self.machine_manager)
         self.working_robot_manager = WorkingRobotManager(self.manufacturing_plan, self.path_finding)
         self.visualize_production = ProductionVisualisation(self.production, self.env)
-        self.transport_robot_manager = TransportRobotManager(self.env, self.manufacturing_plan, self.path_finding, self.machine_manager)
+        self.transport_robot_manager = TransportRobotManager(self.env, self.manufacturing_plan, self.path_finding,
+                                                             self.machine_execution, self.machine_manager)
 
         self.stop_event = False
 

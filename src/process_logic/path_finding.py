@@ -20,7 +20,6 @@ class PathFinding:
 
     def get_path_for_entity(self, entity: Machine | WorkingRobot | TransportRobot, end_coordinate: Coordinates):
         start_coordinate = self.get_start_coordinates_from_entity(entity)
-        # print(f" Start: {start_coordinate}, End: {end_coordinate}")
         start_cell = self.get_start_cell_from_entity(entity)
         end_cell = self.production.get_cell(end_coordinate)
         if self.run_a_star_algorithm(start_cell, end_cell, entity) is False:

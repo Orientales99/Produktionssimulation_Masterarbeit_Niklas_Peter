@@ -115,7 +115,6 @@ class Machine_Manager:
         new_item_type = ItemType(3)
         return ProductionMaterial(new_identification_str, item.production_material_id, item.size, new_item_type)
 
-
     def get_data_of_processing_step_for_machine(self, order: Order, machine: Machine) -> tuple[ProductionMaterial, int]:
         """gives a tuple with required product type for this step and the processing_time_per_product"""
         if order.product.processing_step_1 == machine.machine_type:
@@ -171,3 +170,19 @@ class Machine_Manager:
             machine.processing_list.sort(
                 key=lambda po: (po.priority, -po.step_of_the_process)
             )
+        self.sort_process_material_list_by_processing_list(machine)
+
+    def sort_process_material_list_by_processing_list(self, machine: Machine) -> None:
+        """
+        Sorts the machine.process_material_list based on the order of
+        machine.processing_list, matching by product_id.
+        """
+
+        id_to_material = {process_material.produceing_material.production_material_id: process_material
+                          for process_material in machine.process_material_list}
+
+        sorted_process_material_list = [id_to_material[processing_order.order.product.product_id]
+                                        for processing_order in machine.processing_list
+                                        if processing_order.order.product.product_id in id_to_material]
+
+        machine.process_material_list[:] = sorted_process_material_list

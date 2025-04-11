@@ -64,7 +64,8 @@ class CellInformation:
         items_in_store_after_process = self.get_str_products_in_store(machine.machine_storage.storage_after_process)
         processing_list_str = self.get_str_order_list(machine.processing_list)
         process_material_list_str = self.get_str_process_material_list(machine.process_material_list)
-        produced_product = (machine.producing_production_material.identification_str if machine.producing_production_material is not None else "None")
+        produced_product = (
+            machine.producing_production_material.identification_str if machine.producing_production_material is not None else "None")
 
         title = f"Cell: {machine.identification_str}"
 
@@ -100,7 +101,8 @@ class CellInformation:
             "\n"
             f"{process_material_list_str}\n"
             f"WR On Machine:      {machine.working_robot_on_machine}\n"
-            f"Waiting For WR:     {machine.waiting_for_arriving_of_wr}"
+            f"Waiting For WR:     {machine.waiting_for_arriving_of_wr}\n"
+            f"Waiting For TR:     {machine.waiting_for_arriving_of_tr}\n"
         )
 
         self.print_information_sheet(title, info_text)
@@ -151,7 +153,6 @@ class CellInformation:
 
         return required_material_list_str
 
-
     def get_str_order_list(self, order_list: list[ProcessingOrder]) -> str:
         order_list_str = ""
 
@@ -161,7 +162,7 @@ class CellInformation:
                         f"               Number of Products:            {processing_order.order.number_of_products_per_order}\n" \
                         f"               priority:                      {processing_order.order.priority}\n" \
                         f"               step of the process:           {processing_order.step_of_the_process}\n" \
-                        f"               daily_manufacturing_sequence:  {processing_order.order.daily_manufacturing_sequence} \n"\
+                        f"               daily_manufacturing_sequence:  {processing_order.order.daily_manufacturing_sequence} \n" \
                         f"\n"
 
             order_list_str += order_int
@@ -178,7 +179,8 @@ class CellInformation:
         machine_id = (working_robot.working_status.working_for_machine.identification_str
                       if working_robot.working_status.working_for_machine is not None
                       else "None")
-        destination = (working_robot.working_status.driving_destination_work_on_machine if working_robot.working_status.driving_destination_work_on_machine is not None else "None")
+        destination = (
+            working_robot.working_status.driving_destination_work_on_machine if working_robot.working_status.driving_destination_work_on_machine is not None else "None")
 
         info_text = (
             f"Cell Coordinates:      X: {self.current_cell.cell_coordinates.x}, Y: {self.current_cell.cell_coordinates.y}\n"
@@ -206,7 +208,7 @@ class CellInformation:
     def print_transport_robot_information(self, transport_robot: TransportRobot):
         """Öffnet ein Fenster mit den Informationen zum TransportRobot."""
 
-        transport_order_list_str = self.get_str_transport_order_list(transport_robot.transport_order_list)
+        transport_order_list_str = self.get_str_transport_order(transport_robot.transport_order)
         transport_material_store_str = self.get_str_products_in_store(transport_robot.material_store)
         pick_up_destination = self.get_tr_driving_destination_str(
             transport_robot.working_status.pick_up_location_entity)
@@ -226,8 +228,7 @@ class CellInformation:
             f"Driving Speed:           {transport_robot.driving_speed} field/sec.\n"
             f"Loading Speed:           {transport_robot.loading_speed} pallet/sec.\n"
             f"\n"
-            f"Numbers of Transport Orders:    {len(transport_robot.transport_order_list)}\n"
-            f"Transport Orders:\n"
+            f"Transport Order:\n"
             f"{transport_order_list_str}\n"
             f"\n"
             f"Working Status:\n"
@@ -253,36 +254,31 @@ class CellInformation:
 
         self.print_information_sheet(title, info_text)
 
-    def get_str_transport_order_list(self, transport_order_list: list[TransportOrder]) -> str:
+    def get_str_transport_order(self, transport_order: TransportOrder) -> str:
         """Get a str with different RequiredMaterial.identification_str and counts their quantity."""
-        transport_order_list_str = ""
+        transport_order_str = ""
 
-        for index, transport_order in enumerate(transport_order_list):
-            transport_order_number = index + 1
-            pick_up_station = ""
-            unload_destination = ""
+        pick_up_station = ""
+        unload_destination = ""
+        if transport_order is not None:
             if isinstance(transport_order.pick_up_station, Machine):
                 pick_up_station = transport_order.pick_up_station.identification_str
             elif isinstance(transport_order.pick_up_station, Source):
                 pick_up_station = "Source"
-
             if isinstance(transport_order.unload_destination, Machine):
                 unload_destination = transport_order.unload_destination.identification_str
             elif isinstance(transport_order.unload_destination, Sink):
                 unload_destination = Sink
-
-            transport_order_str = f"           Transport Order {transport_order_number}:\n" \
+            transport_order_str = f"           Transport Order:\n" \
                                   f"                    Transporting Product: {transport_order.transporting_product.identification_str}\n" \
                                   f"                    Pick Up Destination:  {pick_up_station}\n" \
                                   f"                    Unload Destination:   {unload_destination}\n" \
                                   f"                    Quantity:             {transport_order.quantity}\n"
 
-            transport_order_list_str += transport_order_str
+        if transport_order_str == "":
+            transport_order_str = "0"
 
-        if transport_order_list_str == "":
-            transport_order_list_str = "0"
-
-        return transport_order_list_str
+        return transport_order_str
 
     def get_tr_driving_destination_str(self, destination_entity: Machine | Sink | Source) -> str:
         """Get a str with Destination of TR."""

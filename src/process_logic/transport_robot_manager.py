@@ -1,6 +1,9 @@
+import random
+from dataclasses import dataclass
 from datetime import date
 
 from src.entity.machine import Machine
+from src.entity.processing_order import ProcessingOrder
 from src.entity.sink import Sink
 from src.entity.source import Source
 from src.entity.transport_order import TransportOrder
@@ -12,8 +15,14 @@ from src.entity.Process_material import ProcessMaterial
 from src.process_logic.path_finding import PathFinding
 from src.production.base.cell import Cell
 from src.production.base.coordinates import Coordinates
-from src.production.visualisation.production_visualisation import ProductionVisualisation
 from src.production.store_manager import StoreManager
+
+
+@dataclass
+class TransportRequest:
+    machine: Machine
+    processing_order: ProcessingOrder
+    process_material: ProcessMaterial
 
 
 class TransportRobotManager:
@@ -21,10 +30,13 @@ class TransportRobotManager:
     path_finding: PathFinding
     store_manager: StoreManager
     machine_execution: Machine_Manager
-    material_transport_request_list = list[TransportOrder]
+
+    material_transport_order_list = list[TransportOrder]
     tr_list = list[TransportRobot]
     entities_located_after_init = dict[str, list[Cell]]  # dict[tr.identification_str, list[Cell]
     waiting_time: int
+
+    list_transport_request = list[TransportRequest]
     list_tr_rdy_to_calculate_path: list[TransportRobot]
     list_tr_drive_to_pick_up: list[TransportRobot]
     list_arrived_tr_on_pick_up_destination: list[TransportRobot]
@@ -32,11 +44,12 @@ class TransportRobotManager:
 
     current_date: date
 
-    def __init__(self, simulation_environment, manufacturing_plan, path_finding, machine_execution):
+    def __init__(self, simulation_environment, manufacturing_plan, path_finding, machine_execution, machine_manager):
         self.env = simulation_environment
         self.manufacturing_plan = manufacturing_plan
         self.path_finding = path_finding
         self.machine_execution = machine_execution
+        self.machine_manager = machine_manager
 
         # self.v = ProductionVisualisation(self.manufacturing_plan.production, self.env)
         self.store_manager = StoreManager(self.env)
@@ -46,153 +59,173 @@ class TransportRobotManager:
         self.entities_located_after_init = self.manufacturing_plan.production.entities_init_located
         self.waiting_time = self.tr_list[0].working_status.waiting_time_on_path - 3
 
+        self.list_transport_request = []
+
         self.list_tr_rdy_to_calculate_path = self.tr_list[:]
         self.list_tr_drive_to_pick_up = []
         self.list_arrived_tr_on_pick_up_destination = []
         self.list_loaded_tr_drive_to_unload = []
         self.arrived_tr_on_unload_destination = []
 
-        self.material_transport_request_list = []
+        self.material_transport_order_list = []
 
     def start_transport_robot_manager(self, current_date):
         self.current_date = current_date
-        self.get_tr_transport_request_list(current_date)
+        self.get_transport_request_list()
+        self.get_transport_order_list()
         for tr in self.tr_list:
             self.get_transport_order_for_tr(tr)
-            self.get_path_for_tr(tr)
+            self.get_path_for_tr_pick_up(tr)
 
     def path_calculation_for_every_requesting_tr(self):
         self.check_for_transport_order()
 
         if len(self.list_tr_rdy_to_calculate_path) != 0:
             for tr in self.list_tr_rdy_to_calculate_path[:]:
-                self.get_path_for_tr(tr)
+                self.get_transport_request_list()
+                self.get_transport_order_list()
+                self.get_transport_order_for_tr(tr)
+                self.get_path_for_tr_pick_up(tr)
         pass
 
-    def get_tr_transport_request_list(self, current_date: date):
-        """Generates a list of transport requests for transport robots (TR) based on the material requirements of
-        machines for one day."""
-        self.material_transport_request_list = []
-        for machine in self.machine_list:
-            if len(machine.process_material_list) > 0:
-                request_material = machine.process_material_list[0]
+    def get_transport_request_list(self):
+        """Creates a new list of TransportRequest objects for each machine.
+            If this method is called, the list gets reset and a new list is created.
+            """
+        self.list_transport_request = []
 
-                pick_up_station = self.get_pick_up_station(request_material)
-                self.material_transport_request_list.append(
-                    TransportOrder(machine, pick_up_station, request_material.required_material,
+        for machine in self.machine_list:
+
+            self.machine_manager.sort_machine_processing_list(machine)
+            if len(machine.processing_list) > 0:
+
+                processing_order = machine.processing_list[0]
+                process_material = machine.process_material_list[0]
+                self.list_transport_request.append(TransportRequest(machine, processing_order, process_material))
+        self.sort_transport_requests_list()
+
+
+
+    def sort_transport_requests_list(self):
+        """
+        Removes TransportRequest entries where the machine is waiting for a transport to arrive.
+        Sorts self.list_transport_request with the following priority:
+        1. The transport is currently being processed on the assigned machine.
+        2. Order priority.
+        3. Step of the process (descending).
+        4. Daily manufacturing sequence (ascending).
+
+
+        """
+        self.list_transport_request = [tr for tr in self.list_transport_request if
+                                      not tr.machine.waiting_for_arriving_of_tr]
+
+        self.list_transport_request.sort(
+            key=lambda tr: (
+                not (tr.machine.producing_production_material is not None and
+                     tr.machine.producing_production_material.production_material_id ==
+                     tr.processing_order.order.product.product_id),
+                tr.processing_order.priority,
+                -tr.processing_order.step_of_the_process,
+                tr.processing_order.order.daily_manufacturing_sequence if
+                tr.processing_order.order.daily_manufacturing_sequence is not None else float(
+                    'inf')
+            )
+        )
+
+
+    def get_transport_order_list(self):
+        self.material_transport_order_list = []
+        for transport_request in self.list_transport_request:
+            unload_destination_machine = transport_request.machine
+            request_material = transport_request.process_material
+            pick_up_station = self.get_pick_up_station(request_material)
+
+            # if the origin of the material is a machine
+            if isinstance(pick_up_station, Machine):
+                self.material_transport_order_list.append(
+                    TransportOrder(unload_destination_machine, pick_up_station, request_material.required_material,
                                    request_material.quantity_required))
 
-        self.sort_tr_transport_request_list_by_order_priority(current_date)
+            # if the machine is working and the origin of the material is the source
+            elif isinstance(pick_up_station, Source) and (unload_destination_machine.waiting_for_arriving_of_wr is
+                                                          True or
+                                                          unload_destination_machine.working_robot_on_machine is True):
+                self.material_transport_order_list.append(
+                    TransportOrder(unload_destination_machine, pick_up_station, request_material.required_material,
+                                   request_material.quantity_required))
 
-    def get_pick_up_station(self, request_material: ProcessMaterial) -> Machine | Source:
+    def get_pick_up_station(self, request_material: ProcessMaterial) -> Machine | Source | bool:
         """Determines the pickup station (Machine or Source) for the requested material"""
         if request_material.required_material.item_type.value == 0:
             source_coordinates = self.manufacturing_plan.production.source_coordinates
             source_cell = self.manufacturing_plan.production.get_cell(source_coordinates)
             return source_cell.placed_entity
 
+        # Iterate over all machines and check their product_after_process
         for machine in self.machine_list:
-            stored_item = machine.machine_storage.product_after_process.item_type.value
-            if stored_item == request_material.required_material:
-                return machine
-
-        raise Exception(f"Required Material{request_material.required_material} is nowhere in the Production")
-
-    def sort_tr_transport_request_list_by_order_priority(self, current_date: date):
-        """Compares the transport request list with the order list and moves the transport request with the highest
-        order priority to the front of the list."""
-
-        dict_of_orders_on_current_date = self.manufacturing_plan.dictionary_summarised_order_per_day.get(current_date,
-                                                                                                         [])
-        list_of_orders = dict_of_orders_on_current_date['orders']
-
-        for order in reversed(list_of_orders):
-            for i, transport_order in enumerate(self.material_transport_request_list):
-                product_id = transport_order.transporting_product.identification_str.split('.')[0] + '.' + \
-                             transport_order.transporting_product.identification_str.split('.')[1]
-
-                if product_id == order.product.product_id:
-                    item = transport_order
-                    self.material_transport_request_list.remove(i)
-                    self.material_transport_request_list.insert(0, item)
-                    break
+            # Check if product_after_process is not None before accessing item_type
+            if machine.machine_storage.product_after_process is not None:
+                stored_item = machine.machine_storage.product_after_process.item_type.value
+                if stored_item == request_material.required_material:
+                    return machine
+        return False
 
     def get_transport_order_for_tr(self, tr: TransportRobot):
         """If TR has no Transport order or has transport capacities it gets a new Transport order"""
-        total_quantity_of_transport_order = 10000
+        material_transport_order_list_local = self.material_transport_order_list[:]
 
-        material_transport_request_list_local = self.material_transport_request_list[:]
-
-        for transport_request in material_transport_request_list_local:
-            if len(tr.transport_order_list) == 0:
-                tr.transport_order_list.append(transport_request)
-                self.material_transport_request_list.remove(transport_request)
+        for transport_order in material_transport_order_list_local:
+            if tr.transport_order is None:
+                tr.transport_order = transport_order
+                self.material_transport_order_list.remove(transport_order)
                 tr.working_status.waiting_for_order = False
-
-        if self.material_transport_request_list:  # is list not empty
-            for tr in self.tr_list:
-                material_transport_request_list_local = self.material_transport_request_list[:]
-
-                for transport_request in material_transport_request_list_local:
-
-                    if len(tr.transport_order_list) != 0:
-                        total_quantity_of_transport_order = self.calculate_total_quantity_of_transport_orders(tr) + \
-                                                            transport_request.quantity
-
-                    if total_quantity_of_transport_order <= tr.material_store.capacity - len(
-                            tr.material_store.items):
-                        tr.transport_order_list.append(transport_request)
-                        tr.working_status.waiting_for_order = False
-                        self.material_transport_request_list.remove(transport_request)
+                if isinstance(transport_order.unload_destination, Machine):
+                    transport_order.unload_destination.waiting_for_arriving_of_tr = True
 
     def calculate_total_quantity_of_transport_orders(self, transport_robot) -> int:
         total_quantity_of_transport_order = 0
-        for transport_order in transport_robot.transport_order_list:
+        for transport_order in transport_robot.transport_order:
             total_quantity_of_transport_order += transport_order.quantity
         return total_quantity_of_transport_order
 
-    def get_path_for_tr(self, tr: TransportRobot):
-        """Is calculating the path for the TR. It is looking on the tr.transport_order_list and gets the path line
-        to the pick_up_station and unload_station"""
-        if len(tr.transport_order_list) > 0:
-            for index, transport_order in enumerate(tr.transport_order_list):
-                if tr.transport_order_list[0].transporting_product not in tr.material_store.items:
-                    path_line_list_pu = self.calculate_path_for_pick_up(tr, index)
-                    path_line_list_ul = self.calculate_path_for_unload(tr, index)
+    def get_path_for_tr_pick_up(self, tr: TransportRobot):
+        if tr.transport_order is not None:
 
-                    if isinstance(path_line_list_ul, list) and isinstance(path_line_list_pu, list):
-                        if tr in self.list_tr_rdy_to_calculate_path:
-                            self.list_tr_rdy_to_calculate_path.remove(tr)
-                            self.list_tr_drive_to_pick_up.append(tr)
-
-
-                else:
-                    path_line_list_pu = []
-                    path_line_list_ul = self.calculate_path_for_unload(tr, index)
-                    tr.working_status.driving_to_new_location = True
-                    if isinstance(path_line_list_ul, list) and isinstance(path_line_list_pu, list):
-                        if tr in self.list_tr_rdy_to_calculate_path:
-                            self.list_tr_rdy_to_calculate_path.remove(tr)
-                            self.list_loaded_tr_drive_to_unload.append(tr)
-                            tr.working_status.waiting_for_order = False
-                            tr.working_status.driving_to_new_location = True
-
-        else:
-            # if the TR has no order and drives back to the waiting position
-            if self.check_waiting_tr_is_in_position(tr) is False:
-                destination_coordinates = self.path_finding.get_init_coordinates_from_entity(tr)
-                path_line_list = self.path_finding.get_path_for_entity(tr, destination_coordinates)
-                tr.working_status.driving_destination_unload_material = destination_coordinates
-                tr.working_status.driving_route_unload_material = path_line_list
-                if isinstance(path_line_list, list):
+            if tr.transport_order.transporting_product not in tr.material_store.items:
+                path_line_list_pu = self.calculate_path_for_pick_up(tr)
+                path_line_list_ul = self.calculate_path_for_unload(tr)
+                if isinstance(path_line_list_ul, list) and isinstance(path_line_list_pu, list):
                     if tr in self.list_tr_rdy_to_calculate_path:
                         self.list_tr_rdy_to_calculate_path.remove(tr)
-                        self.list_loaded_tr_drive_to_unload.append(tr)
-                        tr.working_status.waiting_for_order = False
+                        self.list_tr_drive_to_pick_up.append(tr)
                         tr.working_status.driving_to_new_location = True
 
-    def calculate_path_for_pick_up(self, tr: TransportRobot, index_transport_order: int):
-        pick_up_destination = tr.transport_order_list[index_transport_order].pick_up_station
+    def get_path_for_tr_waiting_position(self, tr: TransportRobot):
+        destination_coordinates = self.path_finding.get_init_coordinates_from_entity(tr)
+        path_line_list = self.path_finding.get_path_for_entity(tr, destination_coordinates)
+        tr.working_status.driving_destination_unload_material = destination_coordinates
+        tr.working_status.driving_route_unload_material = path_line_list
+        if isinstance(path_line_list, list):
+            if tr in self.list_tr_rdy_to_calculate_path:
+                self.list_tr_rdy_to_calculate_path.remove(tr)
+                self.list_loaded_tr_drive_to_unload.append(tr)
+                tr.working_status.driving_to_new_location = True
+
+
+    def get_path_for_tr_unload(self, tr: TransportRobot):
+        path_line_list_pu = []
+        path_line_list_ul = self.calculate_path_for_unload(tr)
+        tr.working_status.driving_to_new_location = True
+        if isinstance(path_line_list_ul, list) and isinstance(path_line_list_pu, list):
+            if tr in self.list_tr_rdy_to_calculate_path:
+                self.list_tr_rdy_to_calculate_path.remove(tr)
+                self.list_loaded_tr_drive_to_unload.append(tr)
+                tr.working_status.waiting_for_order = False
+                tr.working_status.driving_to_new_location = True
+
+    def calculate_path_for_pick_up(self, tr: TransportRobot):
+        pick_up_destination = tr.transport_order.pick_up_station
 
         if isinstance(pick_up_destination, Source):
             pick_up_coordinates = self.path_finding.get_init_coordinates_from_entity(tr)
@@ -200,19 +233,19 @@ class TransportRobotManager:
             pick_up_coordinates = self.get_coordinates_from_pick_up_destination(tr, pick_up_destination)
         path_line_list_pu = self.path_finding.get_path_for_entity(tr, pick_up_coordinates)
 
-        if index_transport_order == 0 and isinstance(path_line_list_pu, list):
+        if isinstance(path_line_list_pu, list):
             tr.working_status.pick_up_location_entity = pick_up_destination
             tr.working_status.driving_destination_pick_up_material = pick_up_coordinates
             tr.working_status.driving_route_pick_up_material = path_line_list_pu
 
         return path_line_list_pu
 
-    def calculate_path_for_unload(self, tr: TransportRobot, index_transport_order: int):
-        unload_destination = tr.transport_order_list[index_transport_order].unload_destination
+    def calculate_path_for_unload(self, tr: TransportRobot):
+        unload_destination = tr.transport_order.unload_destination
         unload_coordinates = self.get_coordinates_from_unload_destination(tr, unload_destination)
         path_line_list_ul = self.path_finding.get_path_for_entity(tr, unload_coordinates)
 
-        if index_transport_order == 0 and isinstance(path_line_list_ul, list):
+        if isinstance(path_line_list_ul, list):
             tr.working_status.unload_location_entity = unload_destination
             tr.working_status.driving_destination_unload_material = unload_coordinates
             tr.working_status.driving_route_unload_material = path_line_list_ul
@@ -328,6 +361,7 @@ class TransportRobotManager:
                         path_line_list = self.path_finding.get_path_for_entity(tr,
                                                                                tr.working_status.driving_destination_pick_up_material)
                         tr.working_status.driving_route_pick_up_material = path_line_list
+                        tr.working_status.waiting_time_on_path = random.randint(1, 10)
 
             elif len(tr.working_status.driving_route_pick_up_material) == 0:
                 tr.working_status.driving_to_new_location = False
@@ -337,43 +371,43 @@ class TransportRobotManager:
     def pick_up_material_on_tr(self, tr: TransportRobot):
         yield self.env.timeout(0)
 
-        for transport_order in tr.transport_order_list:
-            # Pick Up Material from the Source
-            if isinstance(transport_order.pick_up_station, Source):
-                if transport_order.pick_up_station == tr.working_status.pick_up_location_entity:
+        # Pick Up Material from the Source
+        if isinstance(tr.transport_order.pick_up_station, Source):
+            if tr.transport_order.pick_up_station == tr.working_status.pick_up_location_entity:
+                items_to_load = min(
+                    (tr.material_store.capacity - len(tr.material_store.items)),
+                    tr.transport_order.quantity,
+                    tr.transport_order.unload_destination.machine_storage.storage_before_process.capacity
+                    - len(tr.transport_order.unload_destination.machine_storage.storage_before_process.items)
+                )
+                for _ in range(items_to_load):
+                    tr.material_store.put(tr.transport_order.transporting_product)
+        # Pick Up Material from a Machine
+        elif isinstance(tr.transport_order.pick_up_station, Machine):
+            if tr.transport_order.pick_up_station == tr.working_status.pick_up_location_entity:
+                items_to_load = min(
+                    (tr.material_store.capacity - len(tr.material_store.items)),
+                    tr.transport_order.quantity
+                )
+                if isinstance(tr.transport_order.unload_destination, Machine):
                     items_to_load = min(
-                        (tr.material_store.capacity - len(tr.material_store.items)),
-                        transport_order.quantity,
-                        transport_order.unload_destination.machine_storage.storage_before_process.capacity
-                        - len(transport_order.unload_destination.machine_storage.storage_before_process.items)
+                        items_to_load,
+                        tr.transport_order.pick_up_station.machine_storage.storage_before_process.capacity
+                        - len(tr.transport_order.pick_up_station.machine_storage.storage_before_process.items)
                     )
-                    for _ in range(items_to_load):
-                        tr.material_store.put(transport_order.transporting_product)
+                for _ in range(items_to_load):
+                    tr.material_store.put(tr.transport_order.transporting_product)
 
-            # Pick Up Material from a Machine
-            elif isinstance(transport_order.pick_up_station, Machine):
-                if transport_order.pick_up_station == tr.working_status.pick_up_location_entity:
-                    items_to_load = min(
-                        (tr.material_store.capacity - len(tr.material_store.items)),
-                        transport_order.quantity
+                for _ in range(items_to_load):
+                    tr.transport_order.pick_up_station.machine_storage.storage_after_process.items.remove(
+                        tr.transport_order.transporting_product
                     )
-                    if isinstance(transport_order.unload_destination, Machine):
-                        items_to_load = min(
-                            items_to_load,
-                            transport_order.pick_up_station.machine_storage.storage_before_process.capacity
-                            - len(transport_order.pick_up_station.machine_storage.storage_before_process.items)
-                        )
-                    for _ in range(items_to_load):
-                        tr.material_store.put(transport_order.transporting_product)
-                    for _ in range(items_to_load):
-                        tr.material_store.get(
-                            transport_order.pick_up_station.machine_storage.storage_after_process
-                        )
 
         # Wenn etwas aufgeladen wurde → Roboter fährt weiter
         if len(tr.material_store.items) != 0:
             tr.working_status.driving_to_new_location = True
             self.list_arrived_tr_on_pick_up_destination.remove(tr)
+            self.get_path_for_tr_unload(tr)
             self.list_loaded_tr_drive_to_unload.append(tr)
 
     def tr_drive_through_production_to_unload_destination(self):
@@ -384,8 +418,7 @@ class TransportRobotManager:
         list_loaded_tr_drive_to_unload_local = self.list_loaded_tr_drive_to_unload[:]
 
         for tr in list_loaded_tr_drive_to_unload_local:
-            if isinstance(tr.working_status.driving_route_unload_material, Exception):
-                self.v.visualize_layout()
+
             if isinstance(tr.working_status.driving_route_unload_material, list):
                 if tr.working_status.waiting_for_order is False and \
                         tr.working_status.driving_to_new_location is True and \
@@ -406,6 +439,7 @@ class TransportRobotManager:
                             path_line_list = self.path_finding.get_path_for_entity(tr,
                                                                                    tr.working_status.driving_destination_unload_material)
                             tr.working_status.driving_route_unload_material = path_line_list
+                            tr.working_status.waiting_time_on_path = random.randint(1, 10)
 
                 elif len(tr.working_status.driving_route_unload_material) == 0:
                     tr.working_status.driving_to_new_location = False
@@ -414,45 +448,45 @@ class TransportRobotManager:
 
     def unload_single_tr(self, tr: TransportRobot):
         yield self.env.timeout(0)
-
-        transport_order_list_local = tr.transport_order_list[:]
-        for transport_order in transport_order_list_local:
-
-            if isinstance(transport_order.unload_destination, Sink):
+        if tr.transport_order is not None:
+            if isinstance(tr.transport_order.unload_destination, Sink):
                 pass
-
-            if isinstance(transport_order.unload_destination, Machine):
-                if tr.working_status.unload_location_entity == transport_order.unload_destination:
-                    machine_store = transport_order.unload_destination.machine_storage.storage_before_process
+            if isinstance(tr.transport_order.unload_destination, Machine):
+                if tr.working_status.unload_location_entity == tr.transport_order.unload_destination:
+                    machine_store = tr.transport_order.unload_destination.machine_storage.storage_before_process
                     empty_space_machine_store = self.store_manager.count_empty_space_in_store(machine_store)
-
                     tr_store = tr.material_store
-                    unload_product = transport_order.transporting_product
+                    unload_product = tr.transport_order.transporting_product
                     loaded_product_on_tr = self.store_manager.count_products_in_store(tr_store, unload_product)
-
                     items_to_unload = min(empty_space_machine_store, loaded_product_on_tr)
 
                     # reduce number of required elements on machine
-                    machine = transport_order.unload_destination
+                    machine = tr.transport_order.unload_destination
                     for process_material in machine.process_material_list:
                         if process_material.required_material.identification_str == unload_product.identification_str:
                             process_material.quantity_required -= items_to_unload
 
+
+
                     # unload product
                     for _ in range(items_to_unload):
-                        machine_store.put(transport_order.transporting_product)
+                        machine_store.put(tr.transport_order.transporting_product)
                         tr.material_store = self.store_manager.get_material_out_of_store(
-                            tr.material_store, transport_order.transporting_product)
-                        transport_order.quantity -= 1
+                            tr.material_store, tr.transport_order.transporting_product)
+                        tr.transport_order.quantity -= 1
 
-                if transport_order.quantity == 0:
-                    tr.transport_order_list.remove(transport_order)
+                    machine.waiting_for_arriving_of_tr = False
+                    tr.working_status.waiting_for_order = True
+
+                    tr.transport_order = None
                     self.get_transport_order_for_tr(tr)
 
     def check_for_transport_order(self):
         for tr in self.tr_list[:]:
-            if len(tr.transport_order_list) == 0 and tr.working_status.driving_to_new_location is False:
-                tr.working_status.waiting_for_order = True
+            if tr.transport_order is None:
+                if self.check_waiting_tr_is_in_position(tr) is False:
+                    self.get_path_for_tr_waiting_position(tr)
+                    print(f"{tr.identification_str} is not in waiting position")
 
     def check_waiting_tr_is_in_position(self, tr: TransportRobot) -> bool:
         """Checking if the TR is on the right waiting place (Source). False -> no it isn't, True-> yes, it is"""

@@ -16,8 +16,7 @@ class TransportRobot:
     driving_speed: int
     material_store: Store
     working_status: EntityWorkingStatus
-    transport_order_list: list[TransportOrder] = field(
-        default_factory=list)  # default: empty | list (destination Machine, transport Material, quantity)
+    transport_order: TransportOrder = field(default=None)
 
     @property  # only if identification_str is used; one time calculation -> is cached
     def identification_str(self) -> str:
