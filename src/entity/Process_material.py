@@ -7,5 +7,6 @@ from src.order_data.production_material import ProductionMaterial
 class ProcessMaterial:
     required_material: ProductionMaterial
     quantity_required: int
-    produceing_material: ProductionMaterial
+    producing_material: ProductionMaterial
     quantity_producing: int
+    required_material_on_tr_for_delivery: int = 0

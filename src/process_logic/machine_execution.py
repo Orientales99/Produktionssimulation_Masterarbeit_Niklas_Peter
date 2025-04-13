@@ -58,7 +58,7 @@ class MachineExecution:
 
     def reduce_producing_material_by_one(self, machine: Machine, new_item: ProductionMaterial):
         for process_material in machine.process_material_list:
-            if new_item.identification_str == process_material.produceing_material.identification_str:
+            if new_item.identification_str == process_material.producing_material.identification_str:
                 process_material.quantity_producing -= 1
 
     def check_processing_list_input_store(self, machine: Machine) -> ProductionMaterial | bool:

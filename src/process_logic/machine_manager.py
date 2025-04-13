@@ -142,7 +142,7 @@ class Machine_Manager:
         and machine.processing_list"""
 
         for process_material in machine.process_material_list[:]:
-            if new_item.identification_str == process_material.produceing_material.identification_str:
+            if new_item.identification_str == process_material.producing_material.identification_str:
 
                 # remove process_material from machine.processing_material_list
                 if process_material.quantity_producing == 0:
@@ -178,7 +178,7 @@ class Machine_Manager:
         machine.processing_list, matching by product_id.
         """
 
-        id_to_material = {process_material.produceing_material.production_material_id: process_material
+        id_to_material = {process_material.producing_material.production_material_id: process_material
                           for process_material in machine.process_material_list}
 
         sorted_process_material_list = [id_to_material[processing_order.order.product.product_id]

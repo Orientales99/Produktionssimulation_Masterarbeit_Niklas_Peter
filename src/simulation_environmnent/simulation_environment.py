@@ -30,10 +30,7 @@ class SimulationEnvironment:
         # starting processes
         self.env.process(self.visualize_layout())
         self.env.process(self.wr_driving_through_production())
-        self.env.process(self.tr_calculate_path())
-        self.env.process(self.tr_pick_up_process())
-        self.env.process(self.tr_unload_process())
-        self.env.process(self.tr_driving_through_production())
+        self.env.process(self.tr_process())
 
 
     def run_simulation(self, until: int):
@@ -48,7 +45,6 @@ class SimulationEnvironment:
         self.production.create_production()
         start_date = self.production.service_starting_conditions.set_starting_date_of_simulation()
         self.manufacturing_plan.set_parameter_for_start_of_a_simulation_day(start_date)
-        self.transport_robot_manager.start_transport_robot_manager(start_date)
         self.working_robot_manager.start_working_robot_manager()
         self.run_machine_process()
 
@@ -59,61 +55,107 @@ class SimulationEnvironment:
                 self.working_robot_manager.wr_drive_through_production()
             yield self.env.timeout(1 / driving_speed)
 
-    def tr_calculate_path(self):
+    def tr_process(self):
+        self.tr_list = self.transport_robot_manager.tr_list
+        self.tr_rdy_to_get_new_order_list = self.transport_robot_manager.list_tr_rdy_to_get_new_order
+        self.tr_drive_to_pick_up_list = self.transport_robot_manager.list_tr_drive_to_pick_up
+        self.arrived_tr_on_pick_up_destination_list = self.transport_robot_manager.list_arrived_tr_on_pick_up_destination
+        self.loaded_tr_drive_to_unload_list = self.transport_robot_manager.list_loaded_tr_drive_to_unload
+        self.arrived_tr_on_unload_destination_list = self.transport_robot_manager.list_arrived_tr_on_unload_destination
+
         while True:
             if self.stop_event is False:
-                self.transport_robot_manager.path_calculation_for_every_requesting_tr()
+                for tr in self.tr_list:
+
+                    # tr get new order
+                    if tr in self.tr_rdy_to_get_new_order_list:
+                        self.transport_robot_manager.get_transport_request_list()
+                        self.transport_robot_manager.get_transport_order_list()
+                        if self.transport_robot_manager.get_transport_order_for_tr(tr) is True:
+                            tr.working_status.waiting_for_order = False
+                            if self.transport_robot_manager.get_path_for_tr_pick_up(tr) is True:
+                                self.tr_rdy_to_get_new_order_list.remove(tr)
+                                self.tr_drive_to_pick_up_list.append(tr)
+
+                                tr.working_status.driving_to_new_location = True
+
+                    # tr drives to pick up station
+                    if tr in self.tr_drive_to_pick_up_list:
+                        self.tr_drive_to_pick_up_list.remove(tr)
+                        self.env.process(self.tr_driving_through_production_to_pick_up(tr))
+
+                    # tr picks up material
+                    if tr in self.arrived_tr_on_pick_up_destination_list:
+                        self.arrived_tr_on_pick_up_destination_list.remove(tr)
+                        self.env.process(self.tr_pick_up_process(tr))
+
+                    # tr drives to unload station
+                    if tr in self.loaded_tr_drive_to_unload_list:
+                        self.loaded_tr_drive_to_unload_list.remove(tr)
+                        self.env.process(self.tr_driving_through_production_to_unload(tr))
+
+                    # tr unloads material
+                    if tr in self.arrived_tr_on_unload_destination_list:
+                        self.arrived_tr_on_unload_destination_list.remove(tr)
+                        self.env.process(self.tr_unload_process(tr))
+
+            self.transport_robot_manager.get_all_lists()
             yield self.env.timeout(1)
 
-    def tr_pick_up_process(self):
-        loading_speed = self.transport_robot_manager.get_loading_speed()
+    def tr_driving_through_production_to_pick_up(self, tr: TransportRobot):
+        driving_speed = self.transport_robot_manager.get_driving_speed_per_cell()
         while True:
             if self.stop_event is False:
-                arrived_tr = self.transport_robot_manager.list_arrived_tr_on_pick_up_destination[:]
-                for tr in arrived_tr:
-                    self.env.process(self.transport_robot_manager.pick_up_material_on_tr(tr))
+                if self.transport_robot_manager.tr_drive_through_production_to_pick_up_destination(tr) is True:
+                    break
+            yield self.env.timeout(1 / driving_speed)
 
-                yield self.env.timeout(loading_speed)
+        self.arrived_tr_on_pick_up_destination_list.append(tr)
+        tr.working_status.driving_to_new_location = False
 
-                # After expiry → Remove robot from the list and move to next phase
-                for tr in arrived_tr:
-                    if tr in self.transport_robot_manager.list_arrived_tr_on_pick_up_destination:
-                        self.transport_robot_manager.list_arrived_tr_on_pick_up_destination.remove(tr)
-                        self.transport_robot_manager.list_loaded_tr_drive_to_unload.append(tr)
-            else:
-                yield self.env.timeout(loading_speed)
+    def tr_driving_through_production_to_unload(self, tr: TransportRobot):
+        driving_speed = self.transport_robot_manager.get_driving_speed_per_cell()
 
+        if tr.working_status.driving_route_unload_material is None:
+            while True:
+                if self.transport_robot_manager.get_path_for_tr_unload(tr):
+                    break
+                yield self.env.timeout(2)
 
-    def tr_unload_process(self):
+        while True:
+            if self.stop_event is False:
+
+                if self.transport_robot_manager.tr_drive_through_production_to_unload_destination(tr) is True:
+                    break
+            yield self.env.timeout(1 / driving_speed)
+
+        self.arrived_tr_on_unload_destination_list.append(tr)
+        tr.working_status.driving_to_new_location = False
+
+    def tr_pick_up_process(self, tr: TransportRobot):
+        loading_speed = self.transport_robot_manager.get_loading_speed()
+
+        if self.transport_robot_manager.pick_up_material_on_tr(tr) is True:
+            yield self.env.timeout(loading_speed)
+
+            self.loaded_tr_drive_to_unload_list.append(tr)
+            self.transport_robot_manager.get_path_for_tr_unload(tr)
+
+            tr.working_status.driving_to_new_location = True
+
+    def tr_unload_process(self, tr: TransportRobot):
         loading_speed = self.transport_robot_manager.get_loading_speed()
         arrived_tr: list[TransportRobot]
-        while True:
-            if self.stop_event is False:
-                arrived_tr = self.transport_robot_manager.list_arrived_tr_on_unload_destination[:]
-                unload_processes = []
+        if self.transport_robot_manager.unload_single_tr(tr) is True:
+            yield self.env.timeout(loading_speed)
 
-                for tr in arrived_tr:
-                    p = self.env.process(self.transport_robot_manager.unload_single_tr(tr))
-                    unload_processes.append(p)
-
-                yield self.env.timeout(loading_speed)
-
-            else:
-                yield self.env.timeout(loading_speed)
+            tr.working_status.waiting_for_order = True
+            tr.transport_order = None
+            self.tr_rdy_to_get_new_order_list.append(tr)
 
     def run_machine_process(self):
         for machine in self.production.machine_list:
             self.env.process(self.machine_execution.run_machine_production(machine))
-
-
-    def tr_driving_through_production(self):
-        driving_speed = self.transport_robot_manager.get_driving_speed_per_cell()
-        while True:
-            if self.stop_event is False:
-                self.transport_robot_manager.tr_drive_through_production_to_pick_up_destination()
-                self.transport_robot_manager.tr_drive_through_production_to_unload_destination()
-
-            yield self.env.timeout(1 / driving_speed)
 
     def visualize_layout(self):
         driving_speed = self.transport_robot_manager.get_driving_speed_per_cell()
@@ -123,6 +165,4 @@ class SimulationEnvironment:
                 self.stop_event = False
             if stop_event is True:
                 self.stop_event = True
-            yield self.env.timeout(1/driving_speed)
-
-
+            yield self.env.timeout(1 / driving_speed)

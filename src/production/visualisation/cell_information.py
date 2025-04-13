@@ -144,7 +144,7 @@ class CellInformation:
 
         for process_material in process_material_list:
             required_material_str = f"Required Material:   {process_material.required_material.identification_str}, Quantity: {process_material.quantity_required}\n"
-            producing_material_str = f"Producing Material:  {process_material.produceing_material.identification_str}, Quantity: {process_material.quantity_producing}\n"
+            producing_material_str = f"Producing Material:  {process_material.producing_material.identification_str}, Quantity: {process_material.quantity_producing}\n"
             paragraph = f"\n"
             required_material_list_str += (required_material_str + producing_material_str + paragraph)
 
