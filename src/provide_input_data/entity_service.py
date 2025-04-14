@@ -3,13 +3,14 @@ import json
 from simpy import Store
 
 from src import RESOURCES
-from src.constant.constant import MachineQuality
+from src.constant.constant import MachineQuality, TransportRobotStatus
+from src.entity.working_robot.wr_working_status import WrWorkingStatus
 from src.production.base.coordinates import Coordinates
-from src.entity.entity_working_status import EntityWorkingStatus
-from src.entity.machine import Machine
-from src.entity.machine_storage import MachineStorage
-from src.entity.transport_robot import TransportRobot
-from src.entity.working_robot import WorkingRobot
+from src.entity.transport_robot.tr_working_status import TrWorkingStatus
+from src.entity.machine.machine import Machine
+from src.entity.machine.machine_storage import MachineStorage
+from src.entity.transport_robot.transport_robot import TransportRobot
+from src.entity.working_robot.working_robot import WorkingRobot
 
 
 class EntityService:
@@ -42,7 +43,7 @@ class EntityService:
                                 int(working_robot_stats["robot_size_y"])),
                             working_robot_stats["driving_speed"],
                             working_robot_stats["product_transfer_rate_units_per_minute"],
-                            EntityWorkingStatus())
+                            WrWorkingStatus())
 
     def generate_wr_list(self) -> list[WorkingRobot]:
 
@@ -68,7 +69,7 @@ class EntityService:
                               Store(
                                   self.env,
                                   capacity=int(transport_robot_stats["max_loading_capacity"])),
-                              EntityWorkingStatus())
+                              TrWorkingStatus(TransportRobotStatus.IDLE, None, None, None))
 
     def generate_tr_list(self) -> list[TransportRobot]:
         tr_list = []

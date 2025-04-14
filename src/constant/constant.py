@@ -68,7 +68,7 @@ class ProductGroup(Enum):
     FIFTEEN = 15
 
     def building_groups_of_product(self):
-        return{
+        return {
             ProductGroup.ONE: ("ballfreunde", "fussballfreunde_4teilig"),
             ProductGroup.TWO: ("bauernfreunde", "bauernfreunde_4teilig"),
             ProductGroup.THREE: ("janosch_4teilig", "janosch_6teilig"),
@@ -86,3 +86,12 @@ class ProductGroup(Enum):
             ProductGroup.FIFTEEN: "zwerge_gravur"
         }.get(self)
 
+
+class TransportRobotStatus(Enum):
+    IDLE = "idle"
+    MOVING_TO_PICKUP = "moving to pick up"
+    LOADING = "loading"
+    MOVING_TO_DROP_OFF = "moving to drop off"
+    UNLOADING = "unloading"
+    RETURNING = "returning to base"
+    PAUSED = "paused"

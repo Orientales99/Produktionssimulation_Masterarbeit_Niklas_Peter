@@ -5,11 +5,11 @@ from src.production.base.coordinates import Coordinates
 from src.provide_input_data.entity_service import EntityService
 from src.provide_input_data.order_service import OrderService
 from src.provide_input_data.starting_condition_service import StartingConditionsService
-from src.entity.machine import Machine
+from src.entity.machine.machine import Machine
 from src.entity.sink import Sink
 from src.entity.source import Source
-from src.entity.transport_robot import TransportRobot
-from src.entity.working_robot import WorkingRobot
+from src.entity.transport_robot.transport_robot import TransportRobot
+from src.entity.working_robot.working_robot import WorkingRobot
 
 
 class Production:

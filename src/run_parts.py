@@ -1,13 +1,12 @@
-import cProfile
 from datetime import date
 
 from src.command_line_service import CommandLineService
 from src.production.base.coordinates import Coordinates
-from src.entity.entity_working_status import EntityWorkingStatus
+from src.entity.transport_robot.tr_working_status import TrWorkingStatus
 from src.production.entity_movement import EntityMovement
 from src.production.production import Production
-from src.entity.transport_robot import TransportRobot
-from src.entity.working_robot import WorkingRobot
+from src.entity.transport_robot.transport_robot import TransportRobot
+from src.entity.working_robot.working_robot import WorkingRobot
 from src.process_logic.manufacturing_plan import ManufacturingPlan
 from src.process_logic.path_finding import PathFinding
 from src.process_logic.working_robot_manager import WorkingRobotManager
@@ -24,7 +23,7 @@ def run_pathfinding():
     production.set_source_in_production_layout()
     start_cell = production.get_cell(Coordinates(0, 24))
     end_cell = production.get_cell(Coordinates(23, 27))
-    test_wr = WorkingRobot(1, Coordinates(4, 4), 1, 10, EntityWorkingStatus())
+    test_wr = WorkingRobot(1, Coordinates(4, 4), 1, 10, TrWorkingStatus())
     test_tr = TransportRobot(1, None, Coordinates(4, 4), 1, 10, 10)
     funktioniert = path_finding.run_a_star_algorithm(start_cell, end_cell, test_tr)
     path = path_finding.path_line_list
@@ -53,31 +52,31 @@ def move_entity():
     command_line_service.visualise_layout()
 
     for x in range(0, 100):
-        entity_movement.move_entity_right(WorkingRobot(1, Coordinates(2, 2), 1, 10, EntityWorkingStatus()))
+        entity_movement.move_entity_right(WorkingRobot(1, Coordinates(2, 2), 1, 10, TrWorkingStatus()))
     command_line_service.visualise_layout()
 
     for x in range(0, 3):
-        entity_movement.move_entity_upwards(WorkingRobot(1, Coordinates(2, 2), 1, 10, EntityWorkingStatus()))
+        entity_movement.move_entity_upwards(WorkingRobot(1, Coordinates(2, 2), 1, 10, TrWorkingStatus()))
     command_line_service.visualise_layout()
 
     for x in range(0, 3):
-        entity_movement.move_entity_right(WorkingRobot(1, Coordinates(2, 2), 1, 10, EntityWorkingStatus()))
+        entity_movement.move_entity_right(WorkingRobot(1, Coordinates(2, 2), 1, 10, TrWorkingStatus()))
     command_line_service.visualise_layout()
 
     for x in range(0, 100):
-        entity_movement.move_entity_downwards(WorkingRobot(1, Coordinates(2, 2), 1, 10, EntityWorkingStatus()))
+        entity_movement.move_entity_downwards(WorkingRobot(1, Coordinates(2, 2), 1, 10, TrWorkingStatus()))
     command_line_service.visualise_layout()
 
     for x in range(0, 100):
-        entity_movement.move_entity_left(WorkingRobot(1, Coordinates(2, 2), 1, 10, EntityWorkingStatus()))
+        entity_movement.move_entity_left(WorkingRobot(1, Coordinates(2, 2), 1, 10, TrWorkingStatus()))
     command_line_service.visualise_layout()
 
     for x in range(0, 100):
-        entity_movement.move_entity_upwards(WorkingRobot(1, Coordinates(2, 2), 1, 10, EntityWorkingStatus()))
+        entity_movement.move_entity_upwards(WorkingRobot(1, Coordinates(2, 2), 1, 10, TrWorkingStatus()))
     command_line_service.visualise_layout()
 
     for x in range(0, 100):
-        entity_movement.move_entity_downwards(WorkingRobot(1, Coordinates(2, 2), 1, 10, EntityWorkingStatus()))
+        entity_movement.move_entity_downwards(WorkingRobot(1, Coordinates(2, 2), 1, 10, TrWorkingStatus()))
     command_line_service.visualise_layout()
 
 

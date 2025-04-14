@@ -1,12 +1,10 @@
 from dataclasses import dataclass, field
 
 from src.constant.constant import MachineQuality
-from src.entity.Process_material import ProcessMaterial
-from src.entity.processing_order import ProcessingOrder
-from src.order_data.order import Order
-from src.order_data.product import Product
+from src.entity.machine.Process_material import ProcessMaterial
+from src.entity.machine.processing_order import ProcessingOrder
 from src.production.base.coordinates import Coordinates
-from src.entity.machine_storage import MachineStorage
+from src.entity.machine.machine_storage import MachineStorage
 from src.order_data.production_material import ProductionMaterial
 
 

@@ -1,6 +1,6 @@
-from src.entity.machine import Machine
-from src.entity.transport_robot import TransportRobot
-from src.entity.working_robot import WorkingRobot
+from src.entity.machine.machine import Machine
+from src.entity.transport_robot.transport_robot import TransportRobot
+from src.entity.working_robot.working_robot import WorkingRobot
 from src.production.base.coordinates import Coordinates
 from src.production.production import Production
 

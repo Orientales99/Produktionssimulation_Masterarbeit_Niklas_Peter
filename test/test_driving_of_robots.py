@@ -1,7 +1,7 @@
 from src.production.base.cell import Cell
 from src.constant.constant import MachineQuality, ItemType
 from src.production.base.coordinates import Coordinates
-from src.entity.machine_storage import MachineStorage
+from src.entity.machine.machine_storage import MachineStorage
 from src.order_data.product import Product
 from src.production.production import Production
 from src.production.visualisation.production_visualisation import ProductionVisualisation

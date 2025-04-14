@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 
 from src.production.base.coordinates import Coordinates
-from src.entity.machine import Machine
+from src.entity.machine.machine import Machine
 from src.entity.sink import Sink
 from src.entity.source import Source
-from src.entity.transport_robot import TransportRobot
-from src.entity.working_robot import WorkingRobot
+from src.entity.transport_robot.transport_robot import TransportRobot
+from src.entity.working_robot.working_robot import WorkingRobot
 
 
 @dataclass

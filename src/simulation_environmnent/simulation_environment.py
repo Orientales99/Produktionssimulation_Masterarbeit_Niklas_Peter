@@ -1,10 +1,12 @@
 import simpy
 
-from src.entity.transport_robot import TransportRobot
-from src.process_logic.machine_execution import MachineExecution
-from src.process_logic.machine_manager import Machine_Manager
+from src.entity.transport_robot.transport_robot import TransportRobot
+from src.process_logic.machine.machine_execution import MachineExecution
+from src.process_logic.machine.machine_manager import Machine_Manager
 from src.process_logic.path_finding import PathFinding
-from src.process_logic.transport_robot_manager import TransportRobotManager
+from src.process_logic.transport_robot.tr_executing_order import TrExecutingOrder
+from src.process_logic.transport_robot.transport_robot_manager_1 import TransportRobotManager_1
+from src.process_logic.transport_robot.tr_order_manager import TrOrderManager
 from src.process_logic.working_robot_manager import WorkingRobotManager
 from src.production.production import Production
 from src.process_logic.manufacturing_plan import ManufacturingPlan
@@ -22,8 +24,9 @@ class SimulationEnvironment:
         self.machine_execution = MachineExecution(self.env, self.manufacturing_plan, self.machine_manager)
         self.working_robot_manager = WorkingRobotManager(self.manufacturing_plan, self.path_finding)
         self.visualize_production = ProductionVisualisation(self.production, self.env)
-        self.transport_robot_manager = TransportRobotManager(self.env, self.manufacturing_plan, self.path_finding,
-                                                             self.machine_execution, self.machine_manager)
+        self.tr_order_manager = TrOrderManager(self.env, self.manufacturing_plan, self.machine_manager)
+        self.tr_executing_order = TrExecutingOrder(self.env, self.manufacturing_plan, self.path_finding,
+                                                   self.machine_execution, self.machine_manager)
 
         self.stop_event = False
 
@@ -56,12 +59,19 @@ class SimulationEnvironment:
 
     def tr_process(self):
         while True:
-            if self.stop_event is False:
-                for tr in self.transport_robot_manager.tr_list:
+            self.tr_order_manager.create_transport_request_list_from_machines()
+            self.tr_order_manager.every_idle_tr_get_order()
+            self.tr_order_manager.create_transport_request_list_from_machines()
+            self.tr_executing_order.start_tr_process()
+            yield self.env.timeout(20)
 
+    def tr_process_1(self):
+        while True:
+            if self.stop_event is False:
+                for tr in self.tr_order_manager.tr_list:
 
                     # kiss
-                    #Bedingung: Auftrag wurde beendet or Simulation Startet
+                    # Bedingung: Auftrag wurde beendet or Simulation Startet
                     #   Order list calculate & sort
                     #   loop alle TR
                     #        Wenn TR frei ist:
@@ -176,7 +186,7 @@ class SimulationEnvironment:
             tr.transport_order = None
             self.transport_robot_manager.list_tr_rdy_to_get_new_order.append(tr)
 
-    def tr_driving_through_production_to_waiting_destination(self, tr:TransportRobot):
+    def tr_driving_through_production_to_waiting_destination(self, tr: TransportRobot):
         driving_speed = self.transport_robot_manager.get_driving_speed_per_cell()
         while True:
             if self.stop_event is False:
@@ -191,7 +201,7 @@ class SimulationEnvironment:
             self.env.process(self.machine_execution.run_machine_production(machine))
 
     def visualize_layout(self):
-        driving_speed = self.transport_robot_manager.get_driving_speed_per_cell()
+        driving_speed = self.tr_order_manager.get_driving_speed_per_cell()
         while True:
             stop_event = self.visualize_production.visualize_layout()
             if stop_event is False:

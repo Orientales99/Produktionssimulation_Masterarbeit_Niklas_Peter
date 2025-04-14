@@ -1,8 +1,6 @@
-from datetime import date
-
 from src.constant.constant import MachineQuality, ItemType
-from src.entity.machine import Machine
-from src.entity.Process_material import ProcessMaterial
+from src.entity.machine.machine import Machine
+from src.entity.machine.Process_material import ProcessMaterial
 from src.order_data.order import Order
 from src.order_data.production_material import ProductionMaterial
 

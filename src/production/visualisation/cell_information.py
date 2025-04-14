@@ -5,15 +5,14 @@ from tkinter.scrolledtext import ScrolledText
 from typing import Set
 from simpy import Store
 
-from src.entity.machine import Machine
-from src.entity.Process_material import ProcessMaterial
-from src.entity.processing_order import ProcessingOrder
+from src.entity.machine.machine import Machine
+from src.entity.machine.Process_material import ProcessMaterial
+from src.entity.machine.processing_order import ProcessingOrder
 from src.entity.sink import Sink
 from src.entity.source import Source
-from src.entity.transport_order import TransportOrder
-from src.entity.transport_robot import TransportRobot
-from src.entity.working_robot import WorkingRobot
-from src.order_data.order import Order
+from src.entity.transport_robot.transport_order import TransportOrder
+from src.entity.transport_robot.transport_robot import TransportRobot
+from src.entity.working_robot.working_robot import WorkingRobot
 from src.production.base.coordinates import Coordinates
 from src.production.base.cell import Cell
 from src.production.production import Production
@@ -210,9 +209,9 @@ class CellInformation:
 
         transport_order_list_str = self.get_str_transport_order(transport_robot.transport_order)
         transport_material_store_str = self.get_str_products_in_store(transport_robot.material_store)
-        pick_up_destination = self.get_tr_driving_destination_str(
-            transport_robot.working_status.pick_up_location_entity)
-        unload_destination = self.get_tr_driving_destination_str(transport_robot.working_status.unload_location_entity)
+        destination = self.get_tr_driving_destination_str(
+            transport_robot.working_status.destination_location_entity)
+        unload_destination = self.get_tr_driving_destination_str(transport_robot.working_status.destination_location_entity)
 
         title = f"Cell: {transport_robot.identification_str} "
 
@@ -232,23 +231,17 @@ class CellInformation:
             f"{transport_order_list_str}\n"
             f"\n"
             f"Working Status:\n"
-            f"              Driving To New Location: {transport_robot.working_status.driving_to_new_location}\n"
-            f"              Waiting For Order:       {transport_robot.working_status.waiting_for_order}\n"
-            f"              Waiting Time On Path:    {transport_robot.working_status.waiting_time_on_path} sec.\n"
+            f"              {transport_robot.working_status.status.value}\n"
             "\n"
             f"      Transport Destination:\n"
-            f"              Pick-Up                  {pick_up_destination}\n"
-            f"              Pick-Up Coordinates:     {transport_robot.working_status.driving_destination_pick_up_material}\n"
-            f"              Pick-Up Route:           {transport_robot.working_status.driving_route_pick_up_material}\n"
-            "\n"
-            f"              Unload Location:         {unload_destination}\n"
-            f"              Unload Coordinates:      {transport_robot.working_status.driving_destination_unload_material}\n"
-            f"              Unload Route:            {transport_robot.working_status.driving_route_unload_material}\n"
+            f"              Destination                  {destination}\n"
+            f"              Destination Coordinates:     {transport_robot.working_status.driving_destination_coordinates}\n"
+            f"              Route:                       {transport_robot.working_status.driving_route}\n"
             "\n"
             f"Material Transport Status:\n"
-            f"              Max Capacity:    {transport_robot.material_store.capacity}\n"
-            f"              Contained Units: {len(transport_robot.material_store.items)}\n"
-            f"              Loaded_Products: {transport_material_store_str}\n"
+            f"              Max Capacity:                {transport_robot.material_store.capacity}\n"
+            f"              Contained Units:             {len(transport_robot.material_store.items)}\n"
+            f"              Loaded_Products:             {transport_material_store_str}\n"
 
         )
 

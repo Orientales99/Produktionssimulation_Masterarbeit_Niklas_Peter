@@ -5,24 +5,23 @@ from datetime import date
 
 from simpy import Store
 
-from src.entity.machine import Machine
+from src.entity.machine.machine import Machine
 from src.entity.sink import Sink
 from src.entity.source import Source
-from src.entity.transport_order import TransportOrder
-from src.entity.transport_request import TransportRequest
-from src.entity.transport_robot import TransportRobot
-from src.order_data.production_material import ProductionMaterial
+from src.entity.transport_robot.transport_order import TransportOrder
+from src.process_logic.transport_robot.transport_request import TransportRequest
+from src.entity.transport_robot.transport_robot import TransportRobot
 
-from src.process_logic.machine_manager import Machine_Manager
+from src.process_logic.machine.machine_manager import Machine_Manager
 from src.process_logic.manufacturing_plan import ManufacturingPlan
-from src.entity.Process_material import ProcessMaterial
+from src.entity.machine.Process_material import ProcessMaterial
 from src.process_logic.path_finding import PathFinding
 from src.production.base.cell import Cell
 from src.production.base.coordinates import Coordinates
 from src.production.store_manager import StoreManager
 
 
-class TransportRobotManager:
+class TransportRobotManager_1:
     manufacturing_plan: ManufacturingPlan
     path_finding: PathFinding
     store_manager: StoreManager
@@ -92,103 +91,7 @@ class TransportRobotManager:
             print(f"{tr.identification_str}")
         print("\n")
 
-    def get_transport_request_list_from_machines(self):
-        """Creates a new list of TransportRequest objects for each machine.
-            If this method is called, the list gets reset and a new list is created.
-            """
-        self.list_transport_request = []
 
-        for machine in self.machine_list:
-            self.machine_manager.sort_machine_processing_list(machine)
-
-            # Transport request from producing machines for first Order of processing list
-            if machine.waiting_for_arriving_of_wr is True or machine.working_robot_on_machine is True:
-                if machine.waiting_for_arriving_of_tr is False:
-                    #if len(machine.machine_storage.storage_before_process.items) < 50:
-                        processing_order = machine.processing_list[0]
-                        process_material = machine.process_material_list[0]
-                        required_material_quantity = machine.process_material_list[0].quantity_required - \
-                                                     machine.process_material_list[
-                                                         0].required_material_on_tr_for_delivery
-                        pick_up_destination = self.get_pick_up_station(process_material)
-
-                        if required_material_quantity > 0:
-                            self.list_transport_request.append(
-                                TransportRequest(pick_up_destination, machine, processing_order, process_material))
-
-                # elif len(machine.machine_storage.storage_after_process.items) > 50:
-                #     most_common_production_material_identification_str = self.get_most_common_identification_str(
-                #         machine.machine_storage.storage_after_process)
-                #     for priority_index, destination_machine in enumerate(self.machine_list):
-                #         for process_material in destination_machine.process_material_list:
-                #             if process_material.required_material.identification_str == most_common_production_material_identification_str:
-#
-                #                 processing_order = destination_machine.processing_list[priority_index]
-#
-                #                 self.list_transport_request.append(
-                #                     TransportRequest(machine, destination_machine, processing_order, process_material))
-
-        self.sort_transport_requests_list()
-
-    def get_most_common_identification_str(self, item_store: Store) -> str | None:
-        # Get all identification_str values from the store
-        id_strings = [item.identification_str for item in item_store.items]
-
-        # Count occurrences of each identification_str
-        counter = Counter(id_strings)
-
-        # Get the most common identification_str
-        if counter:
-            most_common_id, count = counter.most_common(1)[0]
-            return most_common_id
-        else:
-            return None
-
-    def sort_transport_requests_list(self):
-        """
-        Removes TransportRequest entries where the machine is waiting for a transport to arrive.
-        Sorts self.list_transport_request with the following priority:
-        1. The transport is currently being processed on the assigned machine.
-        2. Order priority.
-        3. Step of the process (descending).
-        4. Daily manufacturing sequence (ascending)."""
-
-        self.list_transport_request = [tr for tr in self.list_transport_request if
-                                       not tr.destination_unload.waiting_for_arriving_of_tr]
-
-        self.list_transport_request.sort(
-            key=lambda tr: (
-                not (tr.destination_unload.producing_production_material is not None and
-                     tr.destination_unload.producing_production_material.production_material_id ==
-                     tr.processing_order.order.product.product_id),
-                tr.processing_order.priority,
-                -tr.processing_order.step_of_the_process,
-                tr.processing_order.order.daily_manufacturing_sequence if
-                tr.processing_order.order.daily_manufacturing_sequence is not None else float(
-                    'inf')
-            )
-        )
-
-    def get_transport_order_list(self):
-        self.material_transport_order_list = []
-        for transport_request in self.list_transport_request:
-            unload_destination_machine = transport_request.destination_unload
-            request_material = transport_request.process_material
-            pick_up_station = transport_request.destination_pick_up
-
-            # if the origin of the material is a machine
-            if isinstance(pick_up_station, Machine):
-                self.material_transport_order_list.append(
-                    TransportOrder(unload_destination_machine, pick_up_station, request_material.required_material,
-                                   request_material.quantity_required))
-
-            # if the machine is working and the origin of the material is the source
-            elif isinstance(pick_up_station, Source) and (unload_destination_machine.waiting_for_arriving_of_wr is
-                                                          True or
-                                                          unload_destination_machine.working_robot_on_machine is True):
-                self.material_transport_order_list.append(
-                    TransportOrder(unload_destination_machine, pick_up_station, request_material.required_material,
-                                   request_material.quantity_required))
 
     def get_pick_up_station(self, request_material: ProcessMaterial) -> Machine | Source | bool:
         """Determines the pickup station (Machine or Source) for the requested material"""
@@ -470,7 +373,7 @@ class TransportRobotManager:
                     machine_store = tr.transport_order.unload_destination.machine_storage.storage_before_process
                     empty_space_machine_store = self.store_manager.count_empty_space_in_store(machine_store)
                     unload_product = tr.transport_order.transporting_product
-                    loaded_product_on_tr = self.store_manager.count_products_in_store(tr.material_store, unload_product)
+                    loaded_product_on_tr = self.store_manager.count_number_of_one_product_type_in_store(tr.material_store, unload_product)
 
                     items_to_unload = min(empty_space_machine_store, loaded_product_on_tr)
 

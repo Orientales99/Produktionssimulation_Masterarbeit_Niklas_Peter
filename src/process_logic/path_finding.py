@@ -4,9 +4,9 @@ from src.production.entity_movement import EntityMovement
 from src.production.production import Production
 from src.production.base.coordinates import Coordinates
 from src.production.base.cell import Cell
-from src.entity.machine import Machine
-from src.entity.transport_robot import TransportRobot
-from src.entity.working_robot import WorkingRobot
+from src.entity.machine.machine import Machine
+from src.entity.transport_robot.transport_robot import TransportRobot
+from src.entity.working_robot.working_robot import WorkingRobot
 
 
 class PathFinding:
@@ -18,7 +18,8 @@ class PathFinding:
         self.entity_movement = EntityMovement(self.production)
         self.path_line_list = []
 
-    def get_path_for_entity(self, entity: Machine | WorkingRobot | TransportRobot, end_coordinate: Coordinates):
+    def get_path_for_entity(self, entity: Machine | WorkingRobot | TransportRobot, end_coordinate: Coordinates)\
+            -> list | Exception:
         start_coordinate = self.get_start_coordinates_from_entity(entity)
         start_cell = self.get_start_cell_from_entity(entity)
         end_cell = self.production.get_cell(end_coordinate)

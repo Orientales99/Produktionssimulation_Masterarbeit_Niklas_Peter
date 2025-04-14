@@ -1,10 +1,8 @@
-from src.constant.constant import ItemType, OrderPriority
-from src.entity.Process_material import ProcessMaterial
-from src.entity.machine import Machine
-from src.entity.processing_order import ProcessingOrder
+from src.entity.machine.Process_material import ProcessMaterial
+from src.entity.machine.machine import Machine
+from src.entity.machine.processing_order import ProcessingOrder
 from src.order_data.order import Order
 from src.order_data.production_material import ProductionMaterial
-from src.process_logic.manufacturing_plan import ManufacturingPlan
 
 
 class MachineExecution:

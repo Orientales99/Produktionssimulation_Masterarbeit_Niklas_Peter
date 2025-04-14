@@ -1,16 +1,15 @@
 from collections import defaultdict
-from dataclasses import dataclass, field
 from datetime import date
 
 import pandas as pd
 
-from src.entity.processing_order import ProcessingOrder
-from src.process_logic.machine_manager import Machine_Manager
+from src.entity.machine.processing_order import ProcessingOrder
+from src.process_logic.machine.machine_manager import Machine_Manager
 from src.production.production import Production
 from src.order_data.order import Order
 from src.order_data.production_material import ProductionMaterial
 from src.provide_input_data.product_information_service import ProductInformationService
-from src.entity.machine import Machine
+from src.entity.machine.machine import Machine
 
 
 class ManufacturingPlan:
