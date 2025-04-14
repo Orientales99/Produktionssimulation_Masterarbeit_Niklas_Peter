@@ -26,3 +26,7 @@ class EntityWorkingStatus:
     driving_destination_unload_material: Coordinates | None = None
     driving_route_unload_material: list[Coordinates] | None = None
     unload_location_entity: Machine | Source | Sink | None = None
+
+    driving_destination_waiting_destination: Coordinates | None = None
+    driving_route_waiting_destination: list[Coordinates] | None = None
+    waiting_destination: Source | None = None
