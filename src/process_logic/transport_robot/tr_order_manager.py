@@ -168,7 +168,8 @@ class TrOrderManager:
             quantity = self.calculate_order_quantity(tr, transport_request)
 
             # get transport order for tr
-            tr.transport_order = TransportOrder(unload_destination, pick_up_destination, transporting_material, quantity)
+            tr.transport_order = TransportOrder(unload_destination, pick_up_destination, transporting_material,
+                                                quantity)
 
             # change list & entity status
             tr.working_status.status = TransportRobotStatus.MOVING_TO_PICKUP
@@ -194,8 +195,6 @@ class TrOrderManager:
                 quantity = empty_space_in_store
 
         return quantity
-
-
 
     def get_driving_speed_per_cell(self):
         return int(self.tr_list[0].driving_speed)

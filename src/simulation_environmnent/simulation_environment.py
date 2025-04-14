@@ -1,5 +1,6 @@
 import simpy
 
+from src.constant.constant import TransportRobotStatus
 from src.entity.transport_robot.transport_robot import TransportRobot
 from src.process_logic.machine.machine_execution import MachineExecution
 from src.process_logic.machine.machine_manager import Machine_Manager
@@ -33,7 +34,7 @@ class SimulationEnvironment:
         # starting processes
         self.env.process(self.visualize_layout())
         self.env.process(self.wr_driving_through_production())
-        self.env.process(self.tr_process())
+        self.env.process(self.start_every_tr_process())
 
     def run_simulation(self, until: int):
         self.env.run(until=until)
@@ -57,13 +58,50 @@ class SimulationEnvironment:
                 self.working_robot_manager.wr_drive_through_production()
             yield self.env.timeout(1 / driving_speed)
 
-    def tr_process(self):
+    def start_every_tr_process(self):
         while True:
-            self.tr_order_manager.create_transport_request_list_from_machines()
-            self.tr_order_manager.every_idle_tr_get_order()
-            self.tr_order_manager.create_transport_request_list_from_machines()
-            self.tr_executing_order.start_tr_process()
-            yield self.env.timeout(20)
+            if self.stop_event is False:
+                self.tr_order_manager.create_transport_request_list_from_machines()
+                self.tr_order_manager.every_idle_tr_get_order()
+
+                for tr in self.tr_order_manager.tr_list:
+
+                    # drive to pick up destination
+                    if tr.working_status.status == TransportRobotStatus.MOVING_TO_PICKUP:
+                        if self.tr_executing_order.start__moving_to_pick_up__process_for_tr(tr):
+                            self.env.process(self.tr_drive_to_destination_process(tr))
+
+                    # pick up material
+                    if tr.working_status.status == TransportRobotStatus.LOADING:
+                        self.env.process(self.pick_up_material_on_tr_process(tr))
+
+                    # drive to unload destination
+                    if tr.working_status.status == TransportRobotStatus.MOVING_TO_DROP_OFF:
+                        if self.tr_executing_order.start__moving_to_unload__process_for_tr(tr):
+                            self.env.process(self.tr_drive_to_destination_process(tr))
+                            pass
+                yield self.env.timeout(20)
+
+    def tr_drive_to_destination_process(self, tr: TransportRobot):
+        driving_speed = self.tr_order_manager.get_driving_speed_per_cell()
+
+        while True:
+            if self.stop_event is False:
+                if self.tr_executing_order.drive_tr_one_step_trough_production(tr) is True:
+                    if tr.working_status.status == TransportRobotStatus.MOVING_TO_PICKUP:
+                        tr.working_status.status = TransportRobotStatus.LOADING
+                    elif tr.working_status.status == TransportRobotStatus.MOVING_TO_DROP_OFF:
+                        tr.working_status.status = TransportRobotStatus.UNLOADING
+                    else:
+                        raise Exception(f"{tr.identification_str} drives to destination but has wrong working_status.status")
+                    break
+            yield self.env.timeout(1/driving_speed)
+
+    def pick_up_material_on_tr_process(self, tr: TransportRobot):
+        loading_speed = self.tr_order_manager.get_loading_speed()
+        yield self.env.timeout(loading_speed)
+        self.tr_executing_order.pick_up_material_on_tr(tr)
+        tr.working_status.status = TransportRobotStatus.MOVING_TO_DROP_OFF
 
     def tr_process_1(self):
         while True:
