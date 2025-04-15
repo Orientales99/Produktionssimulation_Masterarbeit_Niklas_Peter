@@ -1,3 +1,4 @@
+from src.constant.constant import WorkingRobotStatus
 from src.entity.machine.Process_material import ProcessMaterial
 from src.entity.machine.machine import Machine
 from src.entity.machine.processing_order import ProcessingOrder
@@ -37,7 +38,12 @@ class MachineExecution:
                     yield output_store.put(new_item)
                     self.reduce_producing_material_by_one(machine, new_item)
 
-                    self.machine_manager.check_if_order_is_finished(machine, new_item)
+                    # if Order is produced
+                    if self.machine_manager.check_if_order_is_finished(machine, new_item):
+                        machine.working_robot_on_machine = False
+                        wr = self.machine_manager.get_wr_working_on_machine(machine)
+                        wr.working_status.working_on_status = False
+                        wr.working_status.status = WorkingRobotStatus.WAITING_IN_MACHINE_TO_EXIT
 
                     if new_product_produced is True:
                         self.give_order_to_next_machine(new_item, machine)

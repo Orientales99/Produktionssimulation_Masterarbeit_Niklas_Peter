@@ -2,7 +2,7 @@
   "production_machine": [
     {
       "machine_type": "0",
-      "number_of_machines_in_production": "3",
+      "number_of_machines_in_production": "1",
       "number_of_new_machines": "1",
       "driving_speed":  "0",
       "working_speed":  "10",
@@ -16,7 +16,7 @@
     },
     {
       "machine_type": "1",
-      "number_of_machines_in_production": "5",
+      "number_of_machines_in_production": "3",
       "number_of_new_machines": "1",
       "driving_speed":  "3",
       "working_speed":  "10",

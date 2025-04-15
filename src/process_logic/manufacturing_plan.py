@@ -19,7 +19,7 @@ class ManufacturingPlan:
     summarised_order_list: list[Order] | None = None
     dictionary_summarised_order_per_day: dict[date, list[Order]]
     daily_manufacturing_plan: list[Order]
-    process_list_for_every_machine: list[(Machine, ProcessingOrder)] # (machine.identification_str, Order, step of the process)
+    process_list_for_every_machine: list[(Machine, ProcessingOrder)]
     required_materials_for_every_machine: dict = {}
 
     def __init__(self, production, machine_execution):

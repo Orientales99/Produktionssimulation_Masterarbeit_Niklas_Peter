@@ -54,7 +54,6 @@ class TrOrderManager:
         if len(machine.machine_storage.storage_before_process.items) < 50:
             processing_order = machine.processing_list[0]
             process_material = machine.process_material_list[0]
-
             pick_up_station = self.get_pick_up_station(process_material)
 
             return TransportRequest(pick_up_station, machine, processing_order, process_material)
@@ -107,10 +106,11 @@ class TrOrderManager:
                 for items in stored_item_list:
                     if items.identification_str == request_material.required_material.identification_str:
                         return machine
-                if machine.process_material_list[
-                    0].producing_material.identification_str == request_material.required_material.identification_str:
-                    return machine
 
+                if len(machine.process_material_list) > 0:
+                    if machine.process_material_list[
+                        0].producing_material.identification_str == request_material.required_material.identification_str:
+                        return machine
         raise Exception(f"{request_material.required_material.identification_str} cannot be found in the production")
 
     def remove_duplicate_transport_requests(self):
@@ -161,24 +161,25 @@ class TrOrderManager:
     def allocate_order_to_tr(self, tr: TransportRobot):
         if tr.working_status.status == TransportRobotStatus.IDLE:
             # get variables
-            transport_request = self.transport_request_list[0]
-            unload_destination = transport_request.destination_unload
-            pick_up_destination = transport_request.destination_pick_up
-            transporting_material = transport_request.process_material.required_material
-            quantity = self.calculate_order_quantity(tr, transport_request)
+            if len(self.transport_request_list) > 0:
+                transport_request = self.transport_request_list[0]
+                unload_destination = transport_request.destination_unload
+                pick_up_destination = transport_request.destination_pick_up
+                transporting_material = transport_request.process_material.required_material
+                quantity = self.calculate_order_quantity(tr, transport_request)
 
-            # get transport order for tr
-            tr.transport_order = TransportOrder(unload_destination, pick_up_destination, transporting_material,
-                                                quantity)
+                # get transport order for tr
+                tr.transport_order = TransportOrder(unload_destination, pick_up_destination, transporting_material,
+                                                    quantity)
 
-            # change list & entity status
-            tr.working_status.status = TransportRobotStatus.MOVING_TO_PICKUP
-            self.transport_request_list.remove(transport_request)
-            if isinstance(pick_up_destination, Machine):
-                pick_up_destination.waiting_for_arriving_of_tr = True
+                # change list & entity status
+                tr.working_status.status = TransportRobotStatus.MOVING_TO_PICKUP
+                self.transport_request_list.remove(transport_request)
+                if isinstance(pick_up_destination, Machine):
+                    pick_up_destination.waiting_for_arriving_of_tr = True
 
-            if isinstance(unload_destination, Machine):
-                unload_destination.waiting_for_arriving_of_tr = True
+                if isinstance(unload_destination, Machine):
+                    unload_destination.waiting_for_arriving_of_tr = True
 
     def calculate_order_quantity(self, tr: TransportRobot, transport_request: TransportRequest) -> int:
         """Returns the max transporting quantity. Limited by the required material, transporting capacity of tr and

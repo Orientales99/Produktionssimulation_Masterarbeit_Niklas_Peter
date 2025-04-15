@@ -1,6 +1,7 @@
 from src.constant.constant import MachineQuality, ItemType
 from src.entity.machine.machine import Machine
 from src.entity.machine.Process_material import ProcessMaterial
+from src.entity.working_robot.working_robot import WorkingRobot
 from src.order_data.order import Order
 from src.order_data.production_material import ProductionMaterial
 
@@ -135,9 +136,11 @@ class Machine_Manager:
                 if item.production_material_id == processing_order.order.product.product_id:
                     machine.producing_production_material = item
 
-    def check_if_order_is_finished(self, machine: Machine, new_item: ProductionMaterial):
+    def check_if_order_is_finished(self, machine: Machine, new_item: ProductionMaterial) -> bool:
         """If no more material need to be produced for an order -> remove this order from machine.process_material_list
-        and machine.processing_list"""
+        and machine.processing_list
+        Return True -> order is finished
+        Return False -> order is not finished"""
 
         for process_material in machine.process_material_list[:]:
             if new_item.identification_str == process_material.producing_material.identification_str:
@@ -150,6 +153,12 @@ class Machine_Manager:
                     for processing_order in machine.processing_list[:]:
                         if processing_order.order.product.product_id == new_item.production_material_id:
                             machine.processing_list.remove(processing_order)
+
+                    return True
+        return False
+
+
+
 
     def sort_machine_processing_list(self, machine: Machine):
         """The processing list is sorted according to the following criteria:
@@ -184,3 +193,11 @@ class Machine_Manager:
                                         if processing_order.order.product.product_id in id_to_material]
 
         machine.process_material_list[:] = sorted_process_material_list
+
+    def get_wr_working_on_machine(self, machine: Machine) -> WorkingRobot:
+        """Return the Working Robot which is working on the machine"""
+
+        for wr in self.production.wr_list:
+            if wr.working_status.working_for_machine == machine:
+                return wr
+        print(f"No WR is working on {machine.identification_str}")

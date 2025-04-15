@@ -179,7 +179,18 @@ class CellInformation:
                       if working_robot.working_status.working_for_machine is not None
                       else "None")
         destination = (
-            working_robot.working_status.driving_destination_work_on_machine if working_robot.working_status.driving_destination_work_on_machine is not None else "None")
+            working_robot.working_status.driving_destination_coordinates if working_robot.working_status.driving_destination_coordinates is not None else "None")
+
+        if working_robot.working_status.working_on_status:
+            working_on_status = str(("processing..."))
+        else:
+            working_on_status = str("waiting to start process")
+
+        if working_robot.working_status.last_placement_in_production is None:
+            last_placement = None
+        else:
+            last_placement = [cell.cell_id for cell in working_robot.working_status.last_placement_in_production]
+
 
         info_text = (
             f"Cell Coordinates:      X: {self.current_cell.cell_coordinates.x}, Y: {self.current_cell.cell_coordinates.y}\n"
@@ -193,13 +204,16 @@ class CellInformation:
             f"Driving Speed:         {working_robot.driving_speed} field/sec.\n"
             f"Product Transfer Rate: {working_robot.product_transfer_rate} units/sec.\n"
             f"Working Status:\n"
-            f"         Driving To New Location: {working_robot.working_status.driving_to_new_location}\n"
-            f"         Waiting For Order:       {working_robot.working_status.waiting_for_order}\n"
+            f"                                  {working_robot.working_status.status.value}\n"
+            f"                                  {working_on_status}\n"
+            f"\n"
             f"         Machine:                 {machine_id}\n"
             f"         Destination Machine:     {destination}\n"
             f"         Waiting Time On Path:    {working_robot.working_status.waiting_time_on_path} sec.\n"
             f"\n"
-            f"         Driving Route:           {working_robot.working_status.driving_route_work_on_machine}\n"
+            f"         Driving Route:           {working_robot.working_status.driving_route}\n"
+            f"\n"
+            f"last_placement_in_production:     {last_placement}\n"
         )
 
         self.print_information_sheet(title, info_text)
@@ -212,6 +226,11 @@ class CellInformation:
         destination = self.get_tr_driving_destination_str(
             transport_robot.working_status.destination_location_entity)
         unload_destination = self.get_tr_driving_destination_str(transport_robot.working_status.destination_location_entity)
+
+        if transport_robot.working_status.working_on_status:
+            working_on_status = str(("processing..."))
+        else:
+            working_on_status = str("waiting to start process")
 
         title = f"Cell: {transport_robot.identification_str} "
 
@@ -232,7 +251,7 @@ class CellInformation:
             f"\n"
             f"Working Status:\n"
             f"              {transport_robot.working_status.status.value}\n"
-            "\n"
+            f"              {working_on_status}\n"
             f"      Transport Destination:\n"
             f"              Destination                  {destination}\n"
             f"              Destination Coordinates:     {transport_robot.working_status.driving_destination_coordinates}\n"

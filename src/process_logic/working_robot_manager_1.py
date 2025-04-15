@@ -34,9 +34,10 @@ class WorkingRobotManager:
 
     def get_path_for_wr(self):
         for wr in self.list_wr_in_production:
-            if wr.working_status.driving_destination_work_on_machine is not None:
-                path_line_list = self.path_finding.get_path_for_entity(wr, wr.working_status.driving_destination_work_on_machine)
-                wr.working_status.driving_route_work_on_machine = path_line_list
+            if wr.working_status.driving_destination_coordinates is not None:
+                path_line_list = self.path_finding.get_path_for_entity(wr,
+                                                                       wr.working_status.driving_destination_coordinates)
+                wr.working_status.driving_route = path_line_list
                 wr.working_status.driving_to_new_location = True
                 self.list_driving_wr.append(wr)
 
@@ -45,26 +46,30 @@ class WorkingRobotManager:
         period until in calculates a new path"""
 
         for wr in self.list_driving_wr:
-            if isinstance(wr.working_status.driving_route_work_on_machine, Exception):
-                print(f'{wr.identification_str}:{self.path_finding.get_start_cell_from_entity(wr)}, {wr.working_status.driving_route_work_on_machine}')
+            if isinstance(wr.working_status.driving_route, Exception):
+                print(
+                    f'{wr.identification_str}:{self.path_finding.get_start_cell_from_entity(wr)}, {wr.working_status.driving_route}')
             else:
 
-                if wr.working_status.driving_to_new_location is True and len(wr.working_status.driving_route_work_on_machine) != 0:
+                if wr.working_status.driving_to_new_location is True and len(
+                        wr.working_status.driving_route) != 0:
 
                     start_cell = self.path_finding.get_start_cell_from_entity(wr)
 
                     if self.path_finding.entity_movement.move_entity_one_step(start_cell, wr,
-                                                                              wr.working_status.driving_route_work_on_machine[0]) is True:
-                        wr.working_status.driving_route_work_on_machine.pop(0)
+                                                                              wr.working_status.driving_route[
+                                                                                  0]) is True:
+                        wr.working_status.driving_route.pop(0)
                         wr.working_status.waiting_time_on_path = self.waiting_time
                     else:
                         wr.working_status.waiting_time_on_path -= 1
                         if wr.working_status.waiting_time_on_path == 0:
                             path_line_list = self.path_finding.get_path_for_entity(wr,
-                                                                                   wr.working_status.driving_destination_work_on_machine)
-                            wr.working_status.driving_route_work_on_machine = path_line_list
+                                                                                   wr.working_status.driving_destination_coordinates)
+                            wr.working_status.driving_route = path_line_list
 
-                elif len(wr.working_status.driving_route_work_on_machine) == 0 and wr.working_status.driving_to_new_location is True \
+                elif len(
+                        wr.working_status.driving_route) == 0 and wr.working_status.driving_to_new_location is True \
                         and wr.working_status.working_for_machine is not None:
                     if wr not in self.list_wr_working_on_machine:
                         self.wr_arrived_on_destination(wr)
@@ -83,7 +88,6 @@ class WorkingRobotManager:
         self.list_driving_wr.remove(working_robot)
         self.list_wr_working_on_machine.append(working_robot)
 
-
     def change__working_robot_on_machine_status(self, machine_identification_str: str, status: bool):
         cell_list_machine = self.manufacturing_plan.production.entities_located[machine_identification_str]
         for cell in cell_list_machine:
@@ -94,7 +98,8 @@ class WorkingRobotManager:
 
         self.sorted_list_of_processes = sorted(list_of_processes_for_every_machine,
                                                key=lambda x: x[1].order.daily_manufacturing_sequence, reverse=False)
-        self.sorted_list_of_processes = sorted(list_of_processes_for_every_machine, key=lambda x: x[1].order.priority.value,
+        self.sorted_list_of_processes = sorted(list_of_processes_for_every_machine,
+                                               key=lambda x: x[1].order.priority.value,
                                                reverse=False)
 
     def get_next_working_location_for_order(self):
@@ -105,18 +110,19 @@ class WorkingRobotManager:
                 for process_order in sorted_list_of_processes_local:
 
                     if process_order[0].waiting_for_arriving_of_wr is False and process_order[
-                        0].working_robot_on_machine is False:
+                                                                                 0].working_robot_on_machine is False:
                         wr.working_status.waiting_for_order = False
                         process_order[0].waiting_for_arriving_of_wr = True
                         wr.working_status.working_for_machine = process_order[0]
-                        wr.working_status.driving_destination_work_on_machine = self.calculate_coordinates_of_new_driving_destination(
-                            process_order[0], wr)
+
+                        wr.working_status.driving_destination_coordinates = \
+                            self.calculate_coordinates_of_new_driving_destination(process_order[0], wr)
 
                         self.sorted_list_of_processes.remove(process_order)
                         break
 
     def calculate_coordinates_of_new_driving_destination(self, destination_machine: Machine,
-                                                         working_robot) -> Coordinates:
+                                                         working_robot: WorkingRobot) -> Coordinates:
         """Calculate the destination cell for the wr. It is the cell in the upper right corner of the WR"""
 
         location_machine = self.manufacturing_plan.production.entities_located[destination_machine.identification_str]

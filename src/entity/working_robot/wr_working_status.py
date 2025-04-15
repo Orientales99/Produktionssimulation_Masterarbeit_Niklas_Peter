@@ -1,16 +1,20 @@
 from dataclasses import dataclass
 
+from src.constant.constant import WorkingRobotStatus
 from src.production.base.coordinates import Coordinates
 from src.entity.machine.machine import Machine
 
 
 @dataclass
 class WrWorkingStatus:
+    status: WorkingRobotStatus
+    working_on_status: bool
+    in_production: bool
 
-    driving_to_new_location: bool = False
-    waiting_for_order: bool = True
+    working_for_machine: Machine | None
+    driving_destination_coordinates: Coordinates | None
+    driving_route: list[Coordinates] | None
+
+    last_placement_in_production: list | None
+
     waiting_time_on_path: int = 5
-
-    driving_destination_work_on_machine: Coordinates | None = None
-    driving_route_work_on_machine: list[Coordinates] | None = None
-    working_for_machine: Machine | None = None

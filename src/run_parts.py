@@ -9,7 +9,7 @@ from src.entity.transport_robot.transport_robot import TransportRobot
 from src.entity.working_robot.working_robot import WorkingRobot
 from src.process_logic.manufacturing_plan import ManufacturingPlan
 from src.process_logic.path_finding import PathFinding
-from src.process_logic.working_robot_manager import WorkingRobotManager
+from src.process_logic.working_robot_manager_1 import WorkingRobotManager
 from src.production.visualisation.production_visualisation import ProductionVisualisation
 from src.simulation_environmnent.simulation_environment import SimulationEnvironment
 

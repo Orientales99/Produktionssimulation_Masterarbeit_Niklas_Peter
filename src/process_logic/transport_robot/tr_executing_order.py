@@ -1,4 +1,5 @@
 import random
+from collections import Counter
 
 from src.constant.constant import TransportRobotStatus
 from src.entity.machine.machine import Machine
@@ -42,6 +43,15 @@ class TrExecutingOrder:
             return True
         return False
 
+    def start__moving_to_waiting__process_for_tr(self, tr: TransportRobot) -> bool:
+        source_coordinates = self.manufacturing_plan.production.source_coordinates
+        source_cell = self.manufacturing_plan.production.get_cell(source_coordinates)
+        destination = source_cell.placed_entity
+        if self.set_driving_parameter_for_tr(tr, destination):
+            return True
+        return False
+
+
     def set_driving_parameter_for_tr(self, tr: TransportRobot, destination: Machine | Sink | Source) -> bool:
         """Changes the tr.working_status parameter (Location_entity, destination_coordinates, driving_route).
          Return False: If the path cannot be determined or tr.working_status.status is wrong."""
@@ -52,8 +62,8 @@ class TrExecutingOrder:
         elif tr.working_status.status == TransportRobotStatus.MOVING_TO_DROP_OFF:
             driving_destination_coordinates = self.get_coordinates_from_unload_destination(tr, destination)
 
-        else:
-            return False
+        elif tr.working_status.status == TransportRobotStatus.RETURNING:
+            driving_destination_coordinates = self.path_finding.get_init_coordinates_from_entity(tr)
 
         driving_route = self.path_finding.get_path_for_entity(tr, driving_destination_coordinates)
 
@@ -170,13 +180,17 @@ class TrExecutingOrder:
 
         return False
 
-    def pick_up_material_on_tr(self, tr: TransportRobot):
+    def pick_up_material_on_tr(self, tr: TransportRobot) -> bool:
         if isinstance(tr.transport_order.pick_up_station, Source):
             self.pick_up_material_from_source(tr)
+            return True
 
         if isinstance(tr.transport_order.pick_up_station, Machine):
             machine = tr.transport_order.pick_up_station
             self.pick_up_material_from_machine(tr, machine)
+            return True
+
+        return False
 
     def pick_up_material_from_source(self, tr: TransportRobot):
         pick_up_product = tr.transport_order.transporting_product
@@ -191,14 +205,55 @@ class TrExecutingOrder:
 
         pick_up_product = tr.transport_order.transporting_product
         available_product_in_machine_store = self.store_manager.count_number_of_one_product_type_in_store(
-                                                        machine.machine_storage.storage_after_process, pick_up_product)
+            machine.machine_storage.storage_after_process, pick_up_product)
 
         items_to_load = min(tr.transport_order.quantity, available_product_in_machine_store)
 
-        # adding material to TR
         for _ in range(items_to_load):
+            # adding material to TR
             tr.material_store.put(pick_up_product)
-
-        # deleting material from machine
-        for _ in range(items_to_load):
+            # deleting material from machine
             machine.machine_storage.storage_after_process.items.remove(pick_up_product)
+
+    def unload_material_off_tr(self, tr: TransportRobot) -> bool:
+        if isinstance(tr.transport_order.unload_destination, Sink):
+            raise Exception("Unload to Sink: code fehlt noch!")
+
+        if isinstance(tr.transport_order.unload_destination, Machine):
+            self.unload_material_to_machine(tr)
+            return True
+
+        return False
+
+    def unload_material_to_machine(self, tr: TransportRobot):
+
+        unload_product = tr.transport_order.transporting_product
+        item_to_unload = self.store_manager.count_number_of_one_product_type_in_store(tr.material_store, unload_product)
+        machine = tr.transport_order.unload_destination
+
+        # reduce number of required elements on machine
+        for process_material in machine.process_material_list:
+            if process_material.required_material.identification_str == unload_product.identification_str:
+                process_material.quantity_required -= item_to_unload
+
+        for _ in range(item_to_unload):
+            # adding material to machine
+            machine.machine_storage.storage_before_process.put(unload_product)
+
+            # deleting material from TR
+            tr.material_store = self.store_manager.get_material_out_of_store(tr.material_store, unload_product)
+            tr.transport_order.quantity -= 1
+
+    def check_if_tr_is_on_waiting_place(self, tr: TransportRobot) -> bool:
+        """ Checks if the TR is in the right waiting position. The waiting position is the place where the
+        TR was initiated."""
+
+        coords_1 = [(cell.cell_coordinates.x, cell.cell_coordinates.y) for cell in
+                    self.entities_located_after_init[tr.identification_str]]
+        coords_2 = [(cell.cell_coordinates.x, cell.cell_coordinates.y) for cell in
+                    self.manufacturing_plan.production.entities_located[tr.identification_str]]
+
+        if Counter(coords_1) == Counter(coords_2):
+            return True
+        else:
+            return False

@@ -95,3 +95,14 @@ class TransportRobotStatus(Enum):
     UNLOADING = "unloading"
     RETURNING = "returning to base"
     PAUSED = "paused"
+
+
+class WorkingRobotStatus(Enum):
+    IDLE = "idle"
+    MOVING_TO_MACHINE = "moving to machine"
+    WAITING_IN_FRONT_OF_MACHINE = "waiting in front of the machine"
+    WORKING_ON_MACHINE = "working on machine"
+    WAITING_IN_MACHINE_TO_EXIT = "waiting in the machine to exit area"
+    WAITING_FOR_ORDER = "waiting for order"
+    RETURNING = "returning to base"
+    PAUSED = "paused"

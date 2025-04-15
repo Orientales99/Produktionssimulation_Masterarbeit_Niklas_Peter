@@ -10,6 +10,7 @@ from src.constant.constant import TransportRobotStatus
 class TrWorkingStatus:
     # Every Entity
     status: TransportRobotStatus
+    working_on_status: bool
 
     driving_destination_coordinates: Coordinates | None
     driving_route: list[Coordinates] | None
