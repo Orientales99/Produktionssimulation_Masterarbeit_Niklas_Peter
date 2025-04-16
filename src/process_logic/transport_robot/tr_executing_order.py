@@ -8,23 +8,22 @@ from src.entity.source import Source
 from src.entity.transport_robot.transport_robot import TransportRobot
 from src.production.base.cell import Cell
 from src.production.base.coordinates import Coordinates
-from src.production.store_manager import StoreManager
+
 
 
 class TrExecutingOrder:
     tr_list: list[TransportRobot]
     machine_list: list[Machine]
     entities_located_after_init = dict[str, list[Cell]]
-    store_manager: StoreManager
 
-    def __init__(self, simulation_environment, manufacturing_plan, path_finding, machine_execution, machine_manager):
+    def __init__(self, simulation_environment, manufacturing_plan, path_finding, machine_execution, machine_manager, store_manager):
         self.env = simulation_environment
         self.manufacturing_plan = manufacturing_plan
         self.path_finding = path_finding
         self.machine_execution = machine_execution
         self.machine_manager = machine_manager
 
-        self.store_manager = StoreManager(self.env)
+        self.store_manager = store_manager
 
         self.tr_list = self.manufacturing_plan.production.tr_list
         self.machine_list = self.manufacturing_plan.production.machine_list
@@ -163,6 +162,11 @@ class TrExecutingOrder:
         start_cell = self.path_finding.get_start_cell_from_entity(tr)
         path = tr.working_status.driving_route
 
+        if isinstance(path, Exception):
+            path = self.path_finding.get_path_for_entity(tr, tr.working_status.driving_destination_coordinates)
+            tr.working_status.driving_route = path
+            return False
+
         if len(path) > 0:
             if self.path_finding.entity_movement.move_entity_one_step(start_cell, tr, path[0]) is True:
                 tr.working_status.driving_route.pop(0)
@@ -174,6 +178,11 @@ class TrExecutingOrder:
                     path = self.path_finding.get_path_for_entity(tr, tr.working_status.driving_destination_coordinates)
                     tr.working_status.driving_route = path
                     tr.working_status.waiting_time_on_path = random.randint(1, 10)
+
+        if isinstance(path, Exception):
+            path = self.path_finding.get_path_for_entity(tr, tr.working_status.driving_destination_coordinates)
+            tr.working_status.driving_route = path
+            return False
 
         if len(tr.working_status.driving_route) == 0:
             return True

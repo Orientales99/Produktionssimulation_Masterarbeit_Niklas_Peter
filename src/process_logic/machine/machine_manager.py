@@ -1,4 +1,4 @@
-from src.constant.constant import MachineQuality, ItemType
+from src.constant.constant import MachineQuality, ItemType, MachineWorkingRobotStatus
 from src.entity.machine.machine import Machine
 from src.entity.machine.Process_material import ProcessMaterial
 from src.entity.working_robot.working_robot import WorkingRobot
@@ -10,9 +10,10 @@ class Machine_Manager:
     machine_list: list[Machine]
     list_full_store_after_process = list[Machine]
 
-    def __init__(self, production):
+    def __init__(self, production, store_manager):
         self.production = production
         self.machine_list = self.production.machine_list
+        self.store_manager = store_manager
 
         self.list_full_store_after_process = []
         self.material_transport_request_list = []
@@ -24,11 +25,11 @@ class Machine_Manager:
                 number_of_required_products = processing_order.order.number_of_products_per_order
                 time_to_process_one_product = self.get_time_to_process_one_product(processing_order.order,
                                                                                    processing_order.step_of_the_process)
-                if processing_order.order.product != machine.producing_production_material:
+                if processing_order.order.product != machine.working_status.producing_production_material:
                     machine.processing_list_queue_length += (
                                                                     int(number_of_required_products) * time_to_process_one_product) + \
                                                             machine.setting_up_time
-                elif processing_order.order.product == machine.producing_production_material:
+                elif processing_order.order.product == machine.working_status.producing_production_material:
                     machine.processing_list_queue_length += (
                             int(number_of_required_products) * time_to_process_one_product)
                 else:
@@ -130,12 +131,6 @@ class Machine_Manager:
 
         return processing_step
 
-    def get_producing_production_material_on_machine(self, machine: Machine):
-        for item in machine.machine_storage.storage_before_process.items:
-            for processing_order in machine.processing_list:
-                if item.production_material_id == processing_order.order.product.product_id:
-                    machine.producing_production_material = item
-
     def check_if_order_is_finished(self, machine: Machine, new_item: ProductionMaterial) -> bool:
         """If no more material need to be produced for an order -> remove this order from machine.process_material_list
         and machine.processing_list
@@ -157,18 +152,20 @@ class Machine_Manager:
                     return True
         return False
 
-
-
-
     def sort_machine_processing_list(self, machine: Machine):
         """The processing list is sorted according to the following criteria:
         1. If the product is currently being produced, it has the highest sorting priority.
         2. What priority the order has.
-        3. How far the value-adding process has progressed."""
-        if machine.producing_production_material is not None:
+        3. How far the value-adding process has progressed.
+        If the machine is waiting for a TR and WR, keep the first item at the top."""
+
+
+        first_before_sorting = machine.processing_list[0] if machine.processing_list else None
+
+        if machine.working_status.producing_production_material is not None:
             machine.processing_list.sort(
                 key=lambda po: (
-                    po.order.product.product_id != machine.producing_production_material.production_material_id,
+                    po.order.product.product_id != machine.working_status.producing_production_material.production_material_id,
                     po.priority,
                     -po.step_of_the_process
                 )
@@ -177,6 +174,15 @@ class Machine_Manager:
             machine.processing_list.sort(
                 key=lambda po: (po.priority, -po.step_of_the_process)
             )
+
+        # Restore the original first item if waiting for a TR or WR
+        if machine.working_status.waiting_for_arriving_of_tr or \
+            machine.working_status.working_robot_status == MachineWorkingRobotStatus.WAITING_WR or \
+            machine.working_status.working_robot_status == MachineWorkingRobotStatus.WR_PRESENT:
+
+            machine.processing_list.remove(first_before_sorting)
+            machine.processing_list.insert(0, first_before_sorting)
+
         self.sort_process_material_list_by_processing_list(machine)
 
     def sort_process_material_list_by_processing_list(self, machine: Machine) -> None:
@@ -201,3 +207,16 @@ class Machine_Manager:
             if wr.working_status.working_for_machine == machine:
                 return wr
         print(f"No WR is working on {machine.identification_str}")
+
+    def check_required_material_in_storage_before_process(self, machine: Machine, required_material: ProductionMaterial) \
+            -> bool:
+        """Return True: Enough Material (>= 1) is in storage.
+           Return False: 0 Material is in storage before process. """
+
+        input_store = machine.machine_storage.storage_before_process
+
+        number_of_items = self.store_manager.count_number_of_one_product_type_in_store(input_store, required_material)
+        if number_of_items > 0:
+            return True
+        else:
+            return False

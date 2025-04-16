@@ -11,10 +11,12 @@ class WrWorkingStatus:
     working_on_status: bool
     in_production: bool
 
+    waiting_time_on_path: int
+
     working_for_machine: Machine | None
     driving_destination_coordinates: Coordinates | None
     driving_route: list[Coordinates] | None
 
     last_placement_in_production: list | None
 
-    waiting_time_on_path: int = 5
+

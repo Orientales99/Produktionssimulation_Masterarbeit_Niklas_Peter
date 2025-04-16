@@ -8,7 +8,7 @@ from src.entity.working_robot.working_robot import WorkingRobot
 from src.production.base.cell import Cell
 from src.production.base.coordinates import Coordinates
 from src.production.production import Production
-from src.constant.constant import ColorRGB, WorkingRobotStatus
+from src.constant.constant import ColorRGB, WorkingRobotStatus, MachineWorkingRobotStatus
 from src.production.visualisation.cell_information import CellInformation
 
 
@@ -272,12 +272,12 @@ class PygameSpot:
 
     def make_machine_waiting_to_process(self):
         if isinstance(self.cell.placed_entity, Machine):
-            if self.cell.placed_entity.working_robot_on_machine is False:
+            if self.cell.placed_entity.working_status.working_robot_status != MachineWorkingRobotStatus.WR_PRESENT:
                 self.color = ColorRGB.RED.value
 
     def make_machine_processing(self):
         if isinstance(self.cell.placed_entity, Machine):
-            if self.cell.placed_entity.working_robot_on_machine is True:
+            if self.cell.placed_entity.working_status.working_robot_status == MachineWorkingRobotStatus.WR_PRESENT:
                 self.color = ColorRGB.GREEN.value
 
     def make_source(self):

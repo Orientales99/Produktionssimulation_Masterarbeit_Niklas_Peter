@@ -64,7 +64,14 @@ class CellInformation:
         processing_list_str = self.get_str_order_list(machine.processing_list)
         process_material_list_str = self.get_str_process_material_list(machine.process_material_list)
         produced_product = (
-            machine.producing_production_material.identification_str if machine.producing_production_material is not None else "None")
+            machine.working_status.producing_production_material.identification_str if
+            machine.working_status.producing_production_material is not None else "None")
+
+        if machine.working_status.working_on_status:
+            working_on_status = str(("processing..."))
+        else:
+            working_on_status = str("waiting to start process")
+
 
         title = f"Cell: {machine.identification_str}"
 
@@ -73,7 +80,12 @@ class CellInformation:
             "\n"
             f"Maschinen-ID:       {machine.identification_str}\n"
             f"\n"
-            f"Machine is working: {machine.is_working}\n"
+            f"Machine status:     {machine.working_status.process_status.value}\n"
+            f"                    {working_on_status}\n"
+            f"\n"
+            f"WR Status:          {machine.working_status.working_robot_status.value}\n"
+            f"Waiting For TR:     {machine.working_status.waiting_for_arriving_of_tr}\n"
+            f"\n"
             f"Produced Product:   {produced_product}\n"
             f"\n"
             f"Machine Qualität:   {machine.machine_quality}\n"
@@ -99,16 +111,16 @@ class CellInformation:
             f"Processing List:\n{processing_list_str}\n"
             "\n"
             f"{process_material_list_str}\n"
-            f"WR On Machine:      {machine.working_robot_on_machine}\n"
-            f"Waiting For WR:     {machine.waiting_for_arriving_of_wr}\n"
-            f"Waiting For TR:     {machine.waiting_for_arriving_of_tr}\n"
+
         )
 
         self.print_information_sheet(title, info_text)
 
-        if machine.working_robot_on_machine is True:
-            wr = self.get_wr_working_on_machine(machine)
-            self.print_working_robot_information(wr)
+        #if machine.working_status.working_robot_status.WR_PRESENT or \
+        #        machine.working_status.working_robot_status.WAITING_WR or \
+        #        machine.working_status.working_robot_status.WR_LEAVING:
+        #    wr = self.get_wr_working_on_machine(machine)
+        #    self.print_working_robot_information(wr)
 
     def get_wr_working_on_machine(self, machine: Machine) -> WorkingRobot:
         """get a machine and figure out which wr is working on it"""
@@ -156,7 +168,7 @@ class CellInformation:
         order_list_str = ""
 
         for processing_order in order_list:
-            order_int = f"           Order:                         {processing_order.order.product.identification_str}\n" \
+            order_int = f"           Order:                             {processing_order.order.product.identification_str}\n" \
                         f"               order_date:                    {processing_order.order.order_date}\n" \
                         f"               Number of Products:            {processing_order.order.number_of_products_per_order}\n" \
                         f"               priority:                      {processing_order.order.priority}\n" \

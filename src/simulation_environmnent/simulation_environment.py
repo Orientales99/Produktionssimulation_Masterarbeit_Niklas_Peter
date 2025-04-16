@@ -1,6 +1,7 @@
 import simpy
 
-from src.constant.constant import TransportRobotStatus, WorkingRobotStatus
+from src.constant.constant import TransportRobotStatus, WorkingRobotStatus, MachineProcessStatus, \
+    MachineWorkingRobotStatus
 from src.entity.machine.machine import Machine
 from src.entity.transport_robot.transport_robot import TransportRobot
 from src.entity.working_robot.working_robot import WorkingRobot
@@ -12,6 +13,7 @@ from src.process_logic.transport_robot.tr_order_manager import TrOrderManager
 from src.process_logic.working_robot_order_manager import WorkingRobotManager
 from src.production.production import Production
 from src.process_logic.manufacturing_plan import ManufacturingPlan
+from src.production.store_manager import StoreManager
 from src.production.visualisation.production_visualisation import ProductionVisualisation
 
 
@@ -19,16 +21,19 @@ class SimulationEnvironment:
     def __init__(self):
         self.env = simpy.Environment()
         self.production = Production(self.env)
-
+        self.store_manager = StoreManager(self.env)
         self.path_finding = PathFinding(self.production)
-        self.machine_manager = Machine_Manager(self.production)
+
+        self.machine_manager = Machine_Manager(self.production, self.store_manager)
         self.manufacturing_plan = ManufacturingPlan(self.production, self.machine_manager)
-        self.machine_execution = MachineExecution(self.env, self.manufacturing_plan, self.machine_manager)
+        self.machine_execution = MachineExecution(self.env, self.manufacturing_plan, self.machine_manager,
+                                                  self.store_manager)
         self.working_robot_manager = WorkingRobotManager(self.manufacturing_plan, self.path_finding)
         self.visualize_production = ProductionVisualisation(self.production, self.env)
-        self.tr_order_manager = TrOrderManager(self.env, self.manufacturing_plan, self.machine_manager)
+        self.tr_order_manager = TrOrderManager(self.env, self.manufacturing_plan, self.machine_manager,
+                                               self.store_manager)
         self.tr_executing_order = TrExecutingOrder(self.env, self.manufacturing_plan, self.path_finding,
-                                                   self.machine_execution, self.machine_manager)
+                                                   self.machine_execution, self.machine_manager, self.store_manager)
 
         self.stop_event = False
 
@@ -36,6 +41,7 @@ class SimulationEnvironment:
         self.env.process(self.visualize_layout())
         self.env.process(self.start_every_wr_process())
         self.env.process(self.start_every_tr_process())
+        self.env.process(self.run_machine_process())
 
     def run_simulation(self, until: int):
         self.env.run(until=until)
@@ -49,7 +55,8 @@ class SimulationEnvironment:
         self.production.create_production()
         start_date = self.production.service_starting_conditions.set_starting_date_of_simulation()
         self.manufacturing_plan.set_parameter_for_start_of_a_simulation_day(start_date)
-        self.run_machine_process()
+
+    ######################################################################################################################
 
     def start_every_wr_process(self):
         while True:
@@ -61,6 +68,9 @@ class SimulationEnvironment:
                     # get new working order
                     if wr.working_status.status == WorkingRobotStatus.IDLE and \
                             wr.working_status.working_on_status is False:
+                        if wr.identification_number == "WR: 2":
+                            print(f"{wr.identification_str} gets new order")
+
                         wr.working_status.working_on_status = True
                         self.env.process(self.wr_get_working_order(wr))
 
@@ -85,19 +95,14 @@ class SimulationEnvironment:
                             wr.working_status.working_on_status is False:
                         self.env.process(self.wr_exit_machine_process(wr))
 
-
                     # wr drives to waiting location
                     if wr.working_status.status == WorkingRobotStatus.IDLE and \
                             wr.working_status.working_on_status is False:
-                        print(f"Has to drive Home: {wr.identification_str}")
+
                         if self.working_robot_manager.check_if_tr_is_on_waiting_place(wr) is False:
                             wr.working_status.status = WorkingRobotStatus.RETURNING
                             wr.working_status.working_on_status = True
-
                             self.env.process(self.drive_wr_to_destination_process(wr))
-
-
-
             yield self.env.timeout(5)
 
     def wr_get_working_order(self, wr: WorkingRobot):
@@ -132,7 +137,7 @@ class SimulationEnvironment:
     def wr_exit_machine_process(self, wr: WorkingRobot):
         while True:
             if self.working_robot_manager.wr_driving_off_machine(wr):
-
+                print(f"{wr.identification_str} drives off the machine")
                 wr.working_status.working_for_machine = None
                 wr.working_status.driving_destination_coordinates = None
                 wr.working_status.driving_route = None
@@ -143,6 +148,8 @@ class SimulationEnvironment:
                 break
 
             yield self.env.timeout(2)
+
+    ######################################################################################################################
 
     def start_every_tr_process(self):
         while True:
@@ -160,6 +167,8 @@ class SimulationEnvironment:
                         tr.working_status.working_on_status = True
                         if self.tr_executing_order.start__moving_to_pick_up__process_for_tr(tr):
                             self.env.process(self.tr_drive_to_destination_process(tr))
+                        else:
+                            tr.working_status.working_on_status = False
 
                     # pick up material
                     if tr.working_status.status == TransportRobotStatus.LOADING \
@@ -170,10 +179,11 @@ class SimulationEnvironment:
                     # drive to unload destination
                     if tr.working_status.status == TransportRobotStatus.MOVING_TO_DROP_OFF \
                             and tr.working_status.working_on_status is False:
-
                         tr.working_status.working_on_status = True
                         if self.tr_executing_order.start__moving_to_unload__process_for_tr(tr):
                             self.env.process(self.tr_drive_to_destination_process(tr))
+                        else:
+                            tr.working_status.working_on_status = False
 
                     # unload material
                     if tr.working_status.status == TransportRobotStatus.UNLOADING \
@@ -228,7 +238,7 @@ class SimulationEnvironment:
             tr.working_status.status = TransportRobotStatus.MOVING_TO_DROP_OFF
             tr.working_status.working_on_status = False
             if isinstance(tr.transport_order.pick_up_station, Machine):
-                tr.transport_order.pick_up_station.waiting_for_arriving_of_tr = False
+                tr.transport_order.pick_up_station.working_status.waiting_for_arriving_of_tr = False
 
     def unload_material_off_tr_process(self, tr: TransportRobot):
         loading_speed = self.tr_order_manager.get_loading_speed()
@@ -238,11 +248,114 @@ class SimulationEnvironment:
             tr.working_status.status = TransportRobotStatus.IDLE
             tr.working_status.working_on_status = False
             if isinstance(tr.transport_order.unload_destination, Machine):
-                tr.transport_order.unload_destination.waiting_for_arriving_of_tr = False
+                tr.transport_order.unload_destination.working_status.waiting_for_arriving_of_tr = False
+
+    #######################################################################################################################
 
     def run_machine_process(self):
-        for machine in self.production.machine_list:
-            self.env.process(self.machine_execution.run_machine_production(machine))
+        while True:
+            if self.stop_event is False:
+                for machine in self.production.machine_list:
+
+                    # set machine process status: idle
+                    if len(machine.processing_list) == 0:
+                        machine.working_status.process_status = MachineProcessStatus.IDLE
+
+                    # set machine process status: waiting next order
+                    if len(machine.processing_list) != 0 and \
+                            machine.working_status.process_status == MachineProcessStatus.IDLE:
+                        machine.working_status.process_status = MachineProcessStatus.WAITING_NEXT_ORDER
+
+                    # wr is present -> setu up machine
+                    if machine.working_status.working_robot_status == MachineWorkingRobotStatus.WR_PRESENT and \
+                            machine.working_status.process_status == MachineProcessStatus.WAITING_NEXT_ORDER and \
+                            machine.working_status.working_on_status is False:
+                        machine.working_status.working_on_status = True
+                        self.env.process(self.set_up_machine_process(machine))
+
+                    if machine.working_status.process_status == MachineProcessStatus.READY_TO_PRODUCE:
+                        machine.working_status.working_on_status = True
+                        self.env.process(self.producing_process(machine))
+
+                    #   producing product
+                    #       get order for the next machine in the process steps of the product
+                    #       if output full -> wait (other than producing product)
+                    #       if input empty -> wait
+                    #   producing product finished
+                    #       -> release wr; machine status -> wr_leaving -> no wr
+                    #       machine status -> idle or waiting_next_order
+
+            yield self.env.timeout(1)
+
+    def set_up_machine_process(self, machine: Machine):
+        producing_item = machine.process_material_list[0].producing_material
+
+        # set up machine if necessary
+        if machine.working_status.producing_production_material is None \
+                or producing_item.production_material_id != machine.working_status.producing_production_material.production_material_id:
+
+            machine.working_status.process_status = MachineProcessStatus.SETUP
+
+            yield self.env.process(self.machine_execution.start__set_up_machine__process(machine, producing_item))
+
+            machine.working_status.process_status = MachineProcessStatus.READY_TO_PRODUCE
+            machine.working_status.working_on_status = False
+
+        elif producing_item.production_material_id == machine.working_status.producing_production_material.production_material_id:
+            machine.working_status.process_status = MachineProcessStatus.READY_TO_PRODUCE
+            machine.working_status.working_on_status = True
+
+    def producing_process(self, machine: Machine):
+        required_material = machine.process_material_list[0].required_material
+        producing_material = machine.process_material_list[0].producing_material
+
+        # get a new order for the next producing step of the machine
+        self.machine_execution.give_order_to_next_machine(producing_material, machine)
+
+        while True:
+            if self.stop_event is False:
+
+                # check if material is in input_store
+                if self.machine_manager.check_required_material_in_storage_before_process(machine,
+                                                                                          required_material) is False:
+                    machine.working_status.process_status = MachineProcessStatus.INPUT_EMPTY
+                    yield self.env.timeout(1)
+
+                # check if space is in output_store
+                elif self.store_manager.count_empty_space_in_store(machine.machine_storage.storage_after_process) == 0 \
+                        or self.store_manager.check_no_other_material_is_in_store(
+                            machine.machine_storage.storage_after_process, producing_material) is False:
+                    machine.working_status.process_status = MachineProcessStatus.OUTPUT_FULL
+                    yield self.env.timeout(1)
+                else:
+                    machine.working_status.process_status = MachineProcessStatus.READY_TO_PRODUCE
+
+                # start producing process und einen begriff für den Process in
+                if machine.working_status.process_status == MachineProcessStatus.READY_TO_PRODUCE:
+                    machine.working_status.process_status = MachineProcessStatus.PRODUCING_PRODUCT
+                    yield self.env.process(
+                        self.machine_execution.produce_one_item(machine, required_material, producing_material))
+
+                    # if production of Order is finished
+                    if self.machine_manager.check_if_order_is_finished(machine, producing_material):
+
+                        machine.working_status.working_robot_status = MachineWorkingRobotStatus.WR_LEAVING
+                        machine.working_status.working_on_status = False
+
+                        # set machine process status: idle
+                        if len(machine.processing_list) == 0:
+                            machine.working_status.process_status = MachineProcessStatus.IDLE
+
+                        # set machine process status: waiting next order
+                        else:
+                            machine.working_status.process_status = MachineProcessStatus.WAITING_NEXT_ORDER
+
+                        wr = self.machine_manager.get_wr_working_on_machine(machine)
+                        wr.working_status.working_on_status = False
+                        wr.working_status.status = WorkingRobotStatus.WAITING_IN_MACHINE_TO_EXIT
+                        break
+
+    #######################################################################################################################
 
     def visualize_layout(self):
         driving_speed = self.tr_order_manager.get_driving_speed_per_cell()

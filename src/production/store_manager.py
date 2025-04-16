@@ -45,3 +45,18 @@ class StoreManager:
 
         return None
 
+    def check_no_other_material_is_in_store(self, store: Store, material: ProductionMaterial) -> bool:
+        """ Check if all items in the store have the same identification_str.
+            Return True: all items have same identification_str or no item is in Store
+            Return False: Other item than material are in store
+            """
+
+        items = list(store.items)
+
+        if not items:
+            return True  # Leerer Store → keine widersprüchlichen Materialien
+
+        for item in items:
+            if item.identification_str != material.identification_str:
+                return False
+        return True

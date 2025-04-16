@@ -2,7 +2,7 @@
   "production_machine": [
     {
       "machine_type": "0",
-      "number_of_machines_in_production": "1",
+      "number_of_machines_in_production": "4",
       "number_of_new_machines": "1",
       "driving_speed":  "0",
       "working_speed":  "10",
@@ -12,7 +12,7 @@
       "quantity_loaded_product_before_processed": "0",
       "max_loading_capacity_product_after_process": "100",
       "quantity_loaded_product_after_processed": "0",
-      "setting_up_time": "1"
+      "setting_up_time": "10"
     },
     {
       "machine_type": "1",
@@ -26,7 +26,7 @@
       "quantity_loaded_product_before_processed": "0",
       "max_loading_capacity_product_after_process": "100",
       "quantity_loaded_product_after_processed": "0",
-      "setting_up_time": "1"
+      "setting_up_time": "10"
     },
     {
       "machine_type": "2",

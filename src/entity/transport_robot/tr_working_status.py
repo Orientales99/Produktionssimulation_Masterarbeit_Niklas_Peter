@@ -11,9 +11,9 @@ class TrWorkingStatus:
     # Every Entity
     status: TransportRobotStatus
     working_on_status: bool
+    waiting_time_on_path: int
 
     driving_destination_coordinates: Coordinates | None
     driving_route: list[Coordinates] | None
     destination_location_entity: Machine | Source | Sink | None
 
-    waiting_time_on_path: int = 5

@@ -3,7 +3,9 @@ import json
 from simpy import Store
 
 from src import RESOURCES
-from src.constant.constant import MachineQuality, TransportRobotStatus, WorkingRobotStatus
+from src.constant.constant import MachineQuality, TransportRobotStatus, WorkingRobotStatus, MachineProcessStatus, \
+    MachineWorkingRobotStatus
+from src.entity.machine.machine_working_status import MachineWorkingStatus
 from src.entity.working_robot.wr_working_status import WrWorkingStatus
 from src.production.base.coordinates import Coordinates
 from src.entity.transport_robot.tr_working_status import TrWorkingStatus
@@ -37,13 +39,17 @@ class EntityService:
 
     def create_wr(self, identification_number) -> WorkingRobot:
         working_robot_stats = self.data_production_working_robot["working_robot"][0]
+
+        waiting_time = int(identification_number) * 2
+
         return WorkingRobot(identification_number,
                             Coordinates(
                                 int(working_robot_stats["robot_size_x"]),
                                 int(working_robot_stats["robot_size_y"])),
                             working_robot_stats["driving_speed"],
                             working_robot_stats["product_transfer_rate_units_per_minute"],
-                            WrWorkingStatus(WorkingRobotStatus.IDLE, False, False, None, None, None, None))
+                            WrWorkingStatus(WorkingRobotStatus.IDLE, False, False, waiting_time, None, None, None,
+                                            None))
 
     def generate_wr_list(self) -> list[WorkingRobot]:
 
@@ -60,6 +66,8 @@ class EntityService:
 
     def create_tr(self, identification_number) -> TransportRobot:
         transport_robot_stats = self.data_production_transport_robot["transport_robot"][0]
+        waiting_time = int(identification_number) * 2
+
         return TransportRobot(identification_number,
                               Coordinates(
                                   int(transport_robot_stats["robot_size_x"]),
@@ -69,7 +77,7 @@ class EntityService:
                               Store(
                                   self.env,
                                   capacity=int(transport_robot_stats["max_loading_capacity"])),
-                              TrWorkingStatus(TransportRobotStatus.IDLE, False, None, None, None))
+                              TrWorkingStatus(TransportRobotStatus.IDLE, False, waiting_time, None, None, None))
 
     def generate_tr_list(self) -> list[TransportRobot]:
         tr_list = []
@@ -88,7 +96,6 @@ class EntityService:
     def create_machine(self, machine_type, identification_number, machine_quality) -> Machine:
         machine_stats = self.data_production_machine["production_machine"][machine_type]
         return Machine(machine_type,
-                       False,
                        identification_number,
                        MachineQuality(machine_quality),
                        machine_stats["driving_speed"],
@@ -105,8 +112,8 @@ class EntityService:
                                self.env,
                                capacity=int(machine_stats["max_loading_capacity_product_after_process"])),
                            None),
-                       False,
-                       None,
+                       MachineWorkingStatus(MachineProcessStatus.IDLE, MachineWorkingRobotStatus.NO_WR, False, None,
+                                            False),
                        float(machine_stats["setting_up_time"]))
 
     def generate_machine_list(self) -> list[Machine]:

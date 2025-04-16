@@ -1,6 +1,7 @@
 import random
 from collections import Counter
 
+from src.constant.constant import MachineWorkingRobotStatus
 from src.entity.machine.machine import Machine
 from src.entity.machine.processing_order import ProcessingOrder
 from src.entity.source import Source
@@ -39,7 +40,7 @@ class WorkingRobotManager:
         self.sorted_list_of_processes = sorted(
             list_of_processes_for_every_machine,
             key=lambda x: (x[1].order.priority.value,
-                           x[1].step_of_the_process,
+                           - x[1].step_of_the_process,
                            x[1].order.daily_manufacturing_sequence,
                            )
         )
@@ -63,19 +64,18 @@ class WorkingRobotManager:
             return True
         return False
 
-
     def get_next_working_location_for_order(self, wr: WorkingRobot) -> bool:
         for process_order in self.sorted_list_of_processes[:]:
             machine = process_order[0]
 
-            if machine.waiting_for_arriving_of_wr is False and machine.working_robot_on_machine  is False:
-
+            if machine.working_status.working_robot_status == MachineWorkingRobotStatus.NO_WR or \
+                    machine.working_status.working_robot_status == MachineWorkingRobotStatus.WR_LEAVING:
                 wr.working_status.working_for_machine = machine
 
                 wr.working_status.driving_destination_coordinates = \
                     self.calculate_coordinates_of_new_driving_destination(machine, wr)
 
-                machine.waiting_for_arriving_of_wr = True
+                machine.working_status.working_robot_status = MachineWorkingRobotStatus.WAITING_WR
                 self.sorted_list_of_processes.remove(process_order)
                 return True
 
@@ -124,6 +124,11 @@ class WorkingRobotManager:
         start_cell = self.path_finding.get_start_cell_from_entity(wr)
         path = wr.working_status.driving_route
 
+        if isinstance(path, Exception):
+            path = self.path_finding.get_path_for_entity(wr, wr.working_status.driving_destination_coordinates)
+            wr.working_status.driving_route = path
+            return False
+
         if len(path) > 0:
             if self.path_finding.entity_movement.move_entity_one_step(start_cell, wr, path[0]) is True:
                 wr.working_status.driving_route.pop(0)
@@ -135,6 +140,11 @@ class WorkingRobotManager:
                     path = self.path_finding.get_path_for_entity(wr, wr.working_status.driving_destination_coordinates)
                     wr.working_status.driving_route = path
                     wr.working_status.waiting_time_on_path = random.randint(1, 10)
+
+        if isinstance(path, Exception):
+            path = self.path_finding.get_path_for_entity(wr, wr.working_status.driving_destination_coordinates)
+            wr.working_status.driving_route = path
+            return False
 
         if len(wr.working_status.driving_route) == 0:
             return True
@@ -151,8 +161,8 @@ class WorkingRobotManager:
         for cell in cell_list_wr:
             cell.placed_entity = None
 
-        machine.working_robot_on_machine = True
-        machine.waiting_for_arriving_of_wr = False
+        machine.working_status.working_robot_status = MachineWorkingRobotStatus.WR_PRESENT
+
         wr.working_status.last_placement_in_production = cell_list_wr
 
     def wr_driving_off_machine(self, wr: WorkingRobot) -> bool:
@@ -192,5 +202,3 @@ class WorkingRobotManager:
 
     def get_driving_speed_per_cell(self):
         return int(self.wr_list[0].driving_speed)
-
-

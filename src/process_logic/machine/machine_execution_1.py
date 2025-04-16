@@ -1,3 +1,4 @@
+from src.constant.constant import WorkingRobotStatus
 from src.entity.machine.Process_material import ProcessMaterial
 from src.entity.machine.machine import Machine
 from src.entity.machine.processing_order import ProcessingOrder
@@ -6,53 +7,94 @@ from src.order_data.production_material import ProductionMaterial
 
 
 class MachineExecution:
-    def __init__(self, env, manufacturing_plan, machine_manager, store_manager):
+    def __init__(self, env, manufacturing_plan, machine_manager):
         self.env = env
         self.manufacturing_plan = manufacturing_plan
         self.machine_manager = machine_manager
-        self.store_manager = store_manager
 
-    def start__set_up_machine__process(self, machine: Machine, producing_item: ProductionMaterial):
-        yield self.env.timeout(machine.setting_up_time)
-        # yield self.env.timeout(machine.setting_up_time)  # Umrüstzeit
-        machine.working_status.producing_production_material = producing_item
-
-    def produce_one_item(self, machine: Machine, required_material: ProductionMaterial, producing_material: ProductionMaterial):
-        input_store = machine.machine_storage.storage_before_process
-        output_store = machine.machine_storage.storage_after_process
+    def run_machine_production(self, machine: Machine):
         working_speed = int(machine.working_speed)
-        yield self.env.timeout(machine.setting_up_time)
-        # yield self.env.timeout(working_speed)
-        machine.machine_storage.storage_before_process = self.store_manager.get_material_out_of_store(input_store,
-                                                                                                      required_material)
-        yield output_store.put(producing_material)
-        self.reduce_producing_material_by_one(machine, producing_material)
+        new_product_produced = False
+        while True:
+            if machine.working_robot_on_machine:
+                input_store = machine.machine_storage.storage_before_process
+                output_store = machine.machine_storage.storage_after_process
+                item = self.check_processing_list_input_store(machine)
+
+                if item is not False:
+
+                    if machine.producing_production_material is None \
+                            or item.production_material_id != machine.producing_production_material.production_material_id:
+                        yield self.env.timeout(machine.setting_up_time)  # Umrüstzeit
+                        new_product_produced = True
+                        self.machine_manager.set_producing_production_material_on_machine(machine)
+
+                    machine.is_working = True
+                    input_store.items.remove(item)
+                    # yield self.env.timeout(working_speed)
+                    # yield self.env.timeout(0)
+
+                    new_item = self.machine_manager.create_new_item_after_process(machine, item)
+                    yield output_store.put(new_item)
+                    self.reduce_producing_material_by_one(machine, new_item)
+
+                    # if Order is produced
+                    if self.machine_manager.check_if_order_is_finished(machine, new_item):
+                        machine.working_robot_on_machine = False
+                        wr = self.machine_manager.get_wr_working_on_machine(machine)
+                        wr.working_status.working_on_status = False
+                        wr.working_status.status = WorkingRobotStatus.WAITING_IN_MACHINE_TO_EXIT
+
+                    if new_product_produced is True:
+                        self.give_order_to_next_machine(new_item, machine)
+
+                        print(f"{machine.identification_str}: {machine.processing_list}")
+                        # self.manufacturing_plan.get_required_material_for_every_machine()
+                        new_product_produced = False
+                else:
+                    # Wenn kein Produkt da, kurz warten und neu prüfen
+                    machine.is_working = False
+                    yield self.env.timeout(1)
+            else:
+                machine.is_working = False
+                # Kein WR zugewiesen → warten und später wieder prüfen
+                yield self.env.timeout(1)
 
     def reduce_producing_material_by_one(self, machine: Machine, new_item: ProductionMaterial):
         for process_material in machine.process_material_list:
             if new_item.identification_str == process_material.producing_material.identification_str:
                 process_material.quantity_producing -= 1
 
-    def give_order_to_next_machine(self, producing_material: ProductionMaterial, machine: Machine):
+    def check_processing_list_input_store(self, machine: Machine) -> ProductionMaterial | bool:
+        """ Checks if the machine's input store contains an item matching any order in the processing list.
+            Returns: Matching item if found, else None."""
+        for processing_order in machine.processing_list:
+            for item in machine.machine_storage.storage_before_process.items:
+                if item.production_material_id == processing_order.order.product.product_id:
+                    return item
+
+        return False
+
+    def give_order_to_next_machine(self, new_item: ProductionMaterial, machine: Machine):
         """Takes the item and gives the order to the next machine."""
         executing_machine_type = None
         step_of_the_process = None
 
         for processing_order in machine.processing_list:
-            if producing_material.production_material_id == processing_order.order.product.product_id:
-                if processing_order.order.product.required_product_type_step_1 == producing_material:
+            if new_item.production_material_id == processing_order.order.product.product_id:
+                if processing_order.order.product.required_product_type_step_1 == new_item:
                     executing_machine_type = processing_order.order.product.processing_step_1
                     step_of_the_process = 1
 
-                if processing_order.order.product.required_product_type_step_2 == producing_material:
+                if processing_order.order.product.required_product_type_step_2 == new_item:
                     executing_machine_type = processing_order.order.product.processing_step_2
                     step_of_the_process = 2
 
-                if processing_order.order.product.required_product_type_step_3 == producing_material:
+                if processing_order.order.product.required_product_type_step_3 == new_item:
                     executing_machine_type = processing_order.order.product.processing_step_3
                     step_of_the_process = 3
 
-                if processing_order.order.product.required_product_type_step_4 == producing_material:
+                if processing_order.order.product.required_product_type_step_4 == new_item:
                     executing_machine_type = processing_order.order.product.processing_step_4
                     step_of_the_process = 4
 

@@ -106,3 +106,20 @@ class WorkingRobotStatus(Enum):
     WAITING_FOR_ORDER = "waiting for order"
     RETURNING = "returning to base"
     PAUSED = "paused"
+
+
+class MachineProcessStatus(Enum):
+    IDLE = "idle"
+    WAITING_NEXT_ORDER = "waiting to start next order process"
+    SETUP = "setup"
+    READY_TO_PRODUCE = "machine is ready to produce"
+    INPUT_EMPTY = "input is empty"
+    OUTPUT_FULL = "output is full"
+    PRODUCING_PRODUCT = "producing product"
+
+
+class MachineWorkingRobotStatus(Enum):
+    NO_WR = "no WR in machine"
+    WAITING_WR = "waiting for WR arriving"
+    WR_PRESENT = "WR is in machine"
+    WR_LEAVING = "WR is leaving machine"

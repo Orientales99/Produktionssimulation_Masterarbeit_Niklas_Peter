@@ -37,6 +37,7 @@ class ManufacturingPlan:
         self.set_processing_machine_list__queue_length_estimation()
         self.get_required_material_for_every_machine()
 
+
     def get_daily_manufacturing_plan(self, current_date: date):
         """calling methods -> creating daily_manufacturing_plan as a list"""
         self.analyse_orders()
