@@ -113,8 +113,10 @@ class MachineProcessStatus(Enum):
     WAITING_NEXT_ORDER = "waiting to start next order process"
     SETUP = "setup"
     READY_TO_PRODUCE = "machine is ready to produce"
+    FINISHED_TO_PRODUCE = "machine has finished producing the order"
     INPUT_EMPTY = "input is empty"
     OUTPUT_FULL = "output is full"
+    PRODUCING_PAUSED = "producing is paused"
     PRODUCING_PRODUCT = "producing product"
 
 
@@ -123,3 +125,8 @@ class MachineWorkingRobotStatus(Enum):
     WAITING_WR = "waiting for WR arriving"
     WR_PRESENT = "WR is in machine"
     WR_LEAVING = "WR is leaving machine"
+
+class MachineStorageStatus(Enum):
+    STORAGES_READY_FOR_PRODUCTION = "storages are ready for production"
+    INPUT_EMPTY = "input storage is empty"
+    OUTPUT_FULL = "output storage is full"

@@ -1,24 +1,18 @@
-from src.production.visualisation.production_visualisation import ProductionVisualisation
 from src.production.production import Production
+from src.provide_input_data.starting_condition_service import StartingConditionsService
 from src.simulation_environmnent.simulation_environment import SimulationEnvironment
 
 
 class CommandLineService:
     simulation_environment = SimulationEnvironment()
-    production = Production(simulation_environment)
-    production_visualisation = ProductionVisualisation(production, simulation_environment)
 
+    service_starting_conditions = StartingConditionsService()
+    production = Production(simulation_environment, service_starting_conditions)
 
-    def create_production(self):
-        self.production.create_production()
-        self.production.set_entities()
 
     def start_simulation(self):
         simulation_duration = self.production.service_starting_conditions.set_simulation_duration_per_day()
         self.simulation_environment.initialise_simulation_start()
-        self.simulation_environment.run_simulation(until=2000)
+        self.simulation_environment.run_simulation(until=20000)
 
-
-    def visualise_layout(self):
-        self.production_visualisation.visualize_layout()
 

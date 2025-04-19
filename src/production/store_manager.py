@@ -1,5 +1,5 @@
 from simpy import Store
-from collections import Counter
+from collections import Counter, defaultdict
 from src.order_data.product import Product
 from src.order_data.production_material import ProductionMaterial
 
@@ -9,7 +9,8 @@ class StoreManager:
     def __init__(self, simulation_environment):
         self.env = simulation_environment
 
-    def count_number_of_one_product_type_in_store(self, store: Store, product_type: Product | ProductionMaterial) -> int:
+    def count_number_of_one_product_type_in_store(self, store: Store,
+                                                  product_type: Product | ProductionMaterial) -> int:
         return sum(1 for item in store.items if item == product_type)
 
     def count_empty_space_in_store(self, store: Store) -> int:
@@ -60,3 +61,21 @@ class StoreManager:
             if item.identification_str != material.identification_str:
                 return False
         return True
+
+    def get_str_products_in_store(self, store: Store) -> str:
+        """Finds all different ProductionMaterial.identification_str and counts their frequency."""
+        item_counts = defaultdict(int)
+        item_count_str = ""
+
+        for item in store.items:
+            identification_str = item.identification_str
+            item_counts[identification_str] += 1
+
+        for identification, count in item_counts.items():
+            item_count_str_part = str(f"Produkt-ID '{identification}' kommt {count} mal vor.\n")
+            item_count_str += item_count_str_part
+
+        if item_count_str == "":
+            item_count_str = "0"
+
+        return item_count_str

@@ -4,7 +4,7 @@ from simpy import Store
 
 from src import RESOURCES
 from src.constant.constant import MachineQuality, TransportRobotStatus, WorkingRobotStatus, MachineProcessStatus, \
-    MachineWorkingRobotStatus
+    MachineWorkingRobotStatus, MachineStorageStatus
 from src.entity.machine.machine_working_status import MachineWorkingStatus
 from src.entity.working_robot.wr_working_status import WrWorkingStatus
 from src.production.base.coordinates import Coordinates
@@ -49,7 +49,7 @@ class EntityService:
                             working_robot_stats["driving_speed"],
                             working_robot_stats["product_transfer_rate_units_per_minute"],
                             WrWorkingStatus(WorkingRobotStatus.IDLE, False, False, waiting_time, None, None, None,
-                                            None))
+                                            None, None))
 
     def generate_wr_list(self) -> list[WorkingRobot]:
 
@@ -77,7 +77,7 @@ class EntityService:
                               Store(
                                   self.env,
                                   capacity=int(transport_robot_stats["max_loading_capacity"])),
-                              TrWorkingStatus(TransportRobotStatus.IDLE, False, waiting_time, None, None, None))
+                              TrWorkingStatus(TransportRobotStatus.IDLE, False, waiting_time, None, None, None, None))
 
     def generate_tr_list(self) -> list[TransportRobot]:
         tr_list = []
@@ -112,8 +112,8 @@ class EntityService:
                                self.env,
                                capacity=int(machine_stats["max_loading_capacity_product_after_process"])),
                            None),
-                       MachineWorkingStatus(MachineProcessStatus.IDLE, MachineWorkingRobotStatus.NO_WR, False, None,
-                                            False),
+                       MachineWorkingStatus(MachineProcessStatus.IDLE, MachineWorkingRobotStatus.NO_WR,
+                                            MachineStorageStatus.STORAGES_READY_FOR_PRODUCTION, False, None, False),
                        float(machine_stats["setting_up_time"]))
 
     def generate_machine_list(self) -> list[Machine]:

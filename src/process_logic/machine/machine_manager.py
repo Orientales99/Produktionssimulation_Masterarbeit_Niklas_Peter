@@ -110,6 +110,11 @@ class Machine_Manager:
                     return ProductionMaterial(new_identification_str, item.production_material_id, item.size,
                                               new_item_type)
 
+                if (product.required_product_type_step_4 is not None and
+                        ItemType.FINAL_PRODUCT_PACKED == new_item_type):
+                    return ProductionMaterial(new_identification_str, item.production_material_id, item.size,
+                                              new_item_type)
+
         parts[-1] = str(int(3))
         new_identification_str = ".".join(parts)
         new_item_type = ItemType(3)
@@ -132,9 +137,8 @@ class Machine_Manager:
         return processing_step
 
     def check_if_order_is_finished(self, machine: Machine, new_item: ProductionMaterial) -> bool:
-        """If no more material need to be produced for an order -> remove this order from machine.process_material_list
-        and machine.processing_list
-        Return True -> order is finished
+        """If no more material need to be produced for an order
+        Return True -> order is finished with producing
         Return False -> order is not finished"""
 
         for process_material in machine.process_material_list[:]:
@@ -142,15 +146,22 @@ class Machine_Manager:
 
                 # remove process_material from machine.processing_material_list
                 if process_material.quantity_producing == 0:
-                    machine.process_material_list.remove(process_material)
-
-                    # remove order from machine.processing_list
-                    for processing_order in machine.processing_list[:]:
-                        if processing_order.order.product.product_id == new_item.production_material_id:
-                            machine.processing_list.remove(processing_order)
-
                     return True
         return False
+
+    def remove_processing_order_from_machine(self, machine: Machine, new_item: ProductionMaterial) -> bool:
+        """"If no more material need to be produced for an order and no material is in output store to be picked up
+        -> remove this order from machine.process_material_list and machine.processing_list"""
+        if self.store_manager.count_number_of_one_product_type_in_store(machine.machine_storage.storage_after_process, new_item) == 0:
+
+            for process_material in machine.process_material_list[:]:
+                if new_item.identification_str == process_material.producing_material.identification_str:
+
+                    # remove process_material from machine.processing_material_list
+                    if process_material.quantity_producing == 0:
+                        for processing_order in machine.processing_list[:]:
+                            if processing_order.order.product.product_id == new_item.production_material_id:
+                                machine.processing_list.remove(processing_order)
 
     def sort_machine_processing_list(self, machine: Machine):
         """The processing list is sorted according to the following criteria:

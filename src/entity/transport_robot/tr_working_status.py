@@ -17,3 +17,8 @@ class TrWorkingStatus:
     driving_route: list[Coordinates] | None
     destination_location_entity: Machine | Source | Sink | None
 
+    side_step_driving_route: list[Coordinates] | None
+
+
+
+

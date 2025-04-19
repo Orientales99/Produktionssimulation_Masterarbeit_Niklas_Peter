@@ -1,3 +1,5 @@
+from src.constant.constant import MachineProcessStatus, MachineStorageStatus, WorkingRobotStatus, \
+    MachineWorkingRobotStatus
 from src.entity.machine.Process_material import ProcessMaterial
 from src.entity.machine.machine import Machine
 from src.entity.machine.processing_order import ProcessingOrder
@@ -16,17 +18,49 @@ class MachineExecution:
         yield self.env.timeout(machine.setting_up_time)
         # yield self.env.timeout(machine.setting_up_time)  # Umrüstzeit
         machine.working_status.producing_production_material = producing_item
+        machine.working_status.process_status = MachineProcessStatus.READY_TO_PRODUCE
+        machine.working_status.working_on_status = False
 
-    def produce_one_item(self, machine: Machine, required_material: ProductionMaterial, producing_material: ProductionMaterial):
-        input_store = machine.machine_storage.storage_before_process
-        output_store = machine.machine_storage.storage_after_process
-        working_speed = int(machine.working_speed)
-        yield self.env.timeout(machine.setting_up_time)
-        # yield self.env.timeout(working_speed)
-        machine.machine_storage.storage_before_process = self.store_manager.get_material_out_of_store(input_store,
-                                                                                                      required_material)
-        yield output_store.put(producing_material)
-        self.reduce_producing_material_by_one(machine, producing_material)
+    def produce_one_item(self, machine: Machine, required_material: ProductionMaterial,
+                         producing_material: ProductionMaterial):
+        if self.check_production_process_is_finished(machine, producing_material) is False:
+            self.reduce_producing_material_by_one(machine, producing_material)
+
+            input_store = machine.machine_storage.storage_before_process
+            output_store = machine.machine_storage.storage_after_process
+            working_speed = int(machine.working_speed)
+
+            yield self.env.timeout(1)
+            # yield self.env.timeout(working_speed)
+
+            machine.machine_storage.storage_before_process = self.store_manager.get_material_out_of_store(input_store,
+                                                                                                    required_material)
+            yield output_store.put(producing_material)
+
+    def check_production_process_is_finished(self, machine: Machine, producing_material: ProductionMaterial) -> bool:
+        """Is checking if the production order on this machine has any producing quantity left.
+        If not, it changes the machine and wr parameter."""
+        if self.machine_manager.check_if_order_is_finished(machine, producing_material):
+
+            machine.working_status.working_robot_status = MachineWorkingRobotStatus.WR_LEAVING
+            machine.working_status.working_on_status = False
+
+            machine.working_status.process_status = MachineProcessStatus.FINISHED_TO_PRODUCE
+
+            if self.machine_manager.remove_processing_order_from_machine(machine, producing_material):
+                machine.working_status.storage_status = MachineStorageStatus.STORAGES_READY_FOR_PRODUCTION
+            else:
+                machine.working_status.storage_status = MachineStorageStatus.OUTPUT_FULL
+
+            wr = self.machine_manager.get_wr_working_on_machine(machine)
+
+            if wr is not None:
+
+                wr.working_status.working_on_status = False
+                wr.working_status.status = WorkingRobotStatus.WAITING_IN_MACHINE_TO_EXIT
+
+            return True
+        return False
 
     def reduce_producing_material_by_one(self, machine: Machine, new_item: ProductionMaterial):
         for process_material in machine.process_material_list:
@@ -37,6 +71,8 @@ class MachineExecution:
         """Takes the item and gives the order to the next machine."""
         executing_machine_type = None
         step_of_the_process = None
+        if machine.identification_str == "Ma: 2, 1":
+            print(producing_material.identification_str)
 
         for processing_order in machine.processing_list:
             if producing_material.production_material_id == processing_order.order.product.product_id:

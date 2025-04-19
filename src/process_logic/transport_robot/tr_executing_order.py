@@ -10,13 +10,13 @@ from src.production.base.cell import Cell
 from src.production.base.coordinates import Coordinates
 
 
-
 class TrExecutingOrder:
     tr_list: list[TransportRobot]
     machine_list: list[Machine]
     entities_located_after_init = dict[str, list[Cell]]
 
-    def __init__(self, simulation_environment, manufacturing_plan, path_finding, machine_execution, machine_manager, store_manager):
+    def __init__(self, simulation_environment, manufacturing_plan, path_finding, machine_execution, machine_manager,
+                 store_manager):
         self.env = simulation_environment
         self.manufacturing_plan = manufacturing_plan
         self.path_finding = path_finding
@@ -49,7 +49,6 @@ class TrExecutingOrder:
         if self.set_driving_parameter_for_tr(tr, destination):
             return True
         return False
-
 
     def set_driving_parameter_for_tr(self, tr: TransportRobot, destination: Machine | Sink | Source) -> bool:
         """Changes the tr.working_status parameter (Location_entity, destination_coordinates, driving_route).
@@ -122,7 +121,7 @@ class TrExecutingOrder:
             horizontal_edges_of_list = self.manufacturing_plan.production.get_horizontal_edges_of_coordinates(
                 list_entity_cells_after_init)
 
-            list_transport_robot_cells = self.manufacturing_plan.production.entities_located.values(
+            list_transport_robot_cells = self.manufacturing_plan.production.entities_located.get(
                 f'{transport_robot.identification_str}')
             vertical_edges_of_tr = self.manufacturing_plan.production.get_vertical_edges_of_coordinates(
                 list_transport_robot_cells)
@@ -131,7 +130,7 @@ class TrExecutingOrder:
 
             return Coordinates(horizontal_edges_of_list[0] + (
                     self.manufacturing_plan.production.max_coordinate.x - (
-                    horizontal_edges_of_tr[1] - horizontal_edges_of_tr[0] - 2)),
+                    horizontal_edges_of_tr[1] - horizontal_edges_of_tr[0]) - 2),
                                vertical_edges_of_list[1])
 
         # calculate path coordinates if the unload_destination is a machine:
@@ -154,40 +153,78 @@ class TrExecutingOrder:
                 horizontal_edges_of_machine[0] - (horizontal_edges_of_tr[1] - horizontal_edges_of_tr[0] + 2),
                 vertical_edges_of_machine[0] + (vertical_edges_of_tr[1] - vertical_edges_of_tr[0]) - 1)
 
-    def drive_tr_one_step_trough_production(self, tr: TransportRobot) -> bool:
+    def drive_tr_one_step_trough_production(self, tr: TransportRobot) -> bool | Exception:
         """moving the tr one step further through the production to destination.
            When a tr cannot move it's waiting for waiting_time period until in calculates a new path.
            Returns True on the right place."""
 
-        start_cell = self.path_finding.get_start_cell_from_entity(tr)
+        start_cell_coordinates = self.path_finding.get_start_cell_from_entity(tr)
         path = tr.working_status.driving_route
 
-        if isinstance(path, Exception):
-            path = self.path_finding.get_path_for_entity(tr, tr.working_status.driving_destination_coordinates)
-            tr.working_status.driving_route = path
+        if not isinstance(tr.working_status.side_step_driving_route, list):
+            if isinstance(path, Exception):
+                path = self.path_finding.get_path_for_entity(tr, tr.working_status.driving_destination_coordinates)
+                tr.working_status.driving_route = path
+                return False
+
+            if len(path) > 0:
+                if self.path_finding.entity_movement.move_entity_one_step(start_cell_coordinates, tr, path[0]) is True:
+                    tr.working_status.driving_route.pop(0)
+                    tr.working_status.waiting_time_on_path = self.waiting_time
+
+                else:
+                    tr.working_status.waiting_time_on_path -= 1
+                    if tr.working_status.waiting_time_on_path == 0:
+                        path = self.path_finding.get_path_for_entity(tr,
+                                                                     tr.working_status.driving_destination_coordinates)
+                        if isinstance(path, Exception):
+                            self.set_side_step_driving_parameter_for_tr(tr)
+                        tr.working_status.driving_route = path
+                        tr.working_status.waiting_time_on_path = random.randint(1, 10)
+
+            if isinstance(path, Exception):
+                path = self.path_finding.get_path_for_entity(tr, tr.working_status.driving_destination_coordinates)
+                tr.working_status.driving_route = path
+                return Exception
+
+            if len(tr.working_status.driving_route) == 0:
+                return True
+
+            return False
+        else:
+            self.drive_side_step_route_one_step(tr, start_cell_coordinates)
             return False
 
-        if len(path) > 0:
-            if self.path_finding.entity_movement.move_entity_one_step(start_cell, tr, path[0]) is True:
-                tr.working_status.driving_route.pop(0)
-                tr.working_status.waiting_time_on_path = self.waiting_time
+    def drive_side_step_route_one_step(self, tr: TransportRobot, start_cell_coordinates: Coordinates):
+        side_step_path = tr.working_status.side_step_driving_route
+        if self.path_finding.entity_movement.move_entity_one_step(start_cell_coordinates, tr,
+                                                                  side_step_path[0]) is True:
+            tr.working_status.side_step_driving_route.pop(0)
 
-            else:
-                tr.working_status.waiting_time_on_path -= 1
-                if tr.working_status.waiting_time_on_path == 0:
-                    path = self.path_finding.get_path_for_entity(tr, tr.working_status.driving_destination_coordinates)
-                    tr.working_status.driving_route = path
-                    tr.working_status.waiting_time_on_path = random.randint(1, 10)
-
-        if isinstance(path, Exception):
+        if len(tr.working_status.side_step_driving_route) == 0:
             path = self.path_finding.get_path_for_entity(tr, tr.working_status.driving_destination_coordinates)
             tr.working_status.driving_route = path
-            return False
+            tr.working_status.side_step_driving_route = None
 
-        if len(tr.working_status.driving_route) == 0:
-            return True
+    def set_side_step_driving_parameter_for_tr(self, tr: TransportRobot):
+        """Try to calculate a short path for a side step movement.
+            The side step starts either at the bottom left or top right corner.
+            """
 
-        return False
+        max_coordinates = self.manufacturing_plan.production.service_starting_conditions.set_max_coordinates_for_production_layout
+        min_coordinates = Coordinates(0, 0)
+
+        side_step_path = self.path_finding.get_path_for_entity(tr, min_coordinates)
+        if isinstance(side_step_path, Exception):
+            side_step_path = self.path_finding.get_path_for_entity(tr, max_coordinates)
+
+        if isinstance(side_step_path, Exception):
+            tr.working_status.side_step_driving_route = None
+            return
+
+        # just 4 steps for the side_step
+        side_step_path = side_step_path[:4]
+        tr.working_status.side_step_driving_route = side_step_path
 
     def pick_up_material_on_tr(self, tr: TransportRobot) -> bool:
         if isinstance(tr.transport_order.pick_up_station, Source):
@@ -224,15 +261,35 @@ class TrExecutingOrder:
             # deleting material from machine
             machine.machine_storage.storage_after_process.items.remove(pick_up_product)
 
+        self.machine_manager.remove_processing_order_from_machine(machine, pick_up_product)
+
     def unload_material_off_tr(self, tr: TransportRobot) -> bool:
         if isinstance(tr.transport_order.unload_destination, Sink):
-            raise Exception("Unload to Sink: code fehlt noch!")
+            self.unload_material_to_sink(tr)
+            return True
 
         if isinstance(tr.transport_order.unload_destination, Machine):
             self.unload_material_to_machine(tr)
             return True
 
         return False
+
+    def unload_material_to_sink(self, tr: TransportRobot):
+        unload_product = tr.transport_order.transporting_product
+        item_to_unload = self.store_manager.count_number_of_one_product_type_in_store(tr.material_store, unload_product)
+        sink = tr.transport_order.unload_destination
+
+        for _ in range(item_to_unload):
+            # deleting material from TR
+            tr.material_store = self.store_manager.get_material_out_of_store(tr.material_store, unload_product)
+            tr.transport_order.quantity -= 1
+
+            # adding material to machine
+            sink.goods_issue_store.put(unload_product)
+
+        store_items = self.store_manager.get_str_products_in_store(sink.goods_issue_store)
+        print(f"Items: {len(sink.goods_issue_store.items)}\n")
+        print(f"Quantity of Items: {store_items}")
 
     def unload_material_to_machine(self, tr: TransportRobot):
 

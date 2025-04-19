@@ -1,6 +1,7 @@
-from src.constant.constant import TransportRobotStatus, MachineWorkingRobotStatus, MachineProcessStatus
+from src.constant.constant import TransportRobotStatus, MachineWorkingRobotStatus, MachineStorageStatus
 from src.entity.machine.Process_material import ProcessMaterial
 from src.entity.machine.machine import Machine
+from src.entity.sink import Sink
 from src.entity.source import Source
 from src.entity.transport_robot.transport_order import TransportOrder
 from src.entity.transport_robot.transport_robot import TransportRobot
@@ -27,6 +28,7 @@ class TrOrderManager:
             If this method is called, the list gets reset and a new list is created.
             """
         self.transport_request_list = []
+        transport_request_bring = None
 
         for machine in self.machine_list:
             self.machine_manager.sort_machine_processing_list(machine)
@@ -34,56 +36,56 @@ class TrOrderManager:
             if machine.working_status.waiting_for_arriving_of_tr is False:
                 if machine.working_status.working_robot_status == MachineWorkingRobotStatus.WAITING_WR or \
                         machine.working_status.working_robot_status == MachineWorkingRobotStatus.WR_PRESENT:
-                    transport_request_bring = self.get_transport_request_if_material_is_required(machine)
-                    transport_request_take = self.get_transport_request_if_storage_after_process_is_full(machine)
+                    if machine.working_status.storage_status == MachineStorageStatus.INPUT_EMPTY:
+                        transport_request_bring = self.get_transport_request_if_material_is_required(machine)
+                        transport_request_bring = self.remove_transport_request_zero_quantity(transport_request_bring)
 
                     if transport_request_bring is not None:
                         self.transport_request_list.append(transport_request_bring)
 
+                if machine.working_status.storage_status == MachineStorageStatus.OUTPUT_FULL:
+                    transport_request_take = self.get_transport_request_if_storage_after_process_is_filled(machine)
                     if transport_request_take is not None:
                         self.transport_request_list.append(transport_request_take)
 
         self.remove_duplicate_transport_requests()
-        self.remove_transport_request_zero_quantity()
         self.sort_transport_requests_list()
 
     def get_transport_request_if_material_is_required(self, machine) -> TransportRequest | None:
-        """If storage before the process of a machine has no material for the process. Find the Pick Up station for
-        the required material and get a TransportRequest"""
+        """Find the Pick Up station for the required material and get a TransportRequest"""
 
-        if machine.working_status.process_status == MachineProcessStatus.INPUT_EMPTY:
-            processing_order = machine.processing_list[0]
-            process_material = machine.process_material_list[0]
-            pick_up_station = self.get_pick_up_station(process_material)
-
-            return TransportRequest(pick_up_station, machine, processing_order, process_material)
-
+        processing_order = machine.processing_list[0]
+        process_material = machine.process_material_list[0]
+        pick_up_station = self.get_pick_up_station(process_material)
+        if pick_up_station is not False:
+            if isinstance(pick_up_station, Machine):
+                if len(pick_up_station.machine_storage.storage_after_process.items) > 4:
+                    return TransportRequest(pick_up_station, machine, processing_order, process_material)
+            elif isinstance(pick_up_station, Source):
+                return TransportRequest(pick_up_station, machine, processing_order, process_material)
         return
 
-    def get_transport_request_if_storage_after_process_is_full(self, machine) -> TransportRequest | None:
-        """If the storage after the process of a machine is full.
-        ItemType.value == 4 (FINAL_PRODUCT_PACKED) the TR has to Transport the material to Sink.
+    def get_transport_request_if_storage_after_process_is_filled(self, machine: Machine) -> TransportRequest | None:
+        """ItemType.value == 4 (FINAL_PRODUCT_PACKED) the TR has to Transport the material to Sink.
         Otherwise, loop machine_list and find the machine with the same required Material in storage_before_process or
         process_material_list """
 
-        if machine.working_status.process_status == MachineProcessStatus.OUTPUT_FULL:
-            production_material = self.store_manager.get_most_common_product_in_store(
-                machine.machine_storage.storage_after_process)
+        production_material = self.store_manager.get_most_common_product_in_store(
+            machine.machine_storage.storage_after_process)
+        if production_material is not None:
             if production_material.item_type.value == 4:
                 for priority_index, process_material in enumerate(machine.process_material_list):
-                    if process_material.required_material == production_material:
+                    if process_material.producing_material == production_material:
                         processing_order = machine.processing_list[priority_index]
-
                         sink_coordinates = self.manufacturing_plan.production.sink_coordinates
                         sink_cell = self.manufacturing_plan.production.get_cell(sink_coordinates)
                         sink = sink_cell.placed_entity
-
                         return TransportRequest(machine, sink, processing_order, process_material)
-
             for unload_destination_machine in self.machine_list:
-                for priority_index, process_material in enumerate(unload_destination_machine.process_material_list):
+                if len(unload_destination_machine.process_material_list) > 0:
+                    process_material = unload_destination_machine.process_material_list[0]
                     if process_material.required_material == production_material:
-                        processing_order = unload_destination_machine.processing_list[priority_index]
+                        processing_order = unload_destination_machine.processing_list[0]
                         return TransportRequest(machine, unload_destination_machine, processing_order, process_material)
 
         return
@@ -111,7 +113,7 @@ class TrOrderManager:
                     if machine.process_material_list[0].producing_material.identification_str == \
                             request_material.required_material.identification_str:
                         return machine
-        raise Exception(f"{request_material.required_material.identification_str} cannot be found in the production")
+        return False
 
     def remove_duplicate_transport_requests(self):
         """
@@ -133,11 +135,16 @@ class TrOrderManager:
 
         self.transport_request_list = unique_requests
 
-    def remove_transport_request_zero_quantity(self):
+    def remove_transport_request_zero_quantity(self, transport_request: TransportRequest) -> TransportRequest | None:
         """remove every transport request with the transport quantity of zero"""
 
-        self.transport_request_list = [transport_request for transport_request in self.transport_request_list
-                                       if transport_request.process_material.quantity_required != 0]
+        if transport_request is None:
+            return None
+
+        if isinstance(transport_request.destination_unload, Machine):
+            if transport_request.destination_unload.process_material_list[0].quantity_producing == 0:
+                return None
+        return transport_request
 
     def sort_transport_requests_list(self):
         """
@@ -152,9 +159,7 @@ class TrOrderManager:
                 -tr.processing_order.step_of_the_process,
                 tr.processing_order.order.daily_manufacturing_sequence if
                 tr.processing_order.order.daily_manufacturing_sequence is not None else float(
-                    'inf')
-            )
-        )
+                    'inf')))
 
     def every_idle_tr_get_order(self):
         for tr in self.tr_list:
@@ -169,6 +174,9 @@ class TrOrderManager:
                 pick_up_destination = transport_request.destination_pick_up
                 transporting_material = transport_request.process_material.required_material
                 quantity = self.calculate_order_quantity(tr, transport_request)
+
+                if isinstance(unload_destination, Sink):
+                    transporting_material = pick_up_destination.process_material_list[0].producing_material
 
                 # get transport order for tr
                 tr.transport_order = TransportOrder(unload_destination, pick_up_destination, transporting_material,
@@ -197,6 +205,10 @@ class TrOrderManager:
             if quantity > empty_space_in_store:
                 quantity = empty_space_in_store
 
+        if isinstance(transport_request.destination_unload, Sink):
+            products_in_machine = len(transport_request.destination_pick_up.machine_storage.storage_after_process.items)
+            if quantity < products_in_machine < tr.material_store.capacity:
+                quantity = products_in_machine
         return quantity
 
     def get_driving_speed_per_cell(self):

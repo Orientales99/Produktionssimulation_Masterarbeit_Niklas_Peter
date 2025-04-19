@@ -50,7 +50,7 @@ class CellInformation:
             self.print_source_information()
 
         if isinstance(self.current_cell.placed_entity, Sink):
-            self.print_sink_information()
+            self.print_sink_information(self.current_cell.placed_entity)
 
         if self.current_cell.placed_entity is None:
             self.print_cell_is_none_information()
@@ -97,6 +97,8 @@ class CellInformation:
             f"   height:          {machine.size.y}\n"
             "\n"
             f"Machine Storage:\n"
+            f"\n"
+            f"      Storage Status:       {machine.working_status.storage_status.value}"         
             f"\n"
             f"      Storage before Process:\n"
             f"           Max Capacity:    {machine.machine_storage.storage_before_process.capacity}\n"
@@ -338,18 +340,26 @@ class CellInformation:
 
         self.print_information_sheet(title, info_text)
 
-    def print_sink_information(self):
+    def print_sink_information(self, sink: Sink):
         """Opens a window with information about the machine."""
+        items_in_store_before_process = self.get_str_products_in_store(sink.goods_issue_store)
+
 
         info_text = (
             f"This Cell is The Sink\n"
             f"Cell Coordinates: X:{self.current_cell.cell_coordinates.x}, Y:{self.current_cell.cell_coordinates.y}\n"
+            f"\n"
+            f"Max Capacity:    Infinity\n"
+            f"Contained Units: {len(sink.goods_issue_store.items)}\n"
+            f"Products:        {items_in_store_before_process}\n"
             f"\n"
             f"The Sink represents the end point in the production process, where products are removed from the system. "
             f"It serves as the destination for finished goods, marking the completion of the production flow. "
             f"Transport robots deliver completed packaged products to the Sink, ensuring the production "
             f"process maintains its flow and efficiency. The Sink acts as the warehousing or output stage, where goods "
             f"are finalized and prepared for distribution or further processing.\n"
+
+
         )
 
         root = tk.Tk()

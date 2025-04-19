@@ -1,5 +1,7 @@
 from collections import defaultdict
 
+from simpy import Store
+
 from src.production.base.cell import Cell
 from src.production.base.coordinates import Coordinates
 from src.provide_input_data.entity_service import EntityService
@@ -16,21 +18,21 @@ class Production:
     production_layout: list[list[Cell]] = []
     service_order = OrderService()
 
-    service_starting_conditions = StartingConditionsService()
+    service_starting_conditions = StartingConditionsService
     source_coordinates: Coordinates
     sink_coordinates: Coordinates
     wr_list: list[WorkingRobot]
-    entities_located: {str, list[Cell]}  # {entity.identification_str, list[Cell]}
+    entities_located: {str, list[Cell]}           # {entity.identification_str, list[Cell]}
     entities_init_located: dict[str, list[Cell]]  # {entity.identification_str, list[Cell]} position of initialisation
     tr_list: list[TransportRobot]
     machine_list: list[Machine]
 
     max_coordinate: Coordinates
 
-    def __init__(self, simulation_environment):
-        self.simulation_environment = simulation_environment
+    def __init__(self, simulation_environment, service_starting_conditions):
+        self.env = simulation_environment
         self.service_entity = EntityService(simulation_environment)
-
+        self.service_starting_conditions = service_starting_conditions
         self.wr_list = []
         self.entities_located = {}
         self.entities_init_located = {}
@@ -79,7 +81,8 @@ class Production:
         """Places the sink at the center of the right side of the production layout."""
         self.sink_coordinates = Coordinates(int(self.max_coordinate.x - 1), int(self.max_coordinate.y / 2))
         cell = self.get_cell(self.sink_coordinates)
-        cell.placed_entity = Sink(0, 0, 0)
+        cell.placed_entity = Sink(0, 0, 0, Store(
+                               self.env))
 
     def get_working_robot_placed_in_production(self):
         """Places working robots in the production layout and stores their locations in a dictionary"""

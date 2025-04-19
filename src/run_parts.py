@@ -1,3 +1,4 @@
+import cProfile
 from datetime import date
 
 from src.command_line_service import CommandLineService
@@ -9,7 +10,7 @@ from src.entity.transport_robot.transport_robot import TransportRobot
 from src.entity.working_robot.working_robot import WorkingRobot
 from src.process_logic.manufacturing_plan import ManufacturingPlan
 from src.process_logic.path_finding import PathFinding
-from src.process_logic.working_robot_manager_1 import WorkingRobotManager
+from src.process_logic.working_robot_order_manager import WorkingRobotOrderManager
 from src.production.visualisation.production_visualisation import ProductionVisualisation
 from src.simulation_environmnent.simulation_environment import SimulationEnvironment
 
@@ -88,7 +89,7 @@ def run_manufacturing_plan():
     path_finding = PathFinding(production)
     production.set_sink_in_production_layout()
     production.set_source_in_production_layout()
-    visualisation = ProductionVisualisation(production)
+
 
     manufacturing_plan = ManufacturingPlan(production)
 
@@ -96,9 +97,9 @@ def run_manufacturing_plan():
     manufacturing_plan.set_processing_machine_list__queue_length_estimation()
     manufacturing_plan.get_required_material_for_every_machine()
     command_line_service.visualise_layout()
-    working_robot_manager = WorkingRobotManager(manufacturing_plan, path_finding)
+    working_robot_manager = WorkingRobotOrderManager(manufacturing_plan, path_finding)
     working_robot_manager.start_working_robot_manager()
-    visualisation.visualize_layout()
+
 
 
 
@@ -109,10 +110,10 @@ def run_simulation():
 
 
 if __name__ == '__main__':
-    run_simulation()
+    # run_simulation()
     # move_entity()
     # run_pathfinding()
-    # cProfile.run('run_simulation()')
+    cProfile.run('run_simulation()')
     #run_manufacturing_plan()
 # service_product_information = ServiceProductInformation()
 # service_product_information.create_product_information_list()

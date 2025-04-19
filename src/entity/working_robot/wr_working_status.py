@@ -17,6 +17,8 @@ class WrWorkingStatus:
     driving_destination_coordinates: Coordinates | None
     driving_route: list[Coordinates] | None
 
+    side_step_driving_route: list[Coordinates] | None
+
     last_placement_in_production: list | None
 
 

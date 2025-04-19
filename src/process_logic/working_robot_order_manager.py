@@ -12,7 +12,7 @@ from src.production.base.cell import Cell
 from src.production.base.coordinates import Coordinates
 
 
-class WorkingRobotManager:
+class WorkingRobotOrderManager:
     manufacturing_plan: ManufacturingPlan
     path_finding: PathFinding
     sorted_list_of_processes: list[(Machine, ProcessingOrder)] = []
@@ -26,16 +26,21 @@ class WorkingRobotManager:
 
         self.waiting_time = self.wr_list[0].working_status.waiting_time_on_path
 
-    def create_working_request_list_from_machines(self):
-        pass
-
     def sort_process_order_list_for_wr(self):
-        """Sort list [machine, processing_order(Order, step_of_the_process_priority)].
+        """
+        Delete orders when machine.process_material_list[0].quantity_producing == 0 ist.
+        Sort list [machine, processing_order(Order, step_of_the_process_priority)].
          1. priority
          2. step of the process
          3. daily manufacturing_sequence
          """
         list_of_processes_for_every_machine = self.manufacturing_plan.process_list_for_every_machine[:]
+
+        list_of_processes_for_every_machine = [
+            (machine, order)
+            for machine, order in list_of_processes_for_every_machine
+            if machine.process_material_list and machine.process_material_list[0].quantity_producing != 0
+        ]
 
         self.sorted_list_of_processes = sorted(
             list_of_processes_for_every_machine,
@@ -44,6 +49,8 @@ class WorkingRobotManager:
                            x[1].order.daily_manufacturing_sequence,
                            )
         )
+
+
 
     def get_waiting_location_for_wr(self, wr: WorkingRobot):
         source_coordinates = self.manufacturing_plan.production.source_coordinates
@@ -116,40 +123,80 @@ class WorkingRobotManager:
         else:
             return False
 
-    def drive_wr_one_step_trough_production(self, wr: WorkingRobot) -> bool:
+    def drive_wr_one_step_trough_production(self, wr: WorkingRobot) -> bool | Exception:
         """moving the wr one step further through the production to destination.
            When a wr cannot move it's waiting for waiting_time period until in calculates a new path.
            Returns True on the right place."""
 
-        start_cell = self.path_finding.get_start_cell_from_entity(wr)
+        start_cell_coordinates = self.path_finding.get_start_cell_from_entity(wr)
         path = wr.working_status.driving_route
 
-        if isinstance(path, Exception):
-            path = self.path_finding.get_path_for_entity(wr, wr.working_status.driving_destination_coordinates)
-            wr.working_status.driving_route = path
+        if not isinstance(wr.working_status.side_step_driving_route, list):
+            if isinstance(path, Exception):
+                path = self.path_finding.get_path_for_entity(wr, wr.working_status.driving_destination_coordinates)
+                wr.working_status.driving_route = path
+                return False
+
+            if len(path) > 0:
+                if self.path_finding.entity_movement.move_entity_one_step(start_cell_coordinates, wr, path[0]) is True:
+                    wr.working_status.driving_route.pop(0)
+                    wr.working_status.waiting_time_on_path = self.waiting_time
+
+                else:
+                    wr.working_status.waiting_time_on_path -= 1
+                    if wr.working_status.waiting_time_on_path == 0:
+                        path = self.path_finding.get_path_for_entity(wr, wr.working_status.driving_destination_coordinates)
+
+                        if isinstance(path, Exception):
+                            self.set_side_step_driving_parameter_for_wr(wr)
+
+                        wr.working_status.driving_route = path
+                        wr.working_status.waiting_time_on_path = random.randint(1, 10)
+
+            if isinstance(path, Exception):
+                path = self.path_finding.get_path_for_entity(wr, wr.working_status.driving_destination_coordinates)
+                wr.working_status.driving_route = path
+                return Exception
+
+            if len(wr.working_status.driving_route) == 0:
+                return True
+
             return False
 
-        if len(path) > 0:
-            if self.path_finding.entity_movement.move_entity_one_step(start_cell, wr, path[0]) is True:
-                wr.working_status.driving_route.pop(0)
-                wr.working_status.waiting_time_on_path = self.waiting_time
-
-            else:
-                wr.working_status.waiting_time_on_path -= 1
-                if wr.working_status.waiting_time_on_path == 0:
-                    path = self.path_finding.get_path_for_entity(wr, wr.working_status.driving_destination_coordinates)
-                    wr.working_status.driving_route = path
-                    wr.working_status.waiting_time_on_path = random.randint(1, 10)
-
-        if isinstance(path, Exception):
-            path = self.path_finding.get_path_for_entity(wr, wr.working_status.driving_destination_coordinates)
-            wr.working_status.driving_route = path
+        else:
+            self.drive_side_step_route_one_step(wr, start_cell_coordinates)
             return False
 
-        if len(wr.working_status.driving_route) == 0:
-            return True
+    def drive_side_step_route_one_step(self, wr: WorkingRobot, start_cell_coordinates: Coordinates):
+        side_step_path = wr.working_status.side_step_driving_route
+        if self.path_finding.entity_movement.move_entity_one_step(start_cell_coordinates, wr, side_step_path[0]) is True:
+            wr.working_status.side_step_driving_route.pop(0)
 
-        return False
+        if len(wr.working_status.side_step_driving_route) == 0:
+            path = self.path_finding.get_path_for_entity(wr, wr.working_status.driving_destination_coordinates)
+            wr.working_status.driving_route = path
+            wr.working_status.side_step_driving_route = None
+
+    def set_side_step_driving_parameter_for_wr(self, wr: WorkingRobot):
+        """Try to calculate a short path for a side step movement.
+            The side step starts either at the bottom left or top right corner.
+            """
+        max_coordinates: Coordinates
+        max_coordinates = self.manufacturing_plan.production.service_starting_conditions.set_max_coordinates_for_production_layout()
+        first_coordinates = Coordinates(max_coordinates.x-2, 0)
+        second_coordinates = Coordinates(0, max_coordinates.y-2)
+
+        side_step_path = self.path_finding.get_path_for_entity(wr, first_coordinates)
+        if isinstance(side_step_path, Exception):
+            side_step_path = self.path_finding.get_path_for_entity(wr, second_coordinates)
+
+        if isinstance(side_step_path, Exception):
+            wr.working_status.side_step_driving_route = None
+            return
+
+        # just 4 steps for the side_step
+        side_step_path = side_step_path[:4]
+        wr.working_status.side_step_driving_route = side_step_path
 
     def wr_driving_in_machine(self, wr: WorkingRobot):
         """Cells with the placed_entity of wr will be changed to None. The Cell coordinates are saved in
@@ -170,19 +217,22 @@ class WorkingRobotManager:
            If wr cannot drive off machine -> Return: False"""
 
         cell_list = wr.working_status.last_placement_in_production
-
-        if self.check_cell_list_is_none(cell_list):
-            for cell in cell_list:
-                cell.placed_entity = wr
-            return True
+        if cell_list is not None:
+            if self.check_cell_list_is_none(cell_list):
+                for cell in cell_list:
+                    cell.placed_entity = wr
+                return True
 
         return False
 
     def check_cell_list_is_none(self, cell_list: list[Cell]) -> bool:
         """if every cell.placed_entity in this list is none -> Return: True, otherwise Return: False"""
+        cell_is_free = True
 
         for cell in cell_list:
             if cell.placed_entity is not None:
+                cell_is_free = False
+        if cell_is_free is False:
                 return False
         return True
 
