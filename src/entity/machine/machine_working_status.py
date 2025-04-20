@@ -10,6 +10,7 @@ class MachineWorkingStatus:
     working_robot_status: MachineWorkingRobotStatus
     storage_status: MachineStorageStatus
     working_on_status: bool
+    producing_item: bool
 
     producing_production_material: ProductionMaterial | None
     waiting_for_arriving_of_tr: bool

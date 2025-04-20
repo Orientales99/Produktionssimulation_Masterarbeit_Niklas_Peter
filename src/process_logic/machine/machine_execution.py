@@ -23,19 +23,21 @@ class MachineExecution:
 
     def produce_one_item(self, machine: Machine, required_material: ProductionMaterial,
                          producing_material: ProductionMaterial):
-        if self.check_production_process_is_finished(machine, producing_material) is False:
-            self.reduce_producing_material_by_one(machine, producing_material)
 
-            input_store = machine.machine_storage.storage_before_process
-            output_store = machine.machine_storage.storage_after_process
-            working_speed = int(machine.working_speed)
+        input_store = machine.machine_storage.storage_before_process
+        output_store = machine.machine_storage.storage_after_process
+        working_speed = int(machine.working_speed)
 
-            yield self.env.timeout(1)
-            # yield self.env.timeout(working_speed)
+        yield self.env.timeout(1)
+        # yield self.env.timeout(working_speed)
+        machine.machine_storage.storage_before_process = self.store_manager.get_material_out_of_store(input_store,
+                                                                                                required_material)
+        yield output_store.put(producing_material)
+        self.reduce_producing_material_by_one(machine, producing_material)
 
-            machine.machine_storage.storage_before_process = self.store_manager.get_material_out_of_store(input_store,
-                                                                                                    required_material)
-            yield output_store.put(producing_material)
+        machine.working_status.producing_item = False
+
+        self.check_production_process_is_finished(machine, producing_material)
 
     def check_production_process_is_finished(self, machine: Machine, producing_material: ProductionMaterial) -> bool:
         """Is checking if the production order on this machine has any producing quantity left.
@@ -46,6 +48,7 @@ class MachineExecution:
             machine.working_status.working_on_status = False
 
             machine.working_status.process_status = MachineProcessStatus.FINISHED_TO_PRODUCE
+            machine.working_status.producing_item = False
 
             if self.machine_manager.remove_processing_order_from_machine(machine, producing_material):
                 machine.working_status.storage_status = MachineStorageStatus.STORAGES_READY_FOR_PRODUCTION

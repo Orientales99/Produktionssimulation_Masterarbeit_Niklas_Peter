@@ -110,10 +110,10 @@ def run_simulation():
 
 
 if __name__ == '__main__':
-    # run_simulation()
+    run_simulation()
     # move_entity()
     # run_pathfinding()
-    cProfile.run('run_simulation()')
+    #cProfile.run('run_simulation()')
     #run_manufacturing_plan()
 # service_product_information = ServiceProductInformation()
 # service_product_information.create_product_information_list()

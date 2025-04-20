@@ -113,7 +113,7 @@ class EntityService:
                                capacity=int(machine_stats["max_loading_capacity_product_after_process"])),
                            None),
                        MachineWorkingStatus(MachineProcessStatus.IDLE, MachineWorkingRobotStatus.NO_WR,
-                                            MachineStorageStatus.STORAGES_READY_FOR_PRODUCTION, False, None, False),
+                                            MachineStorageStatus.STORAGES_READY_FOR_PRODUCTION, False, False, None, False),
                        float(machine_stats["setting_up_time"]))
 
     def generate_machine_list(self) -> list[Machine]:

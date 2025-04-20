@@ -1,9 +1,11 @@
 from collections import defaultdict
 from datetime import date
 
+
 import pandas as pd
 
 from src.entity.machine.processing_order import ProcessingOrder
+from src.entity.sink import Sink
 from src.process_logic.machine.machine_manager import Machine_Manager
 from src.production.production import Production
 from src.order_data.order import Order
@@ -21,6 +23,7 @@ class ManufacturingPlan:
     daily_manufacturing_plan: list[Order]
     process_list_for_every_machine: list[(Machine, ProcessingOrder)]
     required_materials_for_every_machine: dict = {}
+    completed_orders_list: list[Order]
 
     def __init__(self, production, machine_execution):
         self.production = production
@@ -29,6 +32,7 @@ class ManufacturingPlan:
         self.dictionary_summarised_order_per_day = {}
         self.daily_manufacturing_plan = []
         self.process_list_for_every_machine = []
+        self.completed_orders_list = []
         self.product_order_list = self.production.service_order.generate_order_list()
         self.product_information_list = self.service_product_information.create_product_information_list()
 
@@ -36,6 +40,7 @@ class ManufacturingPlan:
         self.get_daily_manufacturing_plan(start_date)
         self.set_processing_machine_list__queue_length_estimation()
         self.get_required_material_for_every_machine()
+        self.get_sink_goods_issue_order_list()
 
 
     def get_daily_manufacturing_plan(self, current_date: date):
@@ -207,3 +212,59 @@ class ManufacturingPlan:
                 list_machine_identification_str.append(identification_str)
 
         return list_machine_identification_str
+
+    def get_sink_goods_issue_order_list(self):
+        sink_coordinates = self.production.sink_coordinates
+        sink_cell = self.production.get_cell(sink_coordinates)
+        sink = sink_cell.placed_entity
+
+        for order in self.daily_manufacturing_plan:
+            sink.goods_issue_order_list.append((order, 0))
+
+    def update_goods_issue_order_quantities(self, sink: Sink):
+        """Checks the goods_issue_store for matching ProductionMaterial and updates
+        the quantities in goods_issue_order_list."""
+
+        store_items = list(sink.goods_issue_store.items)
+
+        for i, (order, _) in enumerate(sink.goods_issue_order_list):
+            matching_items = [item for item in store_items if item.production_material_id == order.product.product_id]
+
+            sink.goods_issue_order_list[i] = (order, len(matching_items))
+
+        self.sink_update_completed_orders(sink)
+
+    def sink_update_completed_orders(self, sink: Sink):
+        """
+            Transfers completed orders from goods_issue_order_list to completed_orders_list
+            if the number of available items in the store matches the order requirement.
+            Also removes the corresponding items from the store.
+            """
+        updated_order_list = []
+
+        for order, produced_quantity in sink.goods_issue_order_list:
+
+            if produced_quantity >= order.number_of_products_per_order:
+
+                self.completed_orders_list.append(order)
+                print(len(self.completed_orders_list))
+
+
+                items_to_remove = [
+                    item for item in sink.goods_issue_store.items
+                    if item.production_material_id == order.product.product_id
+                ]
+
+                for _ in range(order.number_of_products_per_order):
+                    for item in items_to_remove:
+                        try:
+                            sink.goods_issue_store.items.remove(item)
+                            items_to_remove.remove(item)
+                            break
+                        except ValueError:
+                            pass
+
+            else:
+                updated_order_list.append((order, produced_quantity))
+
+        sink.goods_issue_order_list = updated_order_list

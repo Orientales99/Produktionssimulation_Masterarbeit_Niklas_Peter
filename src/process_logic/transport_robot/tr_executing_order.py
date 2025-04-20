@@ -48,6 +48,8 @@ class TrExecutingOrder:
         destination = source_cell.placed_entity
         if self.set_driving_parameter_for_tr(tr, destination):
             return True
+        tr.working_status.status = TransportRobotStatus.IDLE
+        tr.working_status.working_on_status = False
         return False
 
     def set_driving_parameter_for_tr(self, tr: TransportRobot, destination: Machine | Sink | Source) -> bool:
@@ -286,6 +288,7 @@ class TrExecutingOrder:
 
             # adding material to machine
             sink.goods_issue_store.put(unload_product)
+            self.manufacturing_plan.update_goods_issue_order_quantities(sink)
 
         store_items = self.store_manager.get_str_products_in_store(sink.goods_issue_store)
         print(f"Items: {len(sink.goods_issue_store.items)}\n")

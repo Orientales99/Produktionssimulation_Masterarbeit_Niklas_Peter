@@ -13,6 +13,7 @@ from src.entity.source import Source
 from src.entity.transport_robot.transport_order import TransportOrder
 from src.entity.transport_robot.transport_robot import TransportRobot
 from src.entity.working_robot.working_robot import WorkingRobot
+from src.order_data.order import Order
 from src.production.base.coordinates import Coordinates
 from src.production.base.cell import Cell
 from src.production.production import Production
@@ -61,7 +62,7 @@ class CellInformation:
 
         items_in_store_before_process = self.get_str_products_in_store(machine.machine_storage.storage_before_process)
         items_in_store_after_process = self.get_str_products_in_store(machine.machine_storage.storage_after_process)
-        processing_list_str = self.get_str_order_list(machine.processing_list)
+        processing_list_str = self.get_str_processing_order_list(machine.processing_list)
         process_material_list_str = self.get_str_process_material_list(machine.process_material_list)
         produced_product = (
             machine.working_status.producing_production_material.identification_str if
@@ -166,7 +167,7 @@ class CellInformation:
 
         return required_material_list_str
 
-    def get_str_order_list(self, order_list: list[ProcessingOrder]) -> str:
+    def get_str_processing_order_list(self, order_list: list[ProcessingOrder]) -> str:
         order_list_str = ""
 
         for processing_order in order_list:
@@ -343,7 +344,7 @@ class CellInformation:
     def print_sink_information(self, sink: Sink):
         """Opens a window with information about the machine."""
         items_in_store_before_process = self.get_str_products_in_store(sink.goods_issue_store)
-
+        order_list_str = self.get_str_order_list(sink.goods_issue_order_list)
 
         info_text = (
             f"This Cell is The Sink\n"
@@ -353,6 +354,8 @@ class CellInformation:
             f"Contained Units: {len(sink.goods_issue_store.items)}\n"
             f"Products:        {items_in_store_before_process}\n"
             f"\n"
+            f"good issues order list: \n"
+            f" {order_list_str}\n"
             f"The Sink represents the end point in the production process, where products are removed from the system. "
             f"It serves as the destination for finished goods, marking the completion of the production flow. "
             f"Transport robots deliver completed packaged products to the Sink, ensuring the production "
@@ -371,6 +374,27 @@ class CellInformation:
         text_area.pack(expand=True, fill="both")
 
         root.mainloop()
+
+    def get_str_order_list(self, order_list: list[Order, int]) -> str:
+        order_list_str = ""
+
+        print("DEBUG: get_str_order_list wurde aufgerufen")
+        print(f"DEBUG: order_list = {order_list}")
+
+        for order, quantity_produced_items in order_list:
+            print(f"DEBUG: order = {order}, type = {type(order)}")
+            order_int = f"           Order:                             {order.product.identification_str}\n" \
+                        f"               order_date:                    {order.order_date}\n" \
+                        f"               Number of Products:            {order.number_of_products_per_order}\n" \
+                        f"               Produced Products:             {quantity_produced_items}\n" \
+                        f"               priority:                      {order.priority}\n" \
+                        f"               daily_manufacturing_sequence:  {order.daily_manufacturing_sequence} \n\n"
+            order_list_str += order_int
+
+        if order_list_str == "":
+            order_list_str = "0"
+
+        return order_list_str
 
     def print_cell_is_none_information(self):
         title = "Cell: Empty"

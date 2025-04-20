@@ -99,6 +99,7 @@ class TransportRobotStatus(Enum):
 
 class WorkingRobotStatus(Enum):
     IDLE = "idle"
+    WAITING_FREE_DRIVING_ROUTE = "waiting until driving route is free"
     MOVING_TO_MACHINE = "moving to machine"
     WAITING_IN_FRONT_OF_MACHINE = "waiting in front of the machine"
     WORKING_ON_MACHINE = "working on machine"

@@ -207,8 +207,9 @@ class TrOrderManager:
 
         if isinstance(transport_request.destination_unload, Sink):
             products_in_machine = len(transport_request.destination_pick_up.machine_storage.storage_after_process.items)
-            if quantity < products_in_machine < tr.material_store.capacity:
+            if quantity < products_in_machine:
                 quantity = products_in_machine
+
         return quantity
 
     def get_driving_speed_per_cell(self):

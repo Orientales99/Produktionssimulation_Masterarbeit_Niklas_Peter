@@ -5,6 +5,7 @@ from src.constant.constant import TransportRobotStatus, WorkingRobotStatus, Mach
 from src.entity.machine.machine import Machine
 from src.entity.transport_robot.transport_robot import TransportRobot
 from src.entity.working_robot.working_robot import WorkingRobot
+from src.monitoring.SavingSimulationData import SavingSimulationData
 from src.process_logic.machine.machine_execution import MachineExecution
 from src.process_logic.machine.machine_manager import Machine_Manager
 from src.process_logic.path_finding import PathFinding
@@ -25,13 +26,14 @@ class SimulationEnvironment:
         self.production = Production(self.env, self.service_starting_conditions)
         self.store_manager = StoreManager(self.env)
         self.path_finding = PathFinding(self.production)
+        self.saving_simulation_data = SavingSimulationData(self.env, self.production)
 
         self.machine_manager = Machine_Manager(self.production, self.store_manager)
         self.manufacturing_plan = ManufacturingPlan(self.production, self.machine_manager)
         self.machine_execution = MachineExecution(self.env, self.manufacturing_plan, self.machine_manager,
                                                   self.store_manager)
         self.working_robot_manager = WorkingRobotOrderManager(self.manufacturing_plan, self.path_finding)
-        # self.visualize_production = ProductionVisualisation(self.production, self.env)
+        self.visualize_production = ProductionVisualisation(self.production, self.env)
         self.tr_order_manager = TrOrderManager(self.env, self.manufacturing_plan, self.machine_manager,
                                                self.store_manager)
         self.tr_executing_order = TrExecutingOrder(self.env, self.manufacturing_plan, self.path_finding,
@@ -40,7 +42,7 @@ class SimulationEnvironment:
         self.stop_event = False
 
         # starting processes
-        # self.env.process(self.visualize_layout())
+        self.env.process(self.visualize_layout())
         self.env.process(self.print_simulation_time())
         self.env.process(self.start_every_wr_process())
         self.env.process(self.start_every_tr_process())
@@ -48,11 +50,6 @@ class SimulationEnvironment:
 
     def run_simulation(self, until: int):
         self.env.run(until=until)
-
-    def test(self):
-        while True:
-            print(f"Aktuelle Simulationszeit: {self.env.now}")
-            yield self.env.timeout(100)
 
     def initialise_simulation_start(self):
         self.production.create_production()
@@ -65,14 +62,19 @@ class SimulationEnvironment:
         while True:
             if self.stop_event is False:
                 self.working_robot_manager.sort_process_order_list_for_wr()
+                self.working_robot_manager.every_idle_wr_get_order()
 
                 for wr in self.working_robot_manager.wr_list:
 
-                    # get new working order
-                    if wr.working_status.status == WorkingRobotStatus.IDLE and \
+                    # get driving route
+                    if wr.working_status.status == WorkingRobotStatus.WAITING_FREE_DRIVING_ROUTE and \
                             wr.working_status.working_on_status is False:
                         wr.working_status.working_on_status = True
-                        self.env.process(self.wr_get_working_order(wr))
+                        if self.working_robot_manager.get_path_for_wr(wr) is True:
+                            wr.working_status.working_on_status = False
+                            wr.working_status.status = WorkingRobotStatus.MOVING_TO_MACHINE
+                        else:
+                            wr.working_status.working_on_status = False
 
                     # wr drives to waiting location
                     if wr.working_status.status == WorkingRobotStatus.IDLE and \
@@ -105,19 +107,6 @@ class SimulationEnvironment:
                 yield self.env.timeout(1)
             else:
                 yield self.env.timeout(1)
-
-    def wr_get_working_order(self, wr: WorkingRobot):
-        if self.stop_event is False:
-            if self.working_robot_manager.get_next_working_location_for_order(wr) is True:
-
-                while True:
-                    print(f"{wr.identification_str}")
-                    if self.working_robot_manager.get_path_for_wr(wr) is True:
-                        wr.working_status.status = WorkingRobotStatus.MOVING_TO_MACHINE
-                        wr.working_status.working_on_status = False
-                        break
-                    yield self.env.timeout(3)
-            yield self.env.timeout(1)
 
     def drive_wr_to_destination_process(self, wr: WorkingRobot):
         driving_speed = self.working_robot_manager.get_driving_speed_per_cell()
@@ -211,6 +200,7 @@ class SimulationEnvironment:
                             tr.working_status.working_on_status = True
                             if self.tr_executing_order.start__moving_to_waiting__process_for_tr(tr):
                                 self.env.process(self.tr_drive_to_destination_process(tr))
+
             yield self.env.timeout(1)
 
     def tr_drive_to_destination_process(self, tr: TransportRobot):
@@ -248,6 +238,7 @@ class SimulationEnvironment:
     def pick_up_material_on_tr_process(self, tr: TransportRobot):
         loading_speed = self.tr_order_manager.get_loading_speed()
         yield self.env.timeout(loading_speed)
+
         if self.tr_executing_order.pick_up_material_on_tr(tr):
 
             tr.working_status.status = TransportRobotStatus.MOVING_TO_DROP_OFF
@@ -356,8 +347,10 @@ class SimulationEnvironment:
                         machine.working_status.working_robot_status == MachineWorkingRobotStatus.WR_PRESENT:
                     machine.working_status.process_status = MachineProcessStatus.PRODUCING_PRODUCT
 
-                    self.env.process(self.machine_execution.produce_one_item(machine, required_material,
-                                                                             producing_material))
+                    if machine.working_status.producing_item is False:
+                        machine.working_status.producing_item = True
+                        self.env.process(self.machine_execution.produce_one_item(machine, required_material,
+                                                                                                 producing_material))
 
                 if machine.working_status.process_status == MachineProcessStatus.FINISHED_TO_PRODUCE:
                     machine.working_status.working_on_status = False
@@ -389,3 +382,7 @@ class SimulationEnvironment:
             seconds = sim_time % 60
             print(f"Simulationszeit: {hours:02d}:{minutes:02d}:{seconds:02d}")
             yield self.env.timeout(10)
+
+    # def start_monitoring_process(self):
+    #     self.saving_simulation_data.save_every_entity_identification_str()
+
