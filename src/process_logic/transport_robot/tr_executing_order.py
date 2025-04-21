@@ -16,12 +16,13 @@ class TrExecutingOrder:
     entities_located_after_init = dict[str, list[Cell]]
 
     def __init__(self, simulation_environment, manufacturing_plan, path_finding, machine_execution, machine_manager,
-                 store_manager):
+                 store_manager, saving_simulation_data):
         self.env = simulation_environment
         self.manufacturing_plan = manufacturing_plan
         self.path_finding = path_finding
         self.machine_execution = machine_execution
         self.machine_manager = machine_manager
+        self.saving_simulation_data = saving_simulation_data
 
         self.store_manager = store_manager
 
@@ -288,11 +289,14 @@ class TrExecutingOrder:
 
             # adding material to machine
             sink.goods_issue_store.put(unload_product)
-            self.manufacturing_plan.update_goods_issue_order_quantities(sink)
+
+        self.manufacturing_plan.update_goods_issue_order_quantities(sink)
+        self.saving_simulation_data.data_order_completed(unload_product, item_to_unload)
+
+
+
 
         store_items = self.store_manager.get_str_products_in_store(sink.goods_issue_store)
-        print(f"Items: {len(sink.goods_issue_store.items)}\n")
-        print(f"Quantity of Items: {store_items}")
 
     def unload_material_to_machine(self, tr: TransportRobot):
 

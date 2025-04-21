@@ -7,5 +7,6 @@ class Source:
     number_of_tr: int
     product_transfer_rate: int
 
+    @property
     def identification_str(self) -> str:
         return f"Source"

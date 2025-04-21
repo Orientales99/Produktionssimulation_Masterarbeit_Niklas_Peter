@@ -8,22 +8,25 @@ from src.order_data.production_material import ProductionMaterial
 
 
 class MachineExecution:
-    def __init__(self, env, manufacturing_plan, machine_manager, store_manager):
+    def __init__(self, env, manufacturing_plan, machine_manager, store_manager, saving_simulation_data):
         self.env = env
         self.manufacturing_plan = manufacturing_plan
         self.machine_manager = machine_manager
         self.store_manager = store_manager
+        self.saving_simulation_data = saving_simulation_data
 
     def start__set_up_machine__process(self, machine: Machine, producing_item: ProductionMaterial):
+        self.saving_simulation_data.save_entity_action(machine)
         yield self.env.timeout(machine.setting_up_time)
         # yield self.env.timeout(machine.setting_up_time)  # Umrüstzeit
         machine.working_status.producing_production_material = producing_item
         machine.working_status.process_status = MachineProcessStatus.READY_TO_PRODUCE
         machine.working_status.working_on_status = False
+        self.saving_simulation_data.save_entity_action(machine)
 
     def produce_one_item(self, machine: Machine, required_material: ProductionMaterial,
                          producing_material: ProductionMaterial):
-
+        self.saving_simulation_data.save_entity_action(machine)
         input_store = machine.machine_storage.storage_before_process
         output_store = machine.machine_storage.storage_after_process
         working_speed = int(machine.working_speed)
@@ -36,7 +39,7 @@ class MachineExecution:
         self.reduce_producing_material_by_one(machine, producing_material)
 
         machine.working_status.producing_item = False
-
+        self.saving_simulation_data.save_entity_action(machine)
         self.check_production_process_is_finished(machine, producing_material)
 
     def check_production_process_is_finished(self, machine: Machine, producing_material: ProductionMaterial) -> bool:
@@ -61,7 +64,7 @@ class MachineExecution:
 
                 wr.working_status.working_on_status = False
                 wr.working_status.status = WorkingRobotStatus.WAITING_IN_MACHINE_TO_EXIT
-
+            self.saving_simulation_data.save_entity_action(machine)
             return True
         return False
 

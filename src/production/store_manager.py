@@ -79,3 +79,14 @@ class StoreManager:
             item_count_str = "0"
 
         return item_count_str
+
+
+    def get_dict_number_of_products_in_store(self, store: Store) -> dict[str, int]:
+        """Finds all different ProductionMaterial.identification_str and counts their frequency. Put them in dict"""
+        item_counts = defaultdict(int)
+
+        for item in store.items:
+            identification_str = item.identification_str
+            item_counts[identification_str] += 1
+
+        return dict(item_counts)

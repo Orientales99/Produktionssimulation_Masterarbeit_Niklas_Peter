@@ -29,12 +29,16 @@ class ManufacturingPlan:
         self.production = production
         self.machine_execution = machine_execution
         self.service_product_information = ProductInformationService()
+
         self.dictionary_summarised_order_per_day = {}
         self.daily_manufacturing_plan = []
         self.process_list_for_every_machine = []
         self.completed_orders_list = []
+
         self.product_order_list = self.production.service_order.generate_order_list()
         self.product_information_list = self.service_product_information.create_product_information_list()
+
+
 
     def set_parameter_for_start_of_a_simulation_day(self, start_date):
         self.get_daily_manufacturing_plan(start_date)

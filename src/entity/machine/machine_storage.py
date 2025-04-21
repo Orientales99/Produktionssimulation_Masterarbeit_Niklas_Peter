@@ -8,7 +8,6 @@ from src.order_data.production_material import ProductionMaterial
 @dataclass
 class MachineStorage:
     storage_before_process: Store
-    product_before_process: Product | None
     storage_after_process: Store
-    product_after_process: Product | None
+
 

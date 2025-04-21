@@ -107,11 +107,9 @@ class EntityService:
                            Store(
                                self.env,
                                capacity=int(machine_stats["max_loading_capacity_product_before_process"])),
-                           None,
                            Store(
                                self.env,
-                               capacity=int(machine_stats["max_loading_capacity_product_after_process"])),
-                           None),
+                               capacity=int(machine_stats["max_loading_capacity_product_after_process"]))),
                        MachineWorkingStatus(MachineProcessStatus.IDLE, MachineWorkingRobotStatus.NO_WR,
                                             MachineStorageStatus.STORAGES_READY_FOR_PRODUCTION, False, False, None, False),
                        float(machine_stats["setting_up_time"]))

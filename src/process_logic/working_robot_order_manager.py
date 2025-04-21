@@ -16,6 +16,7 @@ class WorkingRobotOrderManager:
     manufacturing_plan: ManufacturingPlan
     path_finding: PathFinding
     sorted_list_of_processes: list[(Machine, ProcessingOrder)] = []
+    wr_list_working_in_machine: list[WorkingRobot]
 
     def __init__(self, manufacturing_plan: ManufacturingPlan, path_finding: PathFinding):
         self.manufacturing_plan = manufacturing_plan
@@ -23,7 +24,7 @@ class WorkingRobotOrderManager:
 
         self.wr_list = self.manufacturing_plan.production.wr_list
         self.entities_located_after_init = self.manufacturing_plan.production.entities_init_located
-
+        self.wr_list_working_in_machine = []
         self.waiting_time = self.wr_list[0].working_status.waiting_time_on_path
 
     def every_idle_wr_get_order(self):
@@ -215,6 +216,7 @@ class WorkingRobotOrderManager:
 
         machine = wr.working_status.working_for_machine
         cell_list_wr = self.manufacturing_plan.production.entities_located[wr.identification_str]
+        self.wr_list_working_in_machine.append(wr)
 
         for cell in cell_list_wr:
             cell.placed_entity = None
@@ -232,7 +234,9 @@ class WorkingRobotOrderManager:
             if self.check_cell_list_is_none(cell_list):
                 for cell in cell_list:
                     cell.placed_entity = wr
+                self.wr_list_working_in_machine.remove(wr)
                 return True
+
 
         return False
 

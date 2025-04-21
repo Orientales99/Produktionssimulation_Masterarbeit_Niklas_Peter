@@ -26,23 +26,28 @@ class SimulationEnvironment:
         self.production = Production(self.env, self.service_starting_conditions)
         self.store_manager = StoreManager(self.env)
         self.path_finding = PathFinding(self.production)
-        self.saving_simulation_data = SavingSimulationData(self.env, self.production)
+
 
         self.machine_manager = Machine_Manager(self.production, self.store_manager)
         self.manufacturing_plan = ManufacturingPlan(self.production, self.machine_manager)
+
+        self.working_robot_order_manager = WorkingRobotOrderManager(self.manufacturing_plan, self.path_finding)
+        self.saving_simulation_data = SavingSimulationData(self.env, self.production, self.working_robot_order_manager,
+                                                           self.store_manager)
         self.machine_execution = MachineExecution(self.env, self.manufacturing_plan, self.machine_manager,
-                                                  self.store_manager)
-        self.working_robot_manager = WorkingRobotOrderManager(self.manufacturing_plan, self.path_finding)
-        self.visualize_production = ProductionVisualisation(self.production, self.env)
+                                                  self.store_manager, self.saving_simulation_data)
+        #self.visualize_production = ProductionVisualisation(self.production, self.env)
         self.tr_order_manager = TrOrderManager(self.env, self.manufacturing_plan, self.machine_manager,
                                                self.store_manager)
         self.tr_executing_order = TrExecutingOrder(self.env, self.manufacturing_plan, self.path_finding,
-                                                   self.machine_execution, self.machine_manager, self.store_manager)
+                                                   self.machine_execution, self.machine_manager, self.store_manager,
+                                                   self.saving_simulation_data)
 
         self.stop_event = False
 
         # starting processes
-        self.env.process(self.visualize_layout())
+        #self.env.process(self.visualize_layout())
+        self.env.process(self.start_monitoring_process())
         self.env.process(self.print_simulation_time())
         self.env.process(self.start_every_wr_process())
         self.env.process(self.start_every_tr_process())
@@ -61,16 +66,16 @@ class SimulationEnvironment:
     def start_every_wr_process(self):
         while True:
             if self.stop_event is False:
-                self.working_robot_manager.sort_process_order_list_for_wr()
-                self.working_robot_manager.every_idle_wr_get_order()
+                self.working_robot_order_manager.sort_process_order_list_for_wr()
+                self.working_robot_order_manager.every_idle_wr_get_order()
 
-                for wr in self.working_robot_manager.wr_list:
+                for wr in self.working_robot_order_manager.wr_list:
 
                     # get driving route
                     if wr.working_status.status == WorkingRobotStatus.WAITING_FREE_DRIVING_ROUTE and \
                             wr.working_status.working_on_status is False:
                         wr.working_status.working_on_status = True
-                        if self.working_robot_manager.get_path_for_wr(wr) is True:
+                        if self.working_robot_order_manager.get_path_for_wr(wr) is True:
                             wr.working_status.working_on_status = False
                             wr.working_status.status = WorkingRobotStatus.MOVING_TO_MACHINE
                         else:
@@ -79,7 +84,7 @@ class SimulationEnvironment:
                     # wr drives to waiting location
                     if wr.working_status.status == WorkingRobotStatus.IDLE and \
                             wr.working_status.working_on_status is False and \
-                            self.working_robot_manager.check_if_tr_is_on_waiting_place(wr) is False:
+                            self.working_robot_order_manager.check_if_tr_is_on_waiting_place(wr) is False:
                         wr.working_status.status = WorkingRobotStatus.RETURNING
                         wr.working_status.working_on_status = True
                         self.env.process(self.drive_wr_to_destination_process(wr))
@@ -94,8 +99,9 @@ class SimulationEnvironment:
                     if wr.working_status.status == WorkingRobotStatus.WAITING_IN_FRONT_OF_MACHINE and \
                             wr.working_status.working_on_status is False:
                         wr.working_status.working_on_status = True
-                        self.working_robot_manager.wr_driving_in_machine(wr)
+                        self.working_robot_order_manager.wr_driving_in_machine(wr)
                         wr.working_status.status = WorkingRobotStatus.WORKING_ON_MACHINE
+                        self.saving_simulation_data.save_entity_action(wr)
 
                     # working process on the machine happens in the class machine_execution
 
@@ -109,32 +115,35 @@ class SimulationEnvironment:
                 yield self.env.timeout(1)
 
     def drive_wr_to_destination_process(self, wr: WorkingRobot):
-        driving_speed = self.working_robot_manager.get_driving_speed_per_cell()
+        driving_speed = self.working_robot_order_manager.get_driving_speed_per_cell()
 
         while True:
             if self.stop_event is False:
-                driving_bool = self.working_robot_manager.drive_wr_one_step_trough_production(wr)
+                driving_bool = self.working_robot_order_manager.drive_wr_one_step_trough_production(wr)
                 if driving_bool is True:
                     if wr.working_status.status == WorkingRobotStatus.MOVING_TO_MACHINE:
                         wr.working_status.status = WorkingRobotStatus.WAITING_IN_FRONT_OF_MACHINE
                         wr.working_status.working_on_status = False
+                        self.saving_simulation_data.save_entity_action(wr)
                         break
 
                     elif wr.working_status.status == WorkingRobotStatus.RETURNING:
                         wr.working_status.status = WorkingRobotStatus.IDLE
                         wr.working_status.working_on_status = False
+                        self.saving_simulation_data.save_entity_action(wr)
                         break
 
                 elif driving_bool is Exception:
                     yield self.env.timeout(2)
 
+            self.saving_simulation_data.save_entity_action(wr)
             yield self.env.timeout(1 / driving_speed)
 
         yield self.env.timeout(1)
 
     def wr_exit_machine_process(self, wr: WorkingRobot):
         while True:
-            wr_is_off_machine = self.working_robot_manager.wr_driving_off_machine(wr)
+            wr_is_off_machine = self.working_robot_order_manager.wr_driving_off_machine(wr)
             if wr_is_off_machine is True:
                 print(f"{wr.identification_str} drives off the machine")
                 wr.working_status.working_for_machine.working_status.working_robot_status = \
@@ -147,6 +156,7 @@ class SimulationEnvironment:
 
                 wr.working_status.status = WorkingRobotStatus.IDLE
                 wr.working_status.working_on_status = False
+                self.saving_simulation_data.save_entity_action(wr)
                 break
 
             yield self.env.timeout(2)
@@ -208,6 +218,7 @@ class SimulationEnvironment:
 
         while True:
             if self.stop_event is False:
+                self.saving_simulation_data.save_entity_action(tr)
                 yield self.env.timeout(1 / driving_speed)
                 driving_value = self.tr_executing_order.drive_tr_one_step_trough_production(tr)
                 if driving_value is True:
@@ -215,16 +226,19 @@ class SimulationEnvironment:
                     if tr.working_status.status == TransportRobotStatus.MOVING_TO_PICKUP:
                         tr.working_status.status = TransportRobotStatus.LOADING
                         tr.working_status.working_on_status = False
+                        self.saving_simulation_data.save_entity_action(tr)
                         break
 
                     elif tr.working_status.status == TransportRobotStatus.MOVING_TO_DROP_OFF:
                         tr.working_status.status = TransportRobotStatus.UNLOADING
                         tr.working_status.working_on_status = False
+                        self.saving_simulation_data.save_entity_action(tr)
                         break
 
                     elif tr.working_status.status == TransportRobotStatus.RETURNING:
                         tr.working_status.status = TransportRobotStatus.IDLE
                         tr.working_status.working_on_status = False
+                        self.saving_simulation_data.save_entity_action(tr)
                         break
 
                     else:
@@ -237,6 +251,7 @@ class SimulationEnvironment:
 
     def pick_up_material_on_tr_process(self, tr: TransportRobot):
         loading_speed = self.tr_order_manager.get_loading_speed()
+
         yield self.env.timeout(loading_speed)
 
         if self.tr_executing_order.pick_up_material_on_tr(tr):
@@ -247,16 +262,18 @@ class SimulationEnvironment:
                 tr.transport_order.pick_up_station.working_status.waiting_for_arriving_of_tr = False
                 tr.transport_order.pick_up_station.working_status.storage_status = \
                     MachineStorageStatus.STORAGES_READY_FOR_PRODUCTION
+                self.saving_simulation_data.save_entity_action(tr)
 
     def unload_material_off_tr_process(self, tr: TransportRobot):
         loading_speed = self.tr_order_manager.get_loading_speed()
         yield self.env.timeout(loading_speed)
         if self.tr_executing_order.unload_material_off_tr(tr):
-
+            self.saving_simulation_data.save_entity_action(tr)
             tr.working_status.status = TransportRobotStatus.IDLE
             tr.working_status.working_on_status = False
             if isinstance(tr.transport_order.unload_destination, Machine):
                 tr.transport_order.unload_destination.working_status.waiting_for_arriving_of_tr = False
+
 
     ###################################################################################################################
 
@@ -268,11 +285,13 @@ class SimulationEnvironment:
                     # set machine process status: idle
                     if len(machine.processing_list) == 0:
                         machine.working_status.process_status = MachineProcessStatus.IDLE
+                        self.saving_simulation_data.save_entity_action(machine)
 
                     # set machine process status: waiting next order
                     if len(machine.processing_list) != 0 and \
                             machine.working_status.process_status == MachineProcessStatus.IDLE:
                         machine.working_status.process_status = MachineProcessStatus.WAITING_NEXT_ORDER
+                        self.saving_simulation_data.save_entity_action(machine)
 
                     # wr is present -> setu up machine
                     if machine.working_status.working_robot_status == MachineWorkingRobotStatus.WR_PRESENT and \
@@ -280,6 +299,7 @@ class SimulationEnvironment:
                             machine.working_status.working_on_status is False:
                         machine.working_status.working_on_status = True
                         self.set_up_machine_process(machine)
+
 
                     if machine.working_status.process_status == MachineProcessStatus.READY_TO_PRODUCE and \
                             machine.working_status.working_on_status is False:
@@ -312,6 +332,7 @@ class SimulationEnvironment:
                 machine.working_status.producing_production_material.production_material_id:
             machine.working_status.process_status = MachineProcessStatus.READY_TO_PRODUCE
             machine.working_status.working_on_status = False
+            self.saving_simulation_data.save_entity_action(machine)
 
     def producing_process(self, machine: Machine):
         required_material = machine.process_material_list[0].required_material
@@ -329,6 +350,9 @@ class SimulationEnvironment:
                         machine.working_status.process_status != MachineProcessStatus.FINISHED_TO_PRODUCE:
                     machine.working_status.process_status = MachineProcessStatus.PRODUCING_PAUSED
                     machine.working_status.storage_status = MachineStorageStatus.OUTPUT_FULL
+
+                    self.saving_simulation_data.save_entity_action(machine)
+
                     yield self.env.timeout(1)
 
                 # check if material is in input_store
@@ -337,7 +361,11 @@ class SimulationEnvironment:
                         and machine.working_status.process_status != MachineProcessStatus.FINISHED_TO_PRODUCE:
                     machine.working_status.process_status = MachineProcessStatus.PRODUCING_PAUSED
                     machine.working_status.storage_status = MachineStorageStatus.INPUT_EMPTY
+
+                    self.saving_simulation_data.save_entity_action(machine)
+
                     yield self.env.timeout(1)
+
                 elif machine.working_status.process_status != MachineProcessStatus.FINISHED_TO_PRODUCE:
                     machine.working_status.process_status = MachineProcessStatus.READY_TO_PRODUCE
                     machine.working_status.storage_status = MachineStorageStatus.STORAGES_READY_FOR_PRODUCTION
@@ -383,6 +411,17 @@ class SimulationEnvironment:
             print(f"Simulationszeit: {hours:02d}:{minutes:02d}:{seconds:02d}")
             yield self.env.timeout(10)
 
-    # def start_monitoring_process(self):
-    #     self.saving_simulation_data.save_every_entity_identification_str()
+    def start_monitoring_process(self):
+        self.saving_simulation_data.delete_every_json_file_in_anaylsis_solution()
+        self.saving_simulation_data.save_every_entity_identification_str()
+
+        # save all entity Information at the beginning
+        self.saving_simulation_data.save_one_cell_of_every_entity()
+        self.saving_simulation_data.data_of_entities()
+
+        # continuous saving the simulation data
+        while True:
+            self.saving_simulation_data.convert_simulating_entity_data_to_json()
+            yield self.env.timeout(60)
+#
 
