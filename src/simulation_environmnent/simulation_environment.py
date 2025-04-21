@@ -36,7 +36,7 @@ class SimulationEnvironment:
                                                            self.store_manager)
         self.machine_execution = MachineExecution(self.env, self.manufacturing_plan, self.machine_manager,
                                                   self.store_manager, self.saving_simulation_data)
-        #self.visualize_production = ProductionVisualisation(self.production, self.env)
+        self.visualize_production = ProductionVisualisation(self.production, self.env)
         self.tr_order_manager = TrOrderManager(self.env, self.manufacturing_plan, self.machine_manager,
                                                self.store_manager)
         self.tr_executing_order = TrExecutingOrder(self.env, self.manufacturing_plan, self.path_finding,
@@ -46,7 +46,7 @@ class SimulationEnvironment:
         self.stop_event = False
 
         # starting processes
-        #self.env.process(self.visualize_layout())
+        self.env.process(self.visualize_layout())
         self.env.process(self.start_monitoring_process())
         self.env.process(self.print_simulation_time())
         self.env.process(self.start_every_wr_process())
@@ -87,7 +87,8 @@ class SimulationEnvironment:
                             self.working_robot_order_manager.check_if_tr_is_on_waiting_place(wr) is False:
                         wr.working_status.status = WorkingRobotStatus.RETURNING
                         wr.working_status.working_on_status = True
-                        self.env.process(self.drive_wr_to_destination_process(wr))
+                        if self.working_robot_order_manager.start__moving_to_waiting__process_for_wr(wr):
+                            self.env.process(self.drive_wr_to_destination_process(wr))
 
                     # drive to destination
                     if wr.working_status.status == WorkingRobotStatus.MOVING_TO_MACHINE and \
@@ -413,6 +414,7 @@ class SimulationEnvironment:
 
     def start_monitoring_process(self):
         self.saving_simulation_data.delete_every_json_file_in_anaylsis_solution()
+        self.saving_simulation_data.delete_every_json_file_in_entities_during_simulation_data()
         self.saving_simulation_data.save_every_entity_identification_str()
 
         # save all entity Information at the beginning
@@ -422,6 +424,6 @@ class SimulationEnvironment:
         # continuous saving the simulation data
         while True:
             self.saving_simulation_data.convert_simulating_entity_data_to_json()
-            yield self.env.timeout(60)
+            yield self.env.timeout(120)
 #
 

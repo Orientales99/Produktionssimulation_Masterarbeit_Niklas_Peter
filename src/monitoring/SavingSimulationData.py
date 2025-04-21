@@ -1,7 +1,8 @@
 import json
 import os
+import glob
 
-from src import ANALYSIS_SOLUTION
+from src import ANALYSIS_SOLUTION, ENTITIES_DURING_SIMULATION_DATA
 from src.entity.machine.machine import Machine
 from src.entity.transport_robot.transport_robot import TransportRobot
 from src.entity.working_robot.working_robot import WorkingRobot
@@ -36,6 +37,8 @@ class SavingSimulationData:
         self.saving_entity_data_list = []
         self.wr_on_machine_list = []
         self.simulation_data_list = []
+
+        self.time_variable = 0
 
     def save_every_entity_identification_str(self):
         self.entities_located = self.production.entities_located.copy()
@@ -72,7 +75,9 @@ class SavingSimulationData:
         self.simulation_data_list.append(data_entry)
 
     def convert_simulating_entity_data_to_json(self):
-        output_file = ANALYSIS_SOLUTION / "simulation_run_data.json"
+
+        data_file_name = f"simulation_run_data_from_{self.time_variable}_sec_to_{self.env.now}_sec.json"
+        output_file = ENTITIES_DURING_SIMULATION_DATA / data_file_name
 
         if not os.path.exists(output_file):
             with open(output_file, "w") as f:
@@ -85,7 +90,7 @@ class SavingSimulationData:
 
         with open(output_file, "w") as f:
             json.dump(data, f, indent=4)
-
+        self.time_variable = self.env.now
         self.simulation_data_list = []
 
     def data_of_entities(self):
@@ -120,18 +125,22 @@ class SavingSimulationData:
             json.dump(data, f, indent=4)
 
     def delete_every_json_file_in_anaylsis_solution(self):
-        self.create_empty_json_file("simulation_run_data.json")
-        self.create_empty_json_file("entity_data_.json")
-        self.create_empty_json_file("data_finished_products_leaving_production.json")
+            """Deleting every .json data in """
+            json_files = glob.glob(os.path.join(ANALYSIS_SOLUTION, "*.json"))
+            for file_path in json_files:
+                try:
+                    os.remove(file_path)
+                    print(f"Gelöscht: {file_path}")
+                except Exception as e:
+                    print(f"Fehler beim Löschen von {file_path}: {e}")
 
-    def create_empty_json_file(self, name_of_json_file: str):
-        """Creates an empty JSON file and overwrites any existing file at the given path."""
+    def delete_every_json_file_in_entities_during_simulation_data(self):
+        """Deleting every .json data in """
+        json_files = glob.glob(os.path.join(ENTITIES_DURING_SIMULATION_DATA, "*.json"))
+        for file_path in json_files:
+            try:
+                os.remove(file_path)
+                print(f"Gelöscht: {file_path}")
+            except Exception as e:
+                print(f"Fehler beim Löschen von {file_path}: {e}")
 
-        file_path = ANALYSIS_SOLUTION / name_of_json_file
-        data = []
-
-        if os.path.exists(file_path):
-            os.remove(file_path)
-
-        with open(file_path, "w") as file:
-            json.dump(data, file, indent=4)

@@ -3,6 +3,6 @@ from pathlib import Path
 ROOT = Path(__file__).parent.parent
 SRC = ROOT/'src'
 RESOURCES = ROOT/'resources'
-ANALYSIS_SOLUTION = ROOT/ 'analysis_solution'
-
+ANALYSIS_SOLUTION = ROOT/'analysis_solution'
+ENTITIES_DURING_SIMULATION_DATA = ANALYSIS_SOLUTION / 'entities_during_simulation_data'
 print(ROOT)

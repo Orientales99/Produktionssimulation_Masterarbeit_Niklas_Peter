@@ -152,7 +152,8 @@ class Machine_Manager:
     def remove_processing_order_from_machine(self, machine: Machine, new_item: ProductionMaterial) -> bool:
         """"If no more material need to be produced for an order and no material is in output store to be picked up
         -> remove this order from machine.process_material_list and machine.processing_list"""
-        if self.store_manager.count_number_of_one_product_type_in_store(machine.machine_storage.storage_after_process, new_item) == 0:
+        if self.store_manager.count_number_of_one_product_type_in_store(machine.machine_storage.storage_after_process,
+                                                                        new_item) == 0:
 
             for process_material in machine.process_material_list[:]:
                 if new_item.identification_str == process_material.producing_material.identification_str:
@@ -165,11 +166,10 @@ class Machine_Manager:
 
     def sort_machine_processing_list(self, machine: Machine):
         """The processing list is sorted according to the following criteria:
-        1. If the product is currently being produced, it has the highest sorting priority.
+        1. If the product is currently being produced, it has the highest sorting priority or the storage is filled with the product of the first order.
         2. What priority the order has.
         3. How far the value-adding process has progressed.
         If the machine is waiting for a TR and WR, keep the first item at the top."""
-
 
         first_before_sorting = machine.processing_list[0] if machine.processing_list else None
 
@@ -188,9 +188,9 @@ class Machine_Manager:
 
         # Restore the original first item if waiting for a TR or WR
         if machine.working_status.waiting_for_arriving_of_tr or \
-            machine.working_status.working_robot_status == MachineWorkingRobotStatus.WAITING_WR or \
-            machine.working_status.working_robot_status == MachineWorkingRobotStatus.WR_PRESENT:
-
+                machine.working_status.working_robot_status == MachineWorkingRobotStatus.WAITING_WR or \
+                machine.working_status.working_robot_status == MachineWorkingRobotStatus.WR_PRESENT or \
+                len(machine.machine_storage.storage_before_process.items) != 0:
             machine.processing_list.remove(first_before_sorting)
             machine.processing_list.insert(0, first_before_sorting)
 

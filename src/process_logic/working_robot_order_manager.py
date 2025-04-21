@@ -32,6 +32,26 @@ class WorkingRobotOrderManager:
             if wr.working_status.status == WorkingRobotStatus.IDLE:
                 self.allocate_order_to_wr(wr)
 
+    def start__moving_to_waiting__process_for_wr(self, wr: WorkingRobot) -> bool:
+        source_coordinates = self.manufacturing_plan.production.source_coordinates
+        source_cell = self.manufacturing_plan.production.get_cell(source_coordinates)
+        if self.set_driving_parameter_for_wr(wr):
+            return True
+        wr.working_status.status = WorkingRobotStatus.IDLE
+        wr.working_status.working_on_status = False
+        return False
+
+    def set_driving_parameter_for_wr(self, wr: WorkingRobot) -> bool:
+
+        driving_destination_coordinates = self.path_finding.get_init_coordinates_from_entity(wr)
+        driving_route = self.path_finding.get_path_for_entity(wr, driving_destination_coordinates)
+
+        if isinstance(driving_route, list):
+            wr.working_status.driving_destination_coordinates = driving_destination_coordinates
+            wr.working_status.driving_route = driving_route
+            return True
+        return False
+
     def allocate_order_to_wr(self, wr: WorkingRobot):
         if len(self.sorted_list_of_processes) > 0:
             next_entity_location = self.get_next_working_location_for_order()
@@ -52,11 +72,10 @@ class WorkingRobotOrderManager:
          """
         list_of_processes_for_every_machine = self.manufacturing_plan.process_list_for_every_machine[:]
 
-        list_of_processes_for_every_machine = [
-            (machine, order)
-            for machine, order in list_of_processes_for_every_machine
-            if machine.process_material_list and machine.process_material_list[0].quantity_producing != 0
-        ]
+        list_of_processes_for_every_machine = [(machine, order) for machine, order in
+                                               list_of_processes_for_every_machine
+                                               if machine.process_material_list and machine.process_material_list[
+                                                   0].quantity_producing != 0]
 
         self.sorted_list_of_processes = sorted(
             list_of_processes_for_every_machine,
@@ -148,7 +167,8 @@ class WorkingRobotOrderManager:
 
             if path is not None:
                 if len(path) > 0:
-                    if self.path_finding.entity_movement.move_entity_one_step(start_cell_coordinates, wr, path[0]) is True:
+                    if self.path_finding.entity_movement.move_entity_one_step(start_cell_coordinates, wr,
+                                                                              path[0]) is True:
                         wr.working_status.driving_route.pop(0)
                         wr.working_status.waiting_time_on_path = self.waiting_time
 
@@ -236,8 +256,6 @@ class WorkingRobotOrderManager:
                     cell.placed_entity = wr
                 self.wr_list_working_in_machine.remove(wr)
                 return True
-
-
         return False
 
     def check_cell_list_is_none(self, cell_list: list[Cell]) -> bool:
