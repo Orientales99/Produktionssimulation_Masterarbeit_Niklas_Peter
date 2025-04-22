@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 from src import GRAPH_PRODUCTION_MATERIAL
 
-class AnalysisProductionMaterial:
+class VisualizeProductionMaterialThroughput:
     convert_json_data: ConvertJsonData
 
     def __init__(self, convert_json_data):

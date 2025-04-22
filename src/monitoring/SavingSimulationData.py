@@ -71,7 +71,7 @@ class SavingSimulationData:
             "timestamp": self.env.now,
             "entities": [
                 self.convert_cell_to_dict.start_converting_cell_during_simulation(entity_cell)
-                ]
+            ]
         }
         self.simulation_data_list.append(data_entry)
 
@@ -148,14 +148,14 @@ class SavingSimulationData:
             json.dump(data, f, indent=4)
 
     def delete_every_json_file_in_anaylsis_solution(self):
-            """Deleting every .json data in """
-            json_files = glob.glob(os.path.join(ANALYSIS_SOLUTION, "*.json"))
-            for file_path in json_files:
-                try:
-                    os.remove(file_path)
-                    print(f"Gelöscht: {file_path}")
-                except Exception as e:
-                    print(f"Fehler beim Löschen von {file_path}: {e}")
+        """Deleting every .json data in """
+        json_files = glob.glob(os.path.join(ANALYSIS_SOLUTION, "*.json"))
+        for file_path in json_files:
+            try:
+                os.remove(file_path)
+                print(f"Gelöscht: {file_path}")
+            except Exception as e:
+                print(f"Fehler beim Löschen von {file_path}: {e}")
 
     def delete_every_json_file_in_entities_during_simulation_data(self):
         """Deleting every .json data in """
@@ -166,4 +166,3 @@ class SavingSimulationData:
                 print(f"Gelöscht: {file_path}")
             except Exception as e:
                 print(f"Fehler beim Löschen von {file_path}: {e}")
-
