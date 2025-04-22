@@ -6,6 +6,7 @@ from src.entity.machine.machine import Machine
 from src.entity.sink import Sink
 from src.entity.source import Source
 from src.entity.transport_robot.transport_robot import TransportRobot
+from src.process_logic.good_receipt import GoodReceipt
 from src.production.base.cell import Cell
 from src.production.base.coordinates import Coordinates
 
@@ -14,6 +15,7 @@ class TrExecutingOrder:
     tr_list: list[TransportRobot]
     machine_list: list[Machine]
     entities_located_after_init = dict[str, list[Cell]]
+    goods_receipt_list: list[GoodReceipt]
 
     def __init__(self, simulation_environment, manufacturing_plan, path_finding, machine_execution, machine_manager,
                  store_manager, saving_simulation_data):
@@ -30,6 +32,7 @@ class TrExecutingOrder:
         self.machine_list = self.manufacturing_plan.production.machine_list
         self.entities_located_after_init = self.manufacturing_plan.production.entities_init_located
         self.waiting_time = self.tr_list[0].working_status.waiting_time_on_path
+        self.goods_receipt_list = []
 
     def start__moving_to_pick_up__process_for_tr(self, tr: TransportRobot) -> bool:
         destination = tr.transport_order.pick_up_station
@@ -164,6 +167,10 @@ class TrExecutingOrder:
         start_cell_coordinates = self.path_finding.get_start_cell_from_entity(tr)
         path = tr.working_status.driving_route
 
+        if path is None:
+            path = []
+            tr.working_status.driving_route = path
+
         if not isinstance(tr.working_status.side_step_driving_route, list):
             if isinstance(path, Exception):
                 path = self.path_finding.get_path_for_entity(tr, tr.working_status.driving_destination_coordinates)
@@ -247,6 +254,9 @@ class TrExecutingOrder:
 
         for _ in range(items_to_load):
             tr.material_store.put(pick_up_product)
+
+        if items_to_load != 0:
+            self.saving_simulation_data.data_goods_receipt(GoodReceipt(pick_up_product, items_to_load, self.env.now))
 
     def pick_up_material_from_machine(self, tr: TransportRobot, machine: Machine):
         """Add product to the TR. Quantity is the minimum from transport_order.quantity and the available product in the

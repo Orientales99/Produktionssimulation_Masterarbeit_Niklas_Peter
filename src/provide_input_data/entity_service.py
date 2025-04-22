@@ -77,7 +77,8 @@ class EntityService:
                               Store(
                                   self.env,
                                   capacity=int(transport_robot_stats["max_loading_capacity"])),
-                              TrWorkingStatus(TransportRobotStatus.IDLE, False, waiting_time, None, None, None, None))
+                              TrWorkingStatus(TransportRobotStatus.IDLE, False, waiting_time, None,
+                                              None, None, None, None))
 
     def generate_tr_list(self) -> list[TransportRobot]:
         tr_list = []

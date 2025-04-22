@@ -6,6 +6,7 @@ import pandas as pd
 
 from src.entity.machine.processing_order import ProcessingOrder
 from src.entity.sink import Sink
+from src.process_logic.good_receipt import GoodReceipt
 from src.process_logic.machine.machine_manager import Machine_Manager
 from src.production.production import Production
 from src.order_data.order import Order
@@ -24,6 +25,7 @@ class ManufacturingPlan:
     process_list_for_every_machine: list[(Machine, ProcessingOrder)]
     required_materials_for_every_machine: dict = {}
     completed_orders_list: list[Order]
+
 
     def __init__(self, production, machine_execution):
         self.production = production

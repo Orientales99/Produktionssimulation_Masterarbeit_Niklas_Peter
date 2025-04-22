@@ -8,6 +8,7 @@ from src.entity.transport_robot.transport_robot import TransportRobot
 from src.entity.working_robot.working_robot import WorkingRobot
 from src.monitoring.converting_classes_to_dict.convert_cell_to_dict import ConvertCellToDict
 from src.order_data.production_material import ProductionMaterial
+from src.process_logic.good_receipt import GoodReceipt
 from src.process_logic.working_robot_order_manager import WorkingRobotOrderManager
 from src.production.base.cell import Cell
 from src.production.base.coordinates import Coordinates
@@ -95,7 +96,7 @@ class SavingSimulationData:
 
     def data_of_entities(self):
         """Creating a file with the complete data of every entity"""
-        output_file = ANALYSIS_SOLUTION / "entity_data_.json"
+        output_file = ANALYSIS_SOLUTION / "entity_data.json"
         data_entry = {
             "entities": [self.convert_cell_to_dict.start_converting_cell_during_simulation(cell) for cell in
                          self.saving_entity_data_list]
@@ -109,7 +110,29 @@ class SavingSimulationData:
         output_file = ANALYSIS_SOLUTION / "data_finished_products_leaving_production.json"
         data_entry = {
             "Time": self.env.now,
-            f"{product.production_material_id.name}": quantity,
+            f"Product Group": product.production_material_id.name,
+            f"Quantity": quantity
+        }
+
+        if not os.path.exists(output_file):
+            with open(output_file, "w") as f:
+                json.dump([], f)
+
+        with open(output_file, "r") as f:
+            data = json.load(f)
+
+        data.append(data_entry)
+
+        with open(output_file, "w") as f:
+            json.dump(data, f, indent=4)
+
+    def data_goods_receipt(self, goods_receipt: GoodReceipt):
+        """Creating a file with every input material (in production) and the time"""
+        output_file = ANALYSIS_SOLUTION / "data_goods_entering_production.json"
+        data_entry = {
+            "Time": goods_receipt.time,
+            f"Product Group": goods_receipt.production_material.production_material_id.name,
+            f"Quantity": goods_receipt.quantity
         }
 
         if not os.path.exists(output_file):

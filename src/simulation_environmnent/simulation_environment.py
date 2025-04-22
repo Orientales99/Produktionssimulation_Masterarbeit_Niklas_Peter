@@ -36,7 +36,7 @@ class SimulationEnvironment:
                                                            self.store_manager)
         self.machine_execution = MachineExecution(self.env, self.manufacturing_plan, self.machine_manager,
                                                   self.store_manager, self.saving_simulation_data)
-        self.visualize_production = ProductionVisualisation(self.production, self.env)
+        # self.visualize_production = ProductionVisualisation(self.production, self.env)
         self.tr_order_manager = TrOrderManager(self.env, self.manufacturing_plan, self.machine_manager,
                                                self.store_manager)
         self.tr_executing_order = TrExecutingOrder(self.env, self.manufacturing_plan, self.path_finding,
@@ -46,7 +46,7 @@ class SimulationEnvironment:
         self.stop_event = False
 
         # starting processes
-        self.env.process(self.visualize_layout())
+        # self.env.process(self.visualize_layout())
         self.env.process(self.start_monitoring_process())
         self.env.process(self.print_simulation_time())
         self.env.process(self.start_every_wr_process())
@@ -205,7 +205,14 @@ class SimulationEnvironment:
 
                     # drive to waiting position
                     if tr.working_status.status == TransportRobotStatus.IDLE \
-                            and tr.working_status.working_on_status is False:
+                            and tr.working_status.working_on_status is False or \
+                            (tr.working_status.waiting_error_time is not None and
+                             tr.working_status.waiting_error_time <= self.env.now):
+
+                        tr.working_status.driving_destination_coordinates = None
+                        tr.working_status.driving_route = None
+                        tr.working_status.destination_location_entity = None
+
                         if self.tr_executing_order.check_if_tr_is_on_waiting_place(tr) is False:
                             tr.working_status.status = TransportRobotStatus.RETURNING
                             tr.working_status.working_on_status = True
@@ -222,7 +229,9 @@ class SimulationEnvironment:
                 self.saving_simulation_data.save_entity_action(tr)
                 yield self.env.timeout(1 / driving_speed)
                 driving_value = self.tr_executing_order.drive_tr_one_step_trough_production(tr)
+
                 if driving_value is True:
+                    tr.working_status.waiting_error_time = self.env.now + 60
 
                     if tr.working_status.status == TransportRobotStatus.MOVING_TO_PICKUP:
                         tr.working_status.status = TransportRobotStatus.LOADING
@@ -238,6 +247,7 @@ class SimulationEnvironment:
 
                     elif tr.working_status.status == TransportRobotStatus.RETURNING:
                         tr.working_status.status = TransportRobotStatus.IDLE
+                        tr.working_status.waiting_error_time = None
                         tr.working_status.working_on_status = False
                         self.saving_simulation_data.save_entity_action(tr)
                         break
@@ -248,7 +258,8 @@ class SimulationEnvironment:
                             f"{tr.working_status.status}")
 
                 elif driving_value is Exception:
-                    yield self.env.timeout(4)
+                    yield self.env.timeout(1)
+                tr.working_status.waiting_error_time = self.env.now + 60
 
     def pick_up_material_on_tr_process(self, tr: TransportRobot):
         loading_speed = self.tr_order_manager.get_loading_speed()
@@ -259,6 +270,7 @@ class SimulationEnvironment:
 
             tr.working_status.status = TransportRobotStatus.MOVING_TO_DROP_OFF
             tr.working_status.working_on_status = False
+            tr.working_status.waiting_error_time = self.env.now + 60
             if isinstance(tr.transport_order.pick_up_station, Machine):
                 tr.transport_order.pick_up_station.working_status.waiting_for_arriving_of_tr = False
                 tr.transport_order.pick_up_station.working_status.storage_status = \
@@ -272,8 +284,10 @@ class SimulationEnvironment:
             self.saving_simulation_data.save_entity_action(tr)
             tr.working_status.status = TransportRobotStatus.IDLE
             tr.working_status.working_on_status = False
+            tr.working_status.waiting_error_time = self.env.now + 60
             if isinstance(tr.transport_order.unload_destination, Machine):
                 tr.transport_order.unload_destination.working_status.waiting_for_arriving_of_tr = False
+
 
 
     ###################################################################################################################
@@ -404,13 +418,14 @@ class SimulationEnvironment:
 
     def print_simulation_time(self):
         """Printing the current simulation time in h:min:sec."""
+
         while True:
             sim_time = int(self.env.now)  # Simulationszeit in Sekunden
             hours = sim_time // 3600
             minutes = (sim_time % 3600) // 60
             seconds = sim_time % 60
             print(f"Simulationszeit: {hours:02d}:{minutes:02d}:{seconds:02d}")
-            yield self.env.timeout(10)
+            yield self.env.timeout(1)
 
     def start_monitoring_process(self):
         self.saving_simulation_data.delete_every_json_file_in_anaylsis_solution()

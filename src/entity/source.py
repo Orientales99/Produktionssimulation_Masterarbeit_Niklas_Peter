@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from src.order_data.order import Order
+
 
 @dataclass
 class Source:

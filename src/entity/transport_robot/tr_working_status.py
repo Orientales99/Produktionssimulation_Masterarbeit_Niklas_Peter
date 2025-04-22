@@ -19,6 +19,7 @@ class TrWorkingStatus:
 
     side_step_driving_route: list[Coordinates] | None
 
+    waiting_error_time: int | None
 
 
 

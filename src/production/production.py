@@ -94,7 +94,7 @@ class Production:
                 location_list = []
                 new_coordinates_working_robot = Coordinates(self.source_coordinates.x,
                                                             self.source_coordinates.y + self.wr_list[
-                                                                i].size.y + 1 + avoiding_collision_parameter)
+                                                                i].size.y + 2 + avoiding_collision_parameter)
                 new_cell = self.get_cell(new_coordinates_working_robot)
                 checked_free_area_list = self.check_area_of_cells_is_free_for_entity(new_cell,
                                                                                      self.wr_list[i].size,
