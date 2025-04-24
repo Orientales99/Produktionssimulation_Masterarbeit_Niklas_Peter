@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 from src import GRAPH_PRODUCTION_MATERIAL
 
+
 class VisualizeProductionMaterialThroughput:
     convert_json_data: ConvertJsonData
 
@@ -21,6 +22,8 @@ class VisualizeProductionMaterialThroughput:
 
         for product_group in all_product_groups:
             self.plot_goods_receipt_over_time(product_group)
+
+        self.plot_total_cumulative_line()
 
     def prepare_data(self, product_group: str) -> pd.DataFrame:
         # Prepare incoming goods data
@@ -62,7 +65,7 @@ class VisualizeProductionMaterialThroughput:
         fig, ax = plt.subplots(figsize=(19, 11))
 
         # Plot the lines
-        self.plot_lines(ax, df_combined, color=(113/255, 28/255, 55/255), label=product_group)
+        self.plot_lines(ax, df_combined, color=(113 / 255, 28 / 255, 55 / 255), label=product_group)
 
         ax.set_xticks(list(tick_positions))
         ax.set_xticklabels(tick_labels, rotation=45)
@@ -85,7 +88,6 @@ class VisualizeProductionMaterialThroughput:
         filename = f"Product {product_group} - Production inventory curve.png"
         self.save_plot(fig, GRAPH_PRODUCTION_MATERIAL, filename)
 
-
     def save_plot(self, fig, directory: str, filename: str) -> None:
         """Saves a matplotlib-figure object in the specified directory."""
 
@@ -93,8 +95,6 @@ class VisualizeProductionMaterialThroughput:
         save_path = os.path.join(directory, filename)
         fig.savefig(save_path)
         print(f"Graph saved to: {save_path}")
-
-
 
     def get_filtered_cumulative_df(self, df: pd.DataFrame, product_group: str) -> pd.DataFrame:
         filtered_df = df[df["Product Group"] == product_group].copy()
@@ -114,74 +114,105 @@ class VisualizeProductionMaterialThroughput:
         return f"{hours:02}:{minutes:02}:{secs:02}"
 
     def plot_all_product_groups_with_legend(self) -> None:
-        """Creating and saving one plot which includes a graph of every product group"""
         all_product_groups = pd.concat([
             self.convert_json_data.goods_receipt_production_df["Product Group"],
             self.convert_json_data.finished_products_leaving_production_df["Product Group"]
         ]).unique()
 
         fig, ax = plt.subplots(figsize=(19, 11))
-
-        # Erzeuge eine Farbkarte für jede Produktgruppe
         colors = plt.cm.get_cmap('tab20', len(all_product_groups))
 
-        # Liste für alle Tick-Positionen und Tick-Beschriftungen initialisieren
         tick_positions = []
         tick_labels = []
 
-        # Iteriere über alle Produktgruppen
         for idx, product_group in enumerate(all_product_groups):
             df_combined = self.prepare_data(product_group)
 
-            # Maximalzeit und Tick-Markierungen generieren
             max_time = df_combined["Time"].max()
             group_tick_positions = self.generate_time_ticks(max_time)
-            tick_positions.extend(group_tick_positions)  # Alle Tick-Positionen sammeln
+            tick_positions.extend(group_tick_positions)
             tick_labels.extend([self.seconds_to_hours_minutes_seconds(t) for t in group_tick_positions])
 
-            # Zeichne Linien für jede Produktgruppe
-            color = colors(idx)  # Farbzuweisung für jede Produktgruppe
-            # Füge das Label hinzu
-            self.plot_lines(ax, df_combined, color=color, label=product_group)
+            color = colors(idx)
+            self.plot_lines(ax, df_combined, color=color, label=product_group, with_markers=False)
 
-        # Dupliziere die tick_labels und tick_positions, falls notwendig, um den Plot zu vervollständigen
+        # Gesamtdatenlinie hinzufügen
+        df_total = self.prepare_total_data()
+        self.plot_lines(ax, df_total, color="black", label="Total Cumulative", with_markers=False)
+
         ax.set_xticks(tick_positions)
         ax.set_xticklabels(tick_labels, rotation=45)
-        ax.set_title('Cumulative Quantity over Time for All Product Groups')
+        ax.set_title('All Product Groups - Production inventory curve')
         ax.set_xlabel('Time (hh:mm:ss)')
         ax.set_ylabel('Cumulative Quantity')
         ax.grid(True)
+        ax.legend(title="Product Groups", bbox_to_anchor=(-0.15, 1), loc='upper left')
 
-        # Legende hinzufügen
-        ax.legend(title="Product Groups", bbox_to_anchor=(-0.13, 1), loc='upper left')
+        self.save_plot(fig, GRAPH_PRODUCTION_MATERIAL, "All Product Groups - Production inventory curve.png")
 
-        # Speichere das Bild
-        filename = "All Product Groups - Production inventory curve.png"
-        self.save_plot(fig, GRAPH_PRODUCTION_MATERIAL, filename)
-
-    def plot_lines(self, ax, df_combined: pd.DataFrame, color: str, label: str) -> None:
+    def plot_lines(self, ax, df_combined: pd.DataFrame, color: str, label: str, with_markers: bool = True) -> None:
         previous_time = 0
         previous_cumulative_quantity = 0
-
-        # Eine Flagge für das Label setzen
         label_added = False
 
         for i, row in df_combined.iterrows():
             current_time = row["Time"]
             current_cumulative_quantity = row["Cumulative Quantity"]
 
+            marker = 'o' if with_markers else None
+
             if current_time > previous_time:
-                # Zeichne horizontale Linie
-                ax.plot([previous_time, current_time], [previous_cumulative_quantity, previous_cumulative_quantity],
-                        color=color, linestyle='-', marker='o', label=label if not label_added else "")
-                label_added = True  # Das Label wurde nun hinzugefügt
+                ax.plot([previous_time, current_time],
+                        [previous_cumulative_quantity, previous_cumulative_quantity],
+                        color=color, linestyle='-', marker=marker, label=label if not label_added else "")
+                label_added = True
 
             if current_cumulative_quantity != previous_cumulative_quantity:
-                # Zeichne vertikale Linie
-                ax.plot([current_time, current_time], [previous_cumulative_quantity, current_cumulative_quantity],
-                        color=color, linestyle='-', marker='o', label=label if not label_added else "")
-                label_added = True  # Das Label wurde nun hinzugefügt
+                ax.plot([current_time, current_time],
+                        [previous_cumulative_quantity, current_cumulative_quantity],
+                        color=color, linestyle='-', marker=marker, label=label if not label_added else "")
+                label_added = True
 
-            # Update vorherige Werte
             previous_time = current_time
             previous_cumulative_quantity = current_cumulative_quantity
+
+    def plot_total_cumulative_line(self) -> None:
+        """Erzeugt einen separaten Graphen für alle Produkte zusammen."""
+        df_total = self.prepare_total_data()
+
+        max_time = df_total["Time"].max()
+        tick_positions = self.generate_time_ticks(max_time)
+        tick_labels = [self.seconds_to_hours_minutes_seconds(t) for t in tick_positions]
+
+        fig, ax = plt.subplots(figsize=(19, 11))
+        self.plot_lines(ax, df_total, color="black", label="Total Cumulative", )
+
+        ax.set_xticks(tick_positions)
+        ax.set_xticklabels(tick_labels, rotation=45)
+        ax.set_title('All Product Groups Cumulative Quantity - Production inventory curve ')
+        ax.set_xlabel('Time (hh:mm:ss)')
+        ax.set_ylabel('Cumulative Quantity')
+        ax.grid(True)
+        ax.legend()
+
+        self.save_plot(fig, GRAPH_PRODUCTION_MATERIAL, "Cumulative Quantity - Production inventory curve.png")
+
+    def prepare_total_data(self) -> pd.DataFrame:
+        """Berechnet die kumulierte Menge aller Produkte über die Zeit"""
+        df_in = self.convert_json_data.goods_receipt_production_df.copy()
+        df_in["Quantity Change"] = df_in["Quantity"]
+
+        df_out = self.convert_json_data.finished_products_leaving_production_df.copy()
+        df_out["Quantity Change"] = -df_out["Quantity"]
+
+        df_combined = pd.concat([df_in, df_out], ignore_index=True)
+        df_combined = df_combined.sort_values("Time")
+        df_combined["Cumulative Quantity"] = df_combined["Quantity Change"].cumsum()
+
+        if not (df_combined["Time"].iloc[0] == 0 and df_combined["Cumulative Quantity"].iloc[0] == 0):
+            df_combined = pd.concat([
+                pd.DataFrame([[0, 0, 0, 0]], columns=["Time", "Quantity", "Quantity Change", "Cumulative Quantity"]),
+                df_combined
+            ], ignore_index=True)
+
+        return df_combined

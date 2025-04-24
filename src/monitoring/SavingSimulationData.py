@@ -2,7 +2,8 @@ import json
 import os
 import glob
 
-from src import ANALYSIS_SOLUTION, ENTITIES_DURING_SIMULATION_DATA
+from src import SIMULATION_OUTPUT_DATA, ENTITIES_DURING_SIMULATION_DATA, MACHINES_DURING_SIMULATION_DATA, \
+    TR_DURING_SIMULATION_DATA, WR_DURING_SIMULATION_DATA
 from src.entity.machine.machine import Machine
 from src.entity.transport_robot.transport_robot import TransportRobot
 from src.entity.working_robot.working_robot import WorkingRobot
@@ -37,7 +38,9 @@ class SavingSimulationData:
         self.list_every_entity_identification_str = []
         self.saving_entity_data_list = []
         self.wr_on_machine_list = []
-        self.simulation_data_list = []
+        self.simulation_machine_data_list = []
+        self.simulation_tr_data_list = []
+        self.simulation_wr_data_list = []
 
         self.time_variable = 0
 
@@ -73,12 +76,19 @@ class SavingSimulationData:
                 self.convert_cell_to_dict.start_converting_cell_during_simulation(entity_cell)
             ]
         }
-        self.simulation_data_list.append(data_entry)
+        if isinstance(entity_cell.placed_entity, Machine):
+            self.simulation_machine_data_list.append(data_entry)
 
-    def convert_simulating_entity_data_to_json(self):
+        if isinstance(entity_cell.placed_entity, TransportRobot):
+            self.simulation_tr_data_list.append(data_entry)
 
-        data_file_name = f"simulation_run_data_from_{self.time_variable}_sec_to_{self.env.now}_sec.json"
-        output_file = ENTITIES_DURING_SIMULATION_DATA / data_file_name
+        if isinstance(entity_cell.placed_entity, WorkingRobot):
+            self.simulation_wr_data_list.append(data_entry)
+
+    def convert_simulating_machine_data_to_json(self):
+
+        data_file_name = f"simulation_machine_run_data_from_{self.time_variable}_sec_to_{self.env.now}_sec.json"
+        output_file = MACHINES_DURING_SIMULATION_DATA / data_file_name
 
         if not os.path.exists(output_file):
             with open(output_file, "w") as f:
@@ -87,16 +97,57 @@ class SavingSimulationData:
         with open(output_file, "r") as f:
             data = json.load(f)
 
-        data.append(self.simulation_data_list)
+        data.append(self.simulation_machine_data_list)
 
         with open(output_file, "w") as f:
             json.dump(data, f, indent=4)
+
         self.time_variable = self.env.now
-        self.simulation_data_list = []
+        self.simulation_machine_data_list = []
+
+    def convert_simulating_tr_data_to_json(self):
+
+        data_file_name = f"simulation_tr_run_data_from_{self.time_variable}_sec_to_{self.env.now}_sec.json"
+        output_file = TR_DURING_SIMULATION_DATA / data_file_name
+
+        if not os.path.exists(output_file):
+            with open(output_file, "w") as f:
+                json.dump([], f)
+
+        with open(output_file, "r") as f:
+            data = json.load(f)
+
+        data.append(self.simulation_tr_data_list)
+
+        with open(output_file, "w") as f:
+            json.dump(data, f, indent=4)
+
+        self.time_variable = self.env.now
+        self.simulation_tr_data_list = []
+
+    def convert_simulating_wr_data_to_json(self):
+
+        data_file_name = f"simulation_wr_run_data_from_{self.time_variable}_sec_to_{self.env.now}_sec.json"
+        output_file = WR_DURING_SIMULATION_DATA / data_file_name
+
+        if not os.path.exists(output_file):
+            with open(output_file, "w") as f:
+                json.dump([], f)
+
+        with open(output_file, "r") as f:
+            data = json.load(f)
+
+        data.append(self.simulation_wr_data_list)
+
+        with open(output_file, "w") as f:
+            json.dump(data, f, indent=4)
+
+        self.time_variable = self.env.now
+        self.simulation_wr_data_list = []
 
     def data_of_entities(self):
         """Creating a file with the complete data of every entity"""
-        output_file = ANALYSIS_SOLUTION / "entity_data.json"
+        output_file = ENTITIES_DURING_SIMULATION_DATA / "entity_starting_data.json"
         data_entry = {
             "entities": [self.convert_cell_to_dict.start_converting_cell_during_simulation(cell) for cell in
                          self.saving_entity_data_list]
@@ -107,7 +158,7 @@ class SavingSimulationData:
 
     def data_order_completed(self, product: ProductionMaterial, quantity: int):
         """Creating a file with every output material and the time"""
-        output_file = ANALYSIS_SOLUTION / "data_finished_products_leaving_production.json"
+        output_file = SIMULATION_OUTPUT_DATA / "data_finished_products_leaving_production.json"
         data_entry = {
             "Time": self.env.now,
             f"Product Group": product.production_material_id.name,
@@ -128,7 +179,7 @@ class SavingSimulationData:
 
     def data_goods_receipt(self, goods_receipt: GoodReceipt):
         """Creating a file with every input material (in production) and the time"""
-        output_file = ANALYSIS_SOLUTION / "data_goods_entering_production.json"
+        output_file = SIMULATION_OUTPUT_DATA / "data_goods_entering_production.json"
         data_entry = {
             "Time": goods_receipt.time,
             f"Product Group": goods_receipt.production_material.production_material_id.name,
@@ -149,7 +200,7 @@ class SavingSimulationData:
 
     def delete_every_json_file_in_anaylsis_solution(self):
         """Deleting every .json data in """
-        json_files = glob.glob(os.path.join(ANALYSIS_SOLUTION, "*.json"))
+        json_files = glob.glob(os.path.join(SIMULATION_OUTPUT_DATA, "*.json"))
         for file_path in json_files:
             try:
                 os.remove(file_path)
@@ -159,10 +210,18 @@ class SavingSimulationData:
 
     def delete_every_json_file_in_entities_during_simulation_data(self):
         """Deleting every .json data in """
-        json_files = glob.glob(os.path.join(ENTITIES_DURING_SIMULATION_DATA, "*.json"))
-        for file_path in json_files:
-            try:
-                os.remove(file_path)
-                print(f"Gelöscht: {file_path}")
-            except Exception as e:
-                print(f"Fehler beim Löschen von {file_path}: {e}")
+        folders_to_clean = [
+            ENTITIES_DURING_SIMULATION_DATA,
+            MACHINES_DURING_SIMULATION_DATA,
+            TR_DURING_SIMULATION_DATA,
+            WR_DURING_SIMULATION_DATA
+        ]
+
+        for folder in folders_to_clean:
+            json_files = glob.glob(os.path.join(folder, "*.json"))
+            for file_path in json_files:
+                try:
+                    os.remove(file_path)
+                    print(f"Gelöscht: {file_path}")
+                except Exception as e:
+                    print(f"Fehler beim Löschen von {file_path}: {e}")

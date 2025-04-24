@@ -7,7 +7,7 @@ class ConvertWrToDict:
 
     def serialize_complete_working_robot(self, wr: WorkingRobot) -> dict:
         return {
-            "identification_number": wr.identification_str,
+            "identification_str": wr.identification_str,
             "size": {
                 "x": wr.size.x,
                 "y": wr.size.y
@@ -35,7 +35,7 @@ class ConvertWrToDict:
 
     def serialize_shorted_version_working_robot(self, wr: WorkingRobot) -> dict:
         return {
-            "identification_number": wr.identification_str,
+            "identification_str": wr.identification_str,
             "working_status": {
                 "status": wr.working_status.status.name,
                 "working on status": wr.working_status.working_on_status,

@@ -24,7 +24,7 @@ class ConvertMachineToDict:
 
         return {
             "machine_type": machine.machine_type,
-            "identification_number": machine.identification_str,
+            "identification_str": machine.identification_str,
             "machine_quality": machine.machine_quality.name,
             "driving_speed": machine.driving_speed,
             "working_speed": machine.working_speed,
@@ -70,7 +70,7 @@ class ConvertMachineToDict:
         process_material_list = self.get_str_process_material_list(machine.process_material_list)
 
         return {
-            "identification_number": machine.identification_str,
+            "identification_str": machine.identification_str,
             "working_status": {
                 "process_status": machine.working_status.process_status.value,
                 "working_robot_status": machine.working_status.working_robot_status.value,

@@ -36,7 +36,7 @@ class SimulationEnvironment:
                                                            self.store_manager)
         self.machine_execution = MachineExecution(self.env, self.manufacturing_plan, self.machine_manager,
                                                   self.store_manager, self.saving_simulation_data)
-        # self.visualize_production = ProductionVisualisation(self.production, self.env)
+        #self.visualize_production = ProductionVisualisation(self.production, self.env)
         self.tr_order_manager = TrOrderManager(self.env, self.manufacturing_plan, self.machine_manager,
                                                self.store_manager)
         self.tr_executing_order = TrExecutingOrder(self.env, self.manufacturing_plan, self.path_finding,
@@ -46,7 +46,7 @@ class SimulationEnvironment:
         self.stop_event = False
 
         # starting processes
-        # self.env.process(self.visualize_layout())
+        #self.env.process(self.visualize_layout())
         self.env.process(self.start_monitoring_process())
         self.env.process(self.print_simulation_time())
         self.env.process(self.start_every_wr_process())
@@ -146,7 +146,6 @@ class SimulationEnvironment:
         while True:
             wr_is_off_machine = self.working_robot_order_manager.wr_driving_off_machine(wr)
             if wr_is_off_machine is True:
-                print(f"{wr.identification_str} drives off the machine")
                 wr.working_status.working_for_machine.working_status.working_robot_status = \
                     MachineWorkingRobotStatus.NO_WR
 
@@ -438,7 +437,9 @@ class SimulationEnvironment:
 
         # continuous saving the simulation data
         while True:
-            self.saving_simulation_data.convert_simulating_entity_data_to_json()
+            self.saving_simulation_data.convert_simulating_machine_data_to_json()
+            self.saving_simulation_data.convert_simulating_tr_data_to_json()
+            self.saving_simulation_data.convert_simulating_wr_data_to_json()
             yield self.env.timeout(120)
 #
 

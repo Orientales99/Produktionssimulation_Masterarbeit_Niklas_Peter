@@ -1,5 +1,6 @@
 from src.monitoring.data_analysis.convert_json_data import ConvertJsonData
-from src.monitoring.data_analysis.visualize_machine_working_status import VisualizeMachineWorkingStatus
+from src.monitoring.data_analysis.creating_machine_during_simulation_dict import CreatingMachineDuringSimulationDict
+from src.monitoring.data_analysis.machine_data.machine_processing_time import MachineProcessingTime
 from src.monitoring.data_analysis.product_throughput import ProductThroughput
 from src.monitoring.data_analysis.visualize_production_material_throughput import VisualizeProductionMaterialThroughput
 
@@ -31,10 +32,11 @@ def run_throughput_stats():
 
 def run_machine_working_status():
     convert = ConvertJsonData()
-    machine_working_status = VisualizeMachineWorkingStatus(convert)
-    machine_working_status.print()
-#
+    creating_machine_during_simulation_dict = CreatingMachineDuringSimulationDict(convert)
+    machine_processing_time = MachineProcessingTime(creating_machine_during_simulation_dict)
+
 
 if __name__ == '__main__':
+    # run_analysis()
     run_machine_working_status()
 

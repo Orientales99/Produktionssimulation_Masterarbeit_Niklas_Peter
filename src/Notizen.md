@@ -9,7 +9,14 @@
 # Buck-List
 
 - Bei zu vielen initialisierten Entitäten kann das production_layout zu klein sein
-- bei einem Move außerhalb des Feldes wird dies noch nicht korrekt als False ausgegeben
+- Entitäten fahren so, dass immer ein Platz unter den Entitäten frei bleibt. (calculation path_finding -> empty space funktioniert nicht wie gowollt)
+
+
+# Nachteile:
+- Die Prozessorder Liste der Maschinen wird nicht regelmäßig überarbeitet, 
+am Ende haben langsame Maschinen trotzdem eine lange Liste die sie abarbeiten müssen, obwohl schnellere Maschinen theoritsch frei sind. 
+Das liegt überwiegend an der geringen anzahl an WR
+- 
 
 
 Hotkeys:

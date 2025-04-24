@@ -2,7 +2,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
 SRC = ROOT/'src'
+
 RESOURCES = ROOT/'resources'
+
 ANALYSIS_SOLUTION = ROOT/'analysis_solution'
-ENTITIES_DURING_SIMULATION_DATA = ANALYSIS_SOLUTION / 'entities_during_simulation_data'
+SIMULATION_OUTPUT_DATA = ROOT / 'simulation_output_data'
+
+ENTITIES_DURING_SIMULATION_DATA = SIMULATION_OUTPUT_DATA / 'entities_during_simulation_data'
+MACHINES_DURING_SIMULATION_DATA = ENTITIES_DURING_SIMULATION_DATA / 'machine'
+TR_DURING_SIMULATION_DATA = ENTITIES_DURING_SIMULATION_DATA / 'transport_robot'
+WR_DURING_SIMULATION_DATA = ENTITIES_DURING_SIMULATION_DATA / 'working_robot'
 GRAPH_PRODUCTION_MATERIAL = ANALYSIS_SOLUTION / 'graph_production_material'

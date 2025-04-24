@@ -11,7 +11,7 @@ class ConvertTrToDict:
     def serialize_complete_transport_robot(self, tr: TransportRobot) -> dict:
         products_in_tr_store = self.store_manager.get_dict_number_of_products_in_store(tr.material_store)
         return {
-            "identification_number": tr.identification_str,
+            "identification_str": tr.identification_str,
             "size": {
                 "x": tr.size.x,
                 "y": tr.size.y
@@ -52,7 +52,7 @@ class ConvertTrToDict:
     def serialize_shorted_version_transport_robot(self, tr: TransportRobot) -> dict:
         products_in_tr_store = self.store_manager.get_dict_number_of_products_in_store(tr.material_store)
         return {
-            "identification_number": tr.identification_str,
+            "identification_str": tr.identification_str,
             "material_store": {
                 "Max Capacity": tr.material_store.capacity,
                 "Contained Units": len(tr.material_store.items),

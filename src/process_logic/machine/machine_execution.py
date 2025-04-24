@@ -1,5 +1,5 @@
 from src.constant.constant import MachineProcessStatus, MachineStorageStatus, WorkingRobotStatus, \
-    MachineWorkingRobotStatus
+    MachineWorkingRobotStatus, ProductGroup, MachineQuality
 from src.entity.machine.Process_material import ProcessMaterial
 from src.entity.machine.machine import Machine
 from src.entity.machine.processing_order import ProcessingOrder
@@ -31,8 +31,11 @@ class MachineExecution:
         output_store = machine.machine_storage.storage_after_process
         working_speed = int(machine.working_speed)
 
-        yield self.env.timeout(1)
-        # yield self.env.timeout(working_speed)
+        if machine.machine_quality == MachineQuality.OLD_MACHINE:
+            working_speed = working_speed * 0.8
+
+        #yield self.env.timeout(1)
+        yield self.env.timeout(working_speed)
         machine.machine_storage.storage_before_process = self.store_manager.get_material_out_of_store(input_store,
                                                                                                 required_material)
         yield output_store.put(producing_material)
@@ -77,8 +80,6 @@ class MachineExecution:
         """Takes the item and gives the order to the next machine."""
         executing_machine_type = None
         step_of_the_process = None
-        if machine.identification_str == "Ma: 2, 1":
-            print(producing_material.identification_str)
 
         for processing_order in machine.processing_list:
             if producing_material.production_material_id == processing_order.order.product.product_id:
