@@ -34,7 +34,7 @@ def run_machine_working_status():
     convert = ConvertJsonData()
     creating_machine_during_simulation_dict = CreatingMachineDuringSimulationDict(convert)
     machine_processing_time = MachineProcessingTime(creating_machine_during_simulation_dict)
-
+    # machine_processing_time.get_production_machine_data()
 
 if __name__ == '__main__':
     # run_analysis()

@@ -115,8 +115,6 @@ class MachineProcessStatus(Enum):
     SETUP = "setup"
     READY_TO_PRODUCE = "machine is ready to produce"
     FINISHED_TO_PRODUCE = "machine has finished producing the order"
-    INPUT_EMPTY = "input is empty"
-    OUTPUT_FULL = "output is full"
     PRODUCING_PAUSED = "producing is paused"
     PRODUCING_PRODUCT = "producing product"
 

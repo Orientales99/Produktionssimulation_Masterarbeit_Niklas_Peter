@@ -364,7 +364,6 @@ class SimulationEnvironment:
                         machine.working_status.process_status != MachineProcessStatus.FINISHED_TO_PRODUCE:
                     machine.working_status.process_status = MachineProcessStatus.PRODUCING_PAUSED
                     machine.working_status.storage_status = MachineStorageStatus.OUTPUT_FULL
-
                     self.saving_simulation_data.save_entity_action(machine)
 
                     yield self.env.timeout(1)
