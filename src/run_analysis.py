@@ -14,6 +14,8 @@ def run_analysis():
     visualize_product_material_throughput.plot_all_product_groups_with_legend()
     product_throughput.calculate_throughput_for_all_groups()
 
+    creating_machine_during_simulation_dict = CreatingMachineDuringSimulationDict(convert)
+    machine_processing_time = MachineProcessingTime(creating_machine_during_simulation_dict)
 
 def run_throughput_visualization():
     convert = ConvertJsonData()
@@ -37,6 +39,6 @@ def run_machine_working_status():
     # machine_processing_time.get_production_machine_data()
 
 if __name__ == '__main__':
-    # run_analysis()
-    run_machine_working_status()
+    run_analysis()
+    # run_machine_working_status()
 
