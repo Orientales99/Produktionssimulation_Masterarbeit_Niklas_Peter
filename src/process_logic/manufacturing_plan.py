@@ -1,6 +1,5 @@
 from collections import defaultdict
-from datetime import date
-
+from datetime import date, timedelta
 
 import pandas as pd
 
@@ -25,7 +24,6 @@ class ManufacturingPlan:
     process_list_for_every_machine: list[(Machine, ProcessingOrder)]
     required_materials_for_every_machine: dict = {}
     completed_orders_list: list[Order]
-
 
     def __init__(self, production, machine_execution):
         self.production = production
@@ -253,8 +251,6 @@ class ManufacturingPlan:
             if produced_quantity >= order.number_of_products_per_order:
 
                 self.completed_orders_list.append(order)
-                print(len(self.completed_orders_list))
-
 
                 items_to_remove = [
                     item for item in sink.goods_issue_store.items
@@ -274,3 +270,6 @@ class ManufacturingPlan:
                 updated_order_list.append((order, produced_quantity))
 
         sink.goods_issue_order_list = updated_order_list
+
+    def get_next_date(self, yesterday: date) -> date:
+        return yesterday + timedelta(days=1)

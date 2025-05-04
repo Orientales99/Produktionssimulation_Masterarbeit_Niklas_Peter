@@ -36,7 +36,7 @@ class SimulationEnvironment:
                                                            self.store_manager)
         self.machine_execution = MachineExecution(self.env, self.manufacturing_plan, self.machine_manager,
                                                   self.store_manager, self.saving_simulation_data)
-        #self.visualize_production = ProductionVisualisation(self.production, self.env)
+        self.visualize_production = ProductionVisualisation(self.production, self.env)
         self.tr_order_manager = TrOrderManager(self.env, self.manufacturing_plan, self.machine_manager,
                                                self.store_manager)
         self.tr_executing_order = TrExecutingOrder(self.env, self.manufacturing_plan, self.path_finding,
@@ -46,7 +46,8 @@ class SimulationEnvironment:
         self.stop_event = False
 
         # starting processes
-        #self.env.process(self.visualize_layout())
+        self.env.process(self.initialise_simulation_start())
+        self.env.process(self.visualize_layout())
         self.env.process(self.start_monitoring_process())
         self.env.process(self.print_simulation_time())
         self.env.process(self.start_every_wr_process())
@@ -58,14 +59,21 @@ class SimulationEnvironment:
 
     def initialise_simulation_start(self):
         self.production.create_production()
-        start_date = self.production.service_starting_conditions.set_starting_date_of_simulation()
-        self.manufacturing_plan.set_parameter_for_start_of_a_simulation_day(start_date)
+        current_date = self.production.service_starting_conditions.set_starting_date_of_simulation()
+        while True:
+            self.manufacturing_plan.set_parameter_for_start_of_a_simulation_day(current_date)
+            self.saving_simulation_data.save_daily_manufacturing_plan(current_date, self.manufacturing_plan.daily_manufacturing_plan)
+            print(self.manufacturing_plan.daily_manufacturing_plan)
+            yield self.env.timeout(28800)   # 8h working time
+            current_date = self.manufacturing_plan.get_next_date(current_date)
+
 
     ###################################################################################################################
 
     def start_every_wr_process(self):
         while True:
             if self.stop_event is False:
+
                 self.working_robot_order_manager.sort_process_order_list_for_wr()
                 self.working_robot_order_manager.every_idle_wr_get_order()
 
@@ -100,9 +108,10 @@ class SimulationEnvironment:
                     if wr.working_status.status == WorkingRobotStatus.WAITING_IN_FRONT_OF_MACHINE and \
                             wr.working_status.working_on_status is False:
                         wr.working_status.working_on_status = True
-                        self.working_robot_order_manager.wr_driving_in_machine(wr)
-                        wr.working_status.status = WorkingRobotStatus.WORKING_ON_MACHINE
-                        self.saving_simulation_data.save_entity_action(wr)
+                        if self.working_robot_order_manager.wr_driving_in_machine(wr) is True:
+
+                            wr.working_status.status = WorkingRobotStatus.WORKING_ON_MACHINE
+                            self.saving_simulation_data.save_entity_action(wr)
 
                     # working process on the machine happens in the class machine_execution
 
@@ -287,8 +296,6 @@ class SimulationEnvironment:
             if isinstance(tr.transport_order.unload_destination, Machine):
                 tr.transport_order.unload_destination.working_status.waiting_for_arriving_of_tr = False
 
-
-
     ###################################################################################################################
 
     def run_machine_process(self):
@@ -406,6 +413,7 @@ class SimulationEnvironment:
 
     def visualize_layout(self):
         driving_speed = self.tr_order_manager.get_driving_speed_per_cell()
+        yield self.env.timeout(12100)
         while True:
             stop_event = self.visualize_production.visualize_layout()
             if stop_event is False:
@@ -413,6 +421,7 @@ class SimulationEnvironment:
             if stop_event is True:
                 self.stop_event = True
             yield self.env.timeout(1 / driving_speed)
+
 
     def print_simulation_time(self):
         """Printing the current simulation time in h:min:sec."""

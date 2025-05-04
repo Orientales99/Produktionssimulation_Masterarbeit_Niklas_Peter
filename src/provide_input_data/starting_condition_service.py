@@ -24,7 +24,7 @@ class StartingConditionsService:
         total_duration = duration_per_day_in_h * 60 * 60
         return total_duration
 
-    def set_starting_date_of_simulation(self):
+    def set_starting_date_of_simulation(self) -> date:
         start_date_list = self.data_process_starting_conditions["starting_date_of_simulation"]
         starting_date = date(start_date_list[0], start_date_list[1], start_date_list[2])
         return starting_date

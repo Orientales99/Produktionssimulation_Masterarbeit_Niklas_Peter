@@ -55,7 +55,9 @@ class WorkingRobotOrderManager:
     def allocate_order_to_wr(self, wr: WorkingRobot):
         if len(self.sorted_list_of_processes) > 0:
             next_entity_location = self.get_next_working_location_for_order()
-            if next_entity_location is not None:
+            if next_entity_location is not None and \
+                    (next_entity_location.working_status.working_robot_status != MachineWorkingRobotStatus.WR_PRESENT or
+                     next_entity_location.working_status.working_robot_status != MachineWorkingRobotStatus.WAITING_WR):
                 wr.working_status.working_for_machine = next_entity_location
                 wr.working_status.driving_destination_coordinates = \
                     self.calculate_coordinates_of_new_driving_destination(next_entity_location, wr)
@@ -230,20 +232,29 @@ class WorkingRobotOrderManager:
         side_step_path = side_step_path[:4]
         wr.working_status.side_step_driving_route = side_step_path
 
-    def wr_driving_in_machine(self, wr: WorkingRobot):
+    def wr_driving_in_machine(self, wr: WorkingRobot) -> bool:
         """Cells with the placed_entity of wr will be changed to None. The Cell coordinates are saved in
-        wr.working_status.last_placement_in_production: list[Cell]."""
+        wr.working_status.last_placement_in_production: list[Cell].
+        Return True: driving in machine worked
+        Return False: Machine is occupied"""
 
         machine = wr.working_status.working_for_machine
-        cell_list_wr = self.manufacturing_plan.production.entities_located[wr.identification_str]
-        self.wr_list_working_in_machine.append(wr)
+        if machine.working_status.working_robot_status != MachineWorkingRobotStatus.WR_PRESENT:
+            cell_list_wr = self.manufacturing_plan.production.entities_located[wr.identification_str]
+            self.wr_list_working_in_machine.append(wr)
 
-        for cell in cell_list_wr:
-            cell.placed_entity = None
+            for cell in cell_list_wr:
+                cell.placed_entity = None
 
-        machine.working_status.working_robot_status = MachineWorkingRobotStatus.WR_PRESENT
+            machine.working_status.working_robot_status = MachineWorkingRobotStatus.WR_PRESENT
 
-        wr.working_status.last_placement_in_production = cell_list_wr
+            wr.working_status.last_placement_in_production = cell_list_wr
+            return True
+        else:
+            wr.working_status.status = WorkingRobotStatus.IDLE
+            wr.working_status.working_on_status = False
+            return False
+
 
     def wr_driving_off_machine(self, wr: WorkingRobot) -> bool:
         """If wr can drive off machine -> Return: True

@@ -139,23 +139,24 @@ class PygameVisualisation:
         font = pygame.font.SysFont('Arial', 20)
         sim_time = int(self.env.now)
 
-        tage = sim_time // (24 * 3600)
-        rest = sim_time % (24 * 3600)
+        tage = sim_time // (8 * 3600)
+        rest = sim_time % (8 * 3600)
         stunden = rest // 3600
         rest %= 3600
         minuten = rest // 60
         sekunden = rest % 60
 
-        labels = [("Tag", tage), ("Std", stunden), ("Min", minuten), ("Sek", sekunden)]
+        labels = [("Produktionstag", tage), ("Std", stunden), ("Min", minuten), ("Sek", sekunden)]
 
-        start_x = self.stop_button_rect.right + 30
-        start_y = 15
-        spacing = 90
+        x = self.stop_button_rect.right + 30
+        y = 15
+        padding = 20
 
-        for i, (label, value) in enumerate(labels):
+        for label, value in labels:
             text = f"{label}: {value:02d}"
             text_surface = font.render(text, True, (0, 0, 0))
-            self.window.blit(text_surface, (start_x + i * spacing, start_y))
+            self.window.blit(text_surface, (x, y))
+            x += text_surface.get_width() + padding
 
     def draw_everything(self):
         """Zeichnet das gesamte Layout und verschiebt das Grid nach unten."""

@@ -1,6 +1,7 @@
 import json
 import os
 import glob
+from datetime import date
 
 from src import SIMULATION_OUTPUT_DATA, ENTITIES_DURING_SIMULATION_DATA, MACHINES_DURING_SIMULATION_DATA, \
     TR_DURING_SIMULATION_DATA, WR_DURING_SIMULATION_DATA
@@ -8,6 +9,8 @@ from src.entity.machine.machine import Machine
 from src.entity.transport_robot.transport_robot import TransportRobot
 from src.entity.working_robot.working_robot import WorkingRobot
 from src.monitoring.converting_classes_to_dict.convert_cell_to_dict import ConvertCellToDict
+from src.monitoring.converting_classes_to_dict.convert_order_to_dict import ConvertOrderToDict
+from src.order_data.order import Order
 from src.order_data.production_material import ProductionMaterial
 from src.process_logic.good_receipt import GoodReceipt
 from src.process_logic.working_robot_order_manager import WorkingRobotOrderManager
@@ -33,6 +36,7 @@ class SavingSimulationData:
         self.working_robot_order_manager = working_robot_order_manager
         self.store_manager = store_manager
         self.convert_cell_to_dict = ConvertCellToDict(self.store_manager)
+        self.convert_order_to_dict = ConvertOrderToDict()
 
         self.entities_located = self.production.entities_located.copy()
         self.list_every_entity_identification_str = []
@@ -225,3 +229,22 @@ class SavingSimulationData:
                     print(f"Gelöscht: {file_path}")
                 except Exception as e:
                     print(f"Fehler beim Löschen von {file_path}: {e}")
+
+    def save_daily_manufacturing_plan(self, current_date: date, daily_manufacturing_plan: list[Order]):
+        """Saves the daily production plan in a JSON file with a date in the file name."""
+
+        filename = f"daily_plan_{current_date.isoformat()}.json"
+        output_path = os.path.join(SIMULATION_OUTPUT_DATA / "daily_plans", filename)
+
+        # Unterordner erstellen, falls nicht vorhanden
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+        converted_plan = [self.convert_order_to_dict.order_to_dict(order) for order in daily_manufacturing_plan]
+
+        plan_data = {
+            "date": current_date.isoformat(),
+            "plan": converted_plan
+        }
+
+        with open(output_path, "w") as f:
+            json.dump(plan_data, f, indent=2)
