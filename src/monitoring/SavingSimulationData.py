@@ -46,7 +46,9 @@ class SavingSimulationData:
         self.simulation_tr_data_list = []
         self.simulation_wr_data_list = []
 
-        self.time_variable = 0
+        self.time_variable_machine = 0
+        self.time_variable_tr = 0
+        self.time_variable_wr = 0
 
     def save_every_entity_identification_str(self):
         self.entities_located = self.production.entities_located.copy()
@@ -67,7 +69,7 @@ class SavingSimulationData:
     def save_one_cell_from_entity(self, entity: Machine | WorkingRobot | TransportRobot) -> Cell:
         """Saving the cell in the top left corner of each entity."""
 
-        cell_list = self.entities_located.get(entity.identification_str, [])
+        cell_list = self.production.entities_located.get(entity.identification_str, [])
         horizontal_edges = self.production.get_horizontal_edges_of_coordinates(cell_list)
         vertical_edges = self.production.get_vertical_edges_of_coordinates(cell_list)
         return self.production.get_cell(Coordinates(horizontal_edges[0], vertical_edges[1]))
@@ -87,67 +89,72 @@ class SavingSimulationData:
             self.simulation_tr_data_list.append(data_entry)
 
         if isinstance(entity_cell.placed_entity, WorkingRobot):
+            print(self.env.now)
+            print(entity_cell.placed_entity.identification_str)
             self.simulation_wr_data_list.append(data_entry)
 
     def convert_simulating_machine_data_to_json(self):
 
-        data_file_name = f"simulation_machine_run_data_from_{self.time_variable}_sec_to_{self.env.now}_sec.json"
-        output_file = MACHINES_DURING_SIMULATION_DATA / data_file_name
+        if len(self.simulation_machine_data_list) != 0:
+            data_file_name = f"simulation_machine_run_data_from_{self.time_variable_machine}_sec_to_{self.env.now}_sec.json"
+            output_file = MACHINES_DURING_SIMULATION_DATA / data_file_name
 
-        if not os.path.exists(output_file):
+            if not os.path.exists(output_file):
+                with open(output_file, "w") as f:
+                    json.dump([], f)
+
+            with open(output_file, "r") as f:
+                data = json.load(f)
+
+            data.append(self.simulation_machine_data_list)
+
             with open(output_file, "w") as f:
-                json.dump([], f)
+                json.dump(data, f, indent=4)
 
-        with open(output_file, "r") as f:
-            data = json.load(f)
-
-        data.append(self.simulation_machine_data_list)
-
-        with open(output_file, "w") as f:
-            json.dump(data, f, indent=4)
-
-        self.time_variable = self.env.now
-        self.simulation_machine_data_list = []
+            self.time_variable_machine = self.env.now
+            self.simulation_machine_data_list = []
 
     def convert_simulating_tr_data_to_json(self):
 
-        data_file_name = f"simulation_tr_run_data_from_{self.time_variable}_sec_to_{self.env.now}_sec.json"
-        output_file = TR_DURING_SIMULATION_DATA / data_file_name
+        if len(self.simulation_tr_data_list) != 0:
+            data_file_name = f"simulation_tr_run_data_from_{self.time_variable_tr}_sec_to_{self.env.now}_sec.json"
+            output_file = TR_DURING_SIMULATION_DATA / data_file_name
 
-        if not os.path.exists(output_file):
+            if not os.path.exists(output_file):
+                with open(output_file, "w") as f:
+                    json.dump([], f)
+
+            with open(output_file, "r") as f:
+                data = json.load(f)
+
+            data.append(self.simulation_tr_data_list)
+
             with open(output_file, "w") as f:
-                json.dump([], f)
+                json.dump(data, f, indent=4)
 
-        with open(output_file, "r") as f:
-            data = json.load(f)
-
-        data.append(self.simulation_tr_data_list)
-
-        with open(output_file, "w") as f:
-            json.dump(data, f, indent=4)
-
-        self.time_variable = self.env.now
-        self.simulation_tr_data_list = []
+            self.time_variable_tr = self.env.now
+            self.simulation_tr_data_list = []
 
     def convert_simulating_wr_data_to_json(self):
 
-        data_file_name = f"simulation_wr_run_data_from_{self.time_variable}_sec_to_{self.env.now}_sec.json"
-        output_file = WR_DURING_SIMULATION_DATA / data_file_name
+        if len(self.simulation_wr_data_list) != 0:
+            data_file_name = f"simulation_wr_run_data_from_{self.time_variable_wr}_sec_to_{self.env.now}_sec.json"
+            output_file = WR_DURING_SIMULATION_DATA / data_file_name
 
-        if not os.path.exists(output_file):
+            if not os.path.exists(output_file):
+                with open(output_file, "w") as f:
+                    json.dump([], f)
+
+            with open(output_file, "r") as f:
+                data = json.load(f)
+
+            data.append(self.simulation_wr_data_list)
+
             with open(output_file, "w") as f:
-                json.dump([], f)
+                json.dump(data, f, indent=4)
 
-        with open(output_file, "r") as f:
-            data = json.load(f)
-
-        data.append(self.simulation_wr_data_list)
-
-        with open(output_file, "w") as f:
-            json.dump(data, f, indent=4)
-
-        self.time_variable = self.env.now
-        self.simulation_wr_data_list = []
+            self.time_variable_wr = self.env.now
+            self.simulation_wr_data_list = []
 
     def data_of_entities(self):
         """Creating a file with the complete data of every entity"""

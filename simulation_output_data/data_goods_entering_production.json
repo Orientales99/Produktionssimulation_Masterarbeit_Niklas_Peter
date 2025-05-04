@@ -1,0 +1,32 @@
+[
+    {
+        "Time": 26,
+        "Product Group": "SEVEN",
+        "Quantity": 100
+    },
+    {
+        "Time": 26,
+        "Product Group": "TWELVE",
+        "Quantity": 92
+    },
+    {
+        "Time": 32,
+        "Product Group": "TWO",
+        "Quantity": 100
+    },
+    {
+        "Time": 32,
+        "Product Group": "THREE",
+        "Quantity": 84
+    },
+    {
+        "Time": 1031,
+        "Product Group": "SEVEN",
+        "Quantity": 100
+    },
+    {
+        "Time": 1165,
+        "Product Group": "TWO",
+        "Quantity": 80
+    }
+]

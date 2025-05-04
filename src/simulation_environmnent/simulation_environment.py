@@ -36,7 +36,7 @@ class SimulationEnvironment:
                                                            self.store_manager)
         self.machine_execution = MachineExecution(self.env, self.manufacturing_plan, self.machine_manager,
                                                   self.store_manager, self.saving_simulation_data)
-        self.visualize_production = ProductionVisualisation(self.production, self.env)
+        # self.visualize_production = ProductionVisualisation(self.production, self.env)
         self.tr_order_manager = TrOrderManager(self.env, self.manufacturing_plan, self.machine_manager,
                                                self.store_manager)
         self.tr_executing_order = TrExecutingOrder(self.env, self.manufacturing_plan, self.path_finding,
@@ -47,9 +47,9 @@ class SimulationEnvironment:
 
         # starting processes
         self.env.process(self.initialise_simulation_start())
-        self.env.process(self.visualize_layout())
+        # self.env.process(self.visualize_layout())
         self.env.process(self.start_monitoring_process())
-        self.env.process(self.print_simulation_time())
+        # self.env.process(self.print_simulation_time())
         self.env.process(self.start_every_wr_process())
         self.env.process(self.start_every_tr_process())
         self.env.process(self.run_machine_process())
@@ -413,7 +413,6 @@ class SimulationEnvironment:
 
     def visualize_layout(self):
         driving_speed = self.tr_order_manager.get_driving_speed_per_cell()
-        yield self.env.timeout(12100)
         while True:
             stop_event = self.visualize_production.visualize_layout()
             if stop_event is False:
