@@ -28,6 +28,8 @@ class ConvertMachineToDict:
             "machine_quality": machine.machine_quality.name,
             "driving_speed": machine.driving_speed,
             "working_speed": machine.working_speed,
+            "setting_up_time": machine.setting_up_time,
+            "processing_list_queue_length": machine.processing_list_queue_length,
             "size": {
                 "x": machine.size.x,
                 "y": machine.size.y
@@ -60,47 +62,6 @@ class ConvertMachineToDict:
             "Process Material List": process_material_list
 
         }
-
-    def serialize_machine_shorted_version_machine(self, machine: Machine) -> dict:
-        products_in_before_process_store = self.store_manager.get_dict_number_of_products_in_store(
-            machine.machine_storage.storage_before_process)
-        products_in_after_process_store = self.store_manager.get_dict_number_of_products_in_store(
-            machine.machine_storage.storage_after_process)
-        processing_order_list = self.get_dict_processing_order_list(machine.processing_list)
-        process_material_list = self.get_str_process_material_list(machine.process_material_list)
-
-        return {
-            "identification_str": machine.identification_str,
-            "working_status": {
-                "process_status": machine.working_status.process_status.value,
-                "working_robot_status": machine.working_status.working_robot_status.value,
-                "storage_status": machine.working_status.storage_status.value,
-                "working_on_status": machine.working_status.working_on_status,
-                "producing_item": machine.working_status.producing_item,
-                "producing_production_material": (
-                    machine.working_status.producing_production_material.identification_str
-                    if machine.working_status.producing_production_material else None
-                ),
-                "waiting_for_arriving_of_tr": machine.working_status.waiting_for_arriving_of_tr
-            },
-            "storage": {
-                "before_process": {
-                    "Max Capacity": machine.machine_storage.storage_before_process.capacity,
-                    "Contained Units": len(machine.machine_storage.storage_before_process.items),
-                    "Loaded Products": products_in_before_process_store
-                },
-                "after_process": {
-                    "Max Capacity": machine.machine_storage.storage_after_process.capacity,
-                    "Contained Units": len(machine.machine_storage.storage_after_process.items),
-                    "Loaded Products": products_in_after_process_store
-                }
-            },
-            "Processing Order List": processing_order_list,
-            "Process Material List": process_material_list
-
-        }
-
-
 
     def get_dict_processing_order_list(self, order_list: list[ProcessingOrder]) -> list[dict]:
         """

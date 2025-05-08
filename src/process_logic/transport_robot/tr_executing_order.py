@@ -220,13 +220,15 @@ class TrExecutingOrder:
         """Try to calculate a short path for a side step movement.
             The side step starts either at the bottom left or top right corner.
             """
-
-        max_coordinates = self.manufacturing_plan.production.service_starting_conditions.set_max_coordinates_for_production_layout
+        max_coordinates: Coordinates
+        max_coordinates = self.manufacturing_plan.production.max_coordinate
         min_coordinates = Coordinates(0, 0)
+        print(max_coordinates)
 
         side_step_path = self.path_finding.get_path_for_entity(tr, min_coordinates)
         if isinstance(side_step_path, Exception):
-            side_step_path = self.path_finding.get_path_for_entity(tr, max_coordinates)
+            side_step_path = self.path_finding.get_path_for_entity(tr, Coordinates(max_coordinates.x - 2,
+                                                                                   max_coordinates.y - 2))
 
         if isinstance(side_step_path, Exception):
             tr.working_status.side_step_driving_route = None
@@ -302,9 +304,6 @@ class TrExecutingOrder:
 
         self.manufacturing_plan.update_goods_issue_order_quantities(sink)
         self.saving_simulation_data.data_order_completed(unload_product, item_to_unload)
-
-
-
 
         store_items = self.store_manager.get_str_products_in_store(sink.goods_issue_store)
 

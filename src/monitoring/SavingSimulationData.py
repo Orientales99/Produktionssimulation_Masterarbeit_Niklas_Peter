@@ -89,8 +89,6 @@ class SavingSimulationData:
             self.simulation_tr_data_list.append(data_entry)
 
         if isinstance(entity_cell.placed_entity, WorkingRobot):
-            print(self.env.now)
-            print(entity_cell.placed_entity.identification_str)
             self.simulation_wr_data_list.append(data_entry)
 
     def convert_simulating_machine_data_to_json(self):

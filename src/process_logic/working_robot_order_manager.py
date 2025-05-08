@@ -216,7 +216,7 @@ class WorkingRobotOrderManager:
             The side step starts either at the bottom left or top right corner.
             """
         max_coordinates: Coordinates
-        max_coordinates = self.manufacturing_plan.production.service_starting_conditions.set_max_coordinates_for_production_layout()
+        max_coordinates = self.manufacturing_plan.production.max_coordinate
         first_coordinates = Coordinates(max_coordinates.x - 2, 0)
         second_coordinates = Coordinates(0, max_coordinates.y - 2)
 

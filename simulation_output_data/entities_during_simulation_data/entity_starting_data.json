@@ -8,6 +8,12 @@
                 "entity_id": null,
                 "entity_data": {
                     "identification_str": "WR: 1",
+                    "size": {
+                        "x": 2,
+                        "y": 3
+                    },
+                    "driving_speed": "3",
+                    "product_transfer_rate": "10",
                     "working_status": {
                         "status": "IDLE",
                         "working on status": false,
@@ -16,7 +22,8 @@
                         "working for machine": null,
                         "driving destination coordinates": null,
                         "driving route": null,
-                        "side step driving route": null
+                        "side step driving route": null,
+                        "last placement in production": null
                     }
                 }
             },
@@ -27,6 +34,12 @@
                 "entity_id": null,
                 "entity_data": {
                     "identification_str": "WR: 2",
+                    "size": {
+                        "x": 2,
+                        "y": 3
+                    },
+                    "driving_speed": "3",
+                    "product_transfer_rate": "10",
                     "working_status": {
                         "status": "IDLE",
                         "working on status": false,
@@ -35,7 +48,8 @@
                         "working for machine": null,
                         "driving destination coordinates": null,
                         "driving route": null,
-                        "side step driving route": null
+                        "side step driving route": null,
+                        "last placement in production": null
                     }
                 }
             },
@@ -46,6 +60,12 @@
                 "entity_id": null,
                 "entity_data": {
                     "identification_str": "WR: 3",
+                    "size": {
+                        "x": 2,
+                        "y": 3
+                    },
+                    "driving_speed": "3",
+                    "product_transfer_rate": "10",
                     "working_status": {
                         "status": "IDLE",
                         "working on status": false,
@@ -54,7 +74,8 @@
                         "working for machine": null,
                         "driving destination coordinates": null,
                         "driving route": null,
-                        "side step driving route": null
+                        "side step driving route": null,
+                        "last placement in production": null
                     }
                 }
             },
@@ -65,6 +86,12 @@
                 "entity_id": null,
                 "entity_data": {
                     "identification_str": "WR: 4",
+                    "size": {
+                        "x": 2,
+                        "y": 3
+                    },
+                    "driving_speed": "3",
+                    "product_transfer_rate": "10",
                     "working_status": {
                         "status": "IDLE",
                         "working on status": false,
@@ -73,7 +100,8 @@
                         "working for machine": null,
                         "driving destination coordinates": null,
                         "driving route": null,
-                        "side step driving route": null
+                        "side step driving route": null,
+                        "last placement in production": null
                     }
                 }
             },
@@ -84,6 +112,12 @@
                 "entity_id": null,
                 "entity_data": {
                     "identification_str": "TR: 1",
+                    "size": {
+                        "x": 2,
+                        "y": 3
+                    },
+                    "loading_speed": 10,
+                    "driving_speed": "3",
                     "material_store": {
                         "Max Capacity": 100,
                         "Contained Units": 0,
@@ -96,7 +130,8 @@
                         "driving destination coordinates": null,
                         "driving route": null,
                         "destination location entity": null,
-                        "side_step_driving_route": null
+                        "side_step_driving_route": null,
+                        "waiting_time_error": null
                     },
                     "transport_order": null
                 }
@@ -108,6 +143,12 @@
                 "entity_id": null,
                 "entity_data": {
                     "identification_str": "TR: 2",
+                    "size": {
+                        "x": 2,
+                        "y": 3
+                    },
+                    "loading_speed": 10,
+                    "driving_speed": "3",
                     "material_store": {
                         "Max Capacity": 100,
                         "Contained Units": 0,
@@ -120,7 +161,8 @@
                         "driving destination coordinates": null,
                         "driving route": null,
                         "destination location entity": null,
-                        "side_step_driving_route": null
+                        "side_step_driving_route": null,
+                        "waiting_time_error": null
                     },
                     "transport_order": null
                 }
@@ -132,6 +174,12 @@
                 "entity_id": null,
                 "entity_data": {
                     "identification_str": "TR: 3",
+                    "size": {
+                        "x": 2,
+                        "y": 3
+                    },
+                    "loading_speed": 10,
+                    "driving_speed": "3",
                     "material_store": {
                         "Max Capacity": 100,
                         "Contained Units": 0,
@@ -144,7 +192,8 @@
                         "driving destination coordinates": null,
                         "driving route": null,
                         "destination location entity": null,
-                        "side_step_driving_route": null
+                        "side_step_driving_route": null,
+                        "waiting_time_error": null
                     },
                     "transport_order": null
                 }
@@ -156,6 +205,12 @@
                 "entity_id": null,
                 "entity_data": {
                     "identification_str": "TR: 4",
+                    "size": {
+                        "x": 2,
+                        "y": 3
+                    },
+                    "loading_speed": 10,
+                    "driving_speed": "3",
                     "material_store": {
                         "Max Capacity": 100,
                         "Contained Units": 0,
@@ -168,7 +223,8 @@
                         "driving destination coordinates": null,
                         "driving route": null,
                         "destination location entity": null,
-                        "side_step_driving_route": null
+                        "side_step_driving_route": null,
+                        "waiting_time_error": null
                     },
                     "transport_order": null
                 }
@@ -179,7 +235,17 @@
                 "entity_type": "Machine",
                 "entity_id": null,
                 "entity_data": {
+                    "machine_type": 0,
                     "identification_str": "Ma: 0, 1",
+                    "machine_quality": "OLD_MACHINE",
+                    "driving_speed": "0",
+                    "working_speed": "10",
+                    "setting_up_time": 10.0,
+                    "processing_list_queue_length": 0,
+                    "size": {
+                        "x": 6,
+                        "y": 6
+                    },
                     "working_status": {
                         "process_status": "idle",
                         "working_robot_status": "no WR in machine",
@@ -211,7 +277,17 @@
                 "entity_type": "Machine",
                 "entity_id": null,
                 "entity_data": {
+                    "machine_type": 0,
                     "identification_str": "Ma: 0, 2",
+                    "machine_quality": "NEW_MACHINE",
+                    "driving_speed": "0",
+                    "working_speed": "10",
+                    "setting_up_time": 10.0,
+                    "processing_list_queue_length": 0,
+                    "size": {
+                        "x": 6,
+                        "y": 6
+                    },
                     "working_status": {
                         "process_status": "idle",
                         "working_robot_status": "no WR in machine",
@@ -243,7 +319,17 @@
                 "entity_type": "Machine",
                 "entity_id": null,
                 "entity_data": {
+                    "machine_type": 0,
                     "identification_str": "Ma: 0, 3",
+                    "machine_quality": "NEW_MACHINE",
+                    "driving_speed": "0",
+                    "working_speed": "10",
+                    "setting_up_time": 10.0,
+                    "processing_list_queue_length": 0,
+                    "size": {
+                        "x": 6,
+                        "y": 6
+                    },
                     "working_status": {
                         "process_status": "idle",
                         "working_robot_status": "no WR in machine",
@@ -275,7 +361,17 @@
                 "entity_type": "Machine",
                 "entity_id": null,
                 "entity_data": {
+                    "machine_type": 0,
                     "identification_str": "Ma: 0, 4",
+                    "machine_quality": "NEW_MACHINE",
+                    "driving_speed": "0",
+                    "working_speed": "10",
+                    "setting_up_time": 10.0,
+                    "processing_list_queue_length": 0,
+                    "size": {
+                        "x": 6,
+                        "y": 6
+                    },
                     "working_status": {
                         "process_status": "idle",
                         "working_robot_status": "no WR in machine",
@@ -307,7 +403,17 @@
                 "entity_type": "Machine",
                 "entity_id": null,
                 "entity_data": {
+                    "machine_type": 1,
                     "identification_str": "Ma: 1, 1",
+                    "machine_quality": "OLD_MACHINE",
+                    "driving_speed": "3",
+                    "working_speed": "10",
+                    "setting_up_time": 10.0,
+                    "processing_list_queue_length": 6780.0,
+                    "size": {
+                        "x": 6,
+                        "y": 6
+                    },
                     "working_status": {
                         "process_status": "idle",
                         "working_robot_status": "no WR in machine",
@@ -359,7 +465,17 @@
                 "entity_type": "Machine",
                 "entity_id": null,
                 "entity_data": {
+                    "machine_type": 1,
                     "identification_str": "Ma: 1, 2",
+                    "machine_quality": "NEW_MACHINE",
+                    "driving_speed": "3",
+                    "working_speed": "10",
+                    "setting_up_time": 10.0,
+                    "processing_list_queue_length": 1810.0,
+                    "size": {
+                        "x": 6,
+                        "y": 6
+                    },
                     "working_status": {
                         "process_status": "idle",
                         "working_robot_status": "no WR in machine",
@@ -411,7 +527,17 @@
                 "entity_type": "Machine",
                 "entity_id": null,
                 "entity_data": {
+                    "machine_type": 1,
                     "identification_str": "Ma: 1, 3",
+                    "machine_quality": "NEW_MACHINE",
+                    "driving_speed": "3",
+                    "working_speed": "10",
+                    "setting_up_time": 10.0,
+                    "processing_list_queue_length": 780.0,
+                    "size": {
+                        "x": 6,
+                        "y": 6
+                    },
                     "working_status": {
                         "process_status": "idle",
                         "working_robot_status": "no WR in machine",
@@ -499,7 +625,17 @@
                 "entity_type": "Machine",
                 "entity_id": null,
                 "entity_data": {
+                    "machine_type": 2,
                     "identification_str": "Ma: 2, 1",
+                    "machine_quality": "OLD_MACHINE",
+                    "driving_speed": "3",
+                    "working_speed": "10",
+                    "setting_up_time": 1.0,
+                    "processing_list_queue_length": 1730.4,
+                    "size": {
+                        "x": 6,
+                        "y": 6
+                    },
                     "working_status": {
                         "process_status": "idle",
                         "working_robot_status": "no WR in machine",
@@ -569,7 +705,17 @@
                 "entity_type": "Machine",
                 "entity_id": null,
                 "entity_data": {
+                    "machine_type": 2,
                     "identification_str": "Ma: 2, 2",
+                    "machine_quality": "NEW_MACHINE",
+                    "driving_speed": "3",
+                    "working_speed": "10",
+                    "setting_up_time": 1.0,
+                    "processing_list_queue_length": 1362.0,
+                    "size": {
+                        "x": 6,
+                        "y": 6
+                    },
                     "working_status": {
                         "process_status": "idle",
                         "working_robot_status": "no WR in machine",
@@ -657,7 +803,17 @@
                 "entity_type": "Machine",
                 "entity_id": null,
                 "entity_data": {
+                    "machine_type": 3,
                     "identification_str": "Ma: 3, 1",
+                    "machine_quality": "OLD_MACHINE",
+                    "driving_speed": "3",
+                    "working_speed": "10",
+                    "setting_up_time": 1.0,
+                    "processing_list_queue_length": 481.2,
+                    "size": {
+                        "x": 6,
+                        "y": 6
+                    },
                     "working_status": {
                         "process_status": "idle",
                         "working_robot_status": "no WR in machine",
@@ -709,7 +865,17 @@
                 "entity_type": "Machine",
                 "entity_id": null,
                 "entity_data": {
+                    "machine_type": 3,
                     "identification_str": "Ma: 3, 2",
+                    "machine_quality": "NEW_MACHINE",
+                    "driving_speed": "3",
+                    "working_speed": "10",
+                    "setting_up_time": 1.0,
+                    "processing_list_queue_length": 81.0,
+                    "size": {
+                        "x": 6,
+                        "y": 6
+                    },
                     "working_status": {
                         "process_status": "idle",
                         "working_robot_status": "no WR in machine",

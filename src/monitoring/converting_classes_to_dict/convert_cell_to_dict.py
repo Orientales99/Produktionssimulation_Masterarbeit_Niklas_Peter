@@ -37,32 +37,6 @@ class ConvertCellToDict:
         base_dict["entity_type"] = entity.__class__.__name__
 
         if isinstance(entity, Machine):
-            base_dict["entity_data"] = self.convert_machine_to_dict.serialize_machine_shorted_version_machine(entity)
-
-        if isinstance(entity, WorkingRobot):
-            base_dict["entity_data"] = self.convert_wr_to_dict.serialize_shorted_version_working_robot(entity)
-
-        if isinstance(entity, TransportRobot):
-            base_dict["entity_data"] = self.convert_tr_to_dict.serialize_shorted_version_transport_robot(entity)
-
-        return base_dict
-
-    def start_converting_cell_complete_version(self, cell: Cell) -> dict:
-        base_dict = {
-            "x": cell.cell_coordinates.x,
-            "y": cell.cell_coordinates.y,
-            "entity_type": None,
-            "entity_id": None,
-            "entity_data": None
-        }
-
-        entity = cell.placed_entity
-        if entity is None:
-            return base_dict
-
-        base_dict["entity_type"] = entity.__class__.__name__
-
-        if isinstance(entity, Machine):
             base_dict["entity_data"] = self.convert_machine_to_dict.serialize_complete_machine(entity)
 
         if isinstance(entity, WorkingRobot):
@@ -73,5 +47,3 @@ class ConvertCellToDict:
 
         return base_dict
 
-    def serialize_machine_first_init(self, machine: Machine) -> dict:
-        pass

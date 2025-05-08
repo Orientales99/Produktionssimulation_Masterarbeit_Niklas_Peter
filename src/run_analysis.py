@@ -1,8 +1,11 @@
 from src.monitoring.data_analysis.convert_json_data import ConvertJsonData
 from src.monitoring.data_analysis.creating_machine_during_simulation_dict import CreatingMachineDuringSimulationDict
+from src.monitoring.data_analysis.creating_tr_during_simulation_dict import CreatingTrDuringSimulationDict
+from src.monitoring.data_analysis.creating_wr_during_simulation_dict import CreatingWrDuringSimulationDict
 from src.monitoring.data_analysis.machine_data.machine_processing_time import MachineProcessingTime
 from src.monitoring.data_analysis.product_throughput import ProductThroughput
 from src.monitoring.data_analysis.visualize_production_material_throughput import VisualizeProductionMaterialThroughput
+from src.rebuild_simulation.entities_specifc_simulation_time import EntitiesSpecificSimulationTime
 
 
 def run_analysis():
@@ -38,7 +41,17 @@ def run_machine_working_status():
     machine_processing_time = MachineProcessingTime(creating_machine_during_simulation_dict)
     # machine_processing_time.get_production_machine_data()
 
+def run_tr_working_status():
+    convert = ConvertJsonData()
+    creating_tr_during_simulation_dict = CreatingTrDuringSimulationDict(convert)
+
+def run_wr_working_status():
+    convert = ConvertJsonData()
+    creating_wr_during_simulation_dict = CreatingWrDuringSimulationDict(convert)
+
 if __name__ == '__main__':
-    run_analysis()
-    # run_machine_working_status()
+    # run_analysis()
+    #run_machine_working_status()
+    run_tr_working_status()
+    run_wr_working_status()
 

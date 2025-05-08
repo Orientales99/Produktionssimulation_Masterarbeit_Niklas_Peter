@@ -6,7 +6,7 @@ import pandas as pd
 from src.entity.machine.processing_order import ProcessingOrder
 from src.entity.sink import Sink
 from src.process_logic.good_receipt import GoodReceipt
-from src.process_logic.machine.machine_manager import Machine_Manager
+from src.process_logic.machine.machinemanager import MachineManager
 from src.production.production import Production
 from src.order_data.order import Order
 from src.order_data.production_material import ProductionMaterial
@@ -16,7 +16,7 @@ from src.entity.machine.machine import Machine
 
 class ManufacturingPlan:
     production: Production
-    machine_execution: Machine_Manager
+    machine_execution: MachineManager
     service_product_information: ProductInformationService
     summarised_order_list: list[Order] | None = None
     dictionary_summarised_order_per_day: dict[date, list[Order]]

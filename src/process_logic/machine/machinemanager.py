@@ -6,7 +6,7 @@ from src.order_data.order import Order
 from src.order_data.production_material import ProductionMaterial
 
 
-class Machine_Manager:
+class MachineManager:
     machine_list: list[Machine]
     list_full_store_after_process = list[Machine]
 

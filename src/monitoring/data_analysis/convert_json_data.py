@@ -10,25 +10,16 @@ from src import SIMULATION_OUTPUT_DATA, ENTITIES_DURING_SIMULATION_DATA, MACHINE
 
 
 class ConvertJsonData:
-    entity_starting_data_df: pd.DataFrame
     goods_receipt_production_df: pd.DataFrame
     finished_products_leaving_production_df: pd.DataFrame
     combined_simulation_entity_data_df: pd.DataFrame
 
     def __init__(self):
-        self.entity_starting_data_df = self.get_entity_data()
         self.goods_receipt_production_df = self.get_df_goods_entering_production()
         self.finished_products_leaving_production_df = self.get_df_finished_products_leaving_production()
         self.simulation_machine_data_df = self.get_machine_simulation_df()
         self.simulation_tr_data_df = self.get_tr_simulation_df()
         self.simulation_wr_data_df = self.get_wr_simulation_df()
-
-    def get_entity_data(self) -> pd.DataFrame:
-        """Create a df with all entities and their starting stats"""
-        with open(ENTITIES_DURING_SIMULATION_DATA / "entity_starting_data.json", 'r',
-                  encoding='utf-8') as entity_data:
-            data = json.load(entity_data)
-            return pd.DataFrame(data)
 
     def get_df_goods_entering_production(self) -> pd.DataFrame:
         """Create a df with all the products entering the production and the time"""
@@ -66,9 +57,14 @@ class ConvertJsonData:
 
         # Read in all JSONs and collect them in a list
         for _, file in file_info:
-            with open(file, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                all_data.extend(data)
+            try:
+                with open(file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    all_data.extend(data)
+            except json.JSONDecodeError as e:
+                print(f"Fehler in Datei: {file.name}")
+                print(f"Fehlermeldung: {e}")
+                raise
 
         return pd.DataFrame(all_data)
 
