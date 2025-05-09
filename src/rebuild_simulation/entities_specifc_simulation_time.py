@@ -7,6 +7,7 @@ from src.monitoring.data_analysis.creating_machine_during_simulation_dict import
 from src.monitoring.data_analysis.creating_tr_during_simulation_dict import CreatingTrDuringSimulationDict
 from src.monitoring.data_analysis.creating_wr_during_simulation_dict import CreatingWrDuringSimulationDict
 from src.production.base.cell import Cell
+from src.production.base.coordinates import Coordinates
 from src.production.production import Production
 from src.rebuild_simulation.convert_dict_to_class.convert_dict_to_machine import ConvertDictToMachine
 from src.rebuild_simulation.convert_dict_to_class.convert_dict_to_tr import ConvertDictToTr
@@ -39,8 +40,8 @@ class EntitiesSpecificSimulationTime:
         self.creating_wr_during_simulation_dict = creating_wr_during_simulation_dict
 
         self.convert_dict_to_machine = ConvertDictToMachine(self.env)
-        self.convert_dict_to_tr = ConvertDictToTr(self.env)
-        self.convert_dict_to_wr = ConvertDictToWr()
+        self.convert_dict_to_tr = ConvertDictToTr(self.env, self.production)
+        self.convert_dict_to_wr = ConvertDictToWr(self.production)
 
         self.every_machine_during_simulation_data = self.creating_machine_during_simulation_dict.every_machine_during_simulation_data
         self.every_wr_during_simulation_data = self.creating_wr_during_simulation_dict.every_wr_during_simulation_data
@@ -81,7 +82,7 @@ class EntitiesSpecificSimulationTime:
 
             for dy in range(height):
                 for dx in range(width):
-                    cell = self.production.production_layout[y - dy][x + dx]
+                    cell = self.production.get_cell(Coordinates((x + dx), (y - dy)))
                     cell.placed_entity = machine
                     cell_list.append(cell)
 
@@ -98,8 +99,8 @@ class EntitiesSpecificSimulationTime:
         for identification_str, tr_dict in every_tr_dict.items():
             cell_list: list[Cell]
             cell_list = []
-            x = tr_dict.get("x")
-            y = tr_dict.get("y")
+            x = tr_dict["entities"][0]["x"]
+            y = tr_dict["entities"][0]["y"]
 
             tr = self.convert_dict_to_tr.deserialize_complete_transport_robot(tr_dict)
             tr_object_list.append(tr)
@@ -109,7 +110,7 @@ class EntitiesSpecificSimulationTime:
 
             for dy in range(height):
                 for dx in range(width):
-                    cell = self.production.production_layout[y - dy][x + dx]
+                    cell = self.production.get_cell(Coordinates((x + dx), (y - dy)))
                     cell.placed_entity = tr
                     cell_list.append(cell)
 
@@ -127,8 +128,8 @@ class EntitiesSpecificSimulationTime:
             cell_list: list[Cell]
             cell_list = []
 
-            x = wr_dict.get("x")
-            y = wr_dict.get("y")
+            x = wr_dict["entities"][0]["x"]
+            y = wr_dict["entities"][0]["y"]
 
             wr = self.convert_dict_to_wr.deserialize_complete_working_robot(wr_dict)
             wr_object_list.append(wr)
@@ -138,11 +139,17 @@ class EntitiesSpecificSimulationTime:
 
             for dy in range(height):
                 for dx in range(width):
-                    cell = self.production.production_layout[y - dy][x + dx]
+                    cell = self.production.get_cell(Coordinates((x + dx), (y - dy)))
                     cell.placed_entity = wr
                     cell_list.append(cell)
 
             self.entities_located[identification_str] = cell_list
+
+    def last_know_states_sink(self):
+        """This method restores sink. It reads their position and size from the data. Each robot is
+        deserialized and placed into the production layout. Affected cells are updated with the robot as placed_entity.
+        These cells are saved in self.entities_located under the robot’s identification_str"""
+
 
     def get_last_known_states_before_time(self, entity_dict: dict[str, list[dict]]) -> dict[str, dict]:
         """

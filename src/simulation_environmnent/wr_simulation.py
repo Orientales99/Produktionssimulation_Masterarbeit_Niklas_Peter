@@ -54,6 +54,7 @@ class WrSimulation:
                         wr.working_status.working_on_status = True
                         if self.working_robot_order_manager.wr_driving_in_machine(wr) is True:
                             wr.working_status.status = WorkingRobotStatus.WORKING_ON_MACHINE
+                            print("start_every_wr_process")
                             self.saving_simulation_data.save_entity_action(wr)
 
                     # working process on the machine happens in the class machine_execution
@@ -62,7 +63,6 @@ class WrSimulation:
                     if wr.working_status.status == WorkingRobotStatus.WAITING_IN_MACHINE_TO_EXIT and \
                             wr.working_status.working_on_status is False:
                         self.env.process(self.wr_exit_machine_process(wr))
-
                 yield self.env.timeout(1)
             else:
                 yield self.env.timeout(1)

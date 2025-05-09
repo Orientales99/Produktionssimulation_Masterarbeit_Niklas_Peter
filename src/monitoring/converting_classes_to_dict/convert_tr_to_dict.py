@@ -5,7 +5,7 @@ from src.production.store_manager import StoreManager
 class ConvertTrToDict:
     store_manager: StoreManager
 
-    def __init__(self, store_manager):
+    def __init__(self, store_manager: StoreManager):
         self.store_manager = store_manager
 
     def serialize_complete_transport_robot(self, tr: TransportRobot) -> dict:
@@ -33,8 +33,7 @@ class ConvertTrToDict:
                 "driving route": self.safe_coords_list(tr.working_status.driving_route),
                 "destination location entity": tr.working_status.destination_location_entity.identification_str if
                 tr.working_status.destination_location_entity else None,
-                "side_step_driving_route": tr.working_status.side_step_driving_route if
-                tr.working_status.side_step_driving_route else None,
+                "side_step_driving_route": self.safe_coords_list(tr.working_status.side_step_driving_route),
                 "waiting_time_error": tr.working_status.waiting_error_time
             },
             "transport_order": (
@@ -50,10 +49,14 @@ class ConvertTrToDict:
             )
         }
 
-    def safe_coords_list(self, coord_list):
+    def safe_coords_list(self, coord_list) -> list[str]:
         """Secure access to coordinate lists with error handling."""
-        if coord_list is not None:
-            if isinstance(coord_list, list):
-                return coord_list if coord_list else None
-            else:
-                return None
+        coordinate_list = []
+        if not isinstance(coord_list, list):
+            return coordinate_list
+
+        if len(coord_list) != 0:
+            for coordinate in coord_list:
+                coordinate_list.append(coordinate)
+        return coordinate_list
+

@@ -81,8 +81,7 @@ class Production:
         """Places the sink at the center of the right side of the production layout."""
         self.sink_coordinates = Coordinates(int(self.max_coordinate.x - 1), int(self.max_coordinate.y / 2))
         cell = self.get_cell(self.sink_coordinates)
-        cell.placed_entity = Sink(0, 0, 0, Store(
-                               self.env), [])
+        cell.placed_entity = Sink(Store(self.env), [])
 
     def get_working_robot_placed_in_production(self):
         """Places working robots in the production layout and stores their locations in a dictionary"""

@@ -4,8 +4,9 @@ import glob
 from datetime import date
 
 from src import SIMULATION_OUTPUT_DATA, ENTITIES_DURING_SIMULATION_DATA, MACHINES_DURING_SIMULATION_DATA, \
-    TR_DURING_SIMULATION_DATA, WR_DURING_SIMULATION_DATA
+    TR_DURING_SIMULATION_DATA, WR_DURING_SIMULATION_DATA, SINK_DURING_SIMULATION_DATA
 from src.entity.machine.machine import Machine
+from src.entity.sink import Sink
 from src.entity.transport_robot.transport_robot import TransportRobot
 from src.entity.working_robot.working_robot import WorkingRobot
 from src.monitoring.converting_classes_to_dict.convert_cell_to_dict import ConvertCellToDict
@@ -45,18 +46,28 @@ class SavingSimulationData:
         self.simulation_machine_data_list = []
         self.simulation_tr_data_list = []
         self.simulation_wr_data_list = []
+        self.simulation_sink_data_list = []
 
         self.time_variable_machine = 0
         self.time_variable_tr = 0
         self.time_variable_wr = 0
+        self.time_variable_sink = 0
 
     def save_every_entity_identification_str(self):
         self.entities_located = self.production.entities_located.copy()
         self.list_every_entity_identification_str = list(self.entities_located.keys())
 
-    def save_entity_action(self, entity: Machine | WorkingRobot | TransportRobot):
-        cell = self.save_one_cell_from_entity(entity)
+    def save_entity_action(self, entity: Machine | WorkingRobot | TransportRobot | Sink):
+        if isinstance(entity, Sink):
+            cell = self.production.get_cell(self.production.sink_coordinates)
+        else:
+            cell = self.save_one_cell_from_entity(entity)
+
         self.append_current_data_to_file_during_simulation(cell)
+
+        if isinstance(cell.placed_entity, WorkingRobot):
+            if cell.placed_entity.working_status.last_placement_in_production is not None:
+                print(cell.placed_entity.working_status.last_placement_in_production)
 
     def save_one_cell_of_every_entity(self):
         self.saving_entity_data_list = []
@@ -90,6 +101,10 @@ class SavingSimulationData:
 
         if isinstance(entity_cell.placed_entity, WorkingRobot):
             self.simulation_wr_data_list.append(data_entry)
+
+        if isinstance(entity_cell.placed_entity, Sink):
+            self.simulation_sink_data_list.append(data_entry)
+
 
     def convert_simulating_machine_data_to_json(self):
 
@@ -153,6 +168,27 @@ class SavingSimulationData:
 
             self.time_variable_wr = self.env.now
             self.simulation_wr_data_list = []
+
+    def convert_simulating_sink_data_to_json(self):
+
+        if len(self.simulation_sink_data_list) != 0:
+            data_file_name = f"simulation_sink_run_data_from_{self.time_variable_sink}_sec_to_{self.env.now}_sec.json"
+            output_file = SINK_DURING_SIMULATION_DATA / data_file_name
+
+            if not os.path.exists(output_file):
+                with open(output_file, "w") as f:
+                    json.dump([], f)
+
+            with open(output_file, "r") as f:
+                data = json.load(f)
+
+            data.append(self.simulation_sink_data_list)
+
+            with open(output_file, "w") as f:
+                json.dump(data, f, indent=4)
+
+            self.time_variable_sink = self.env.now
+            self.simulation_sink_data_list = []
 
     def data_of_entities(self):
         """Creating a file with the complete data of every entity"""

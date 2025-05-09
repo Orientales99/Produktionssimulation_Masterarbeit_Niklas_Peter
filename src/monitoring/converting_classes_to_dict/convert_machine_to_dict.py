@@ -101,7 +101,8 @@ class ConvertMachineToDict:
                 "producing_material": {
                     "id": process_material.producing_material.identification_str,
                     "quantity": process_material.quantity_producing
-                }
+                },
+                "required_material_on_tr_for_delivery": process_material.required_material_on_tr_for_delivery
             }
             process_materials_data.append(entry)
 

@@ -57,11 +57,11 @@ class BuckFixingEnvironmentSimulation:
         self.tr_simulation = TrSimulation(self.env, self.tr_order_manager, self.tr_executing_order,
                                           self.saving_simulation_data, self.stop_event)
 
-        # self.visualisation_simulation = VisualisationSimulation(self.env, self.production, self.tr_order_manager,
-        #                                                         self.stop_event)
+        self.visualisation_simulation = VisualisationSimulation(self.env, self.production, self.tr_order_manager,
+                                                                 self.stop_event)
 
         ####################################################################################################################
-
+        self.production.create_production()
         self.control_time = self.get_control_time()
 
         self.convert = ConvertJsonData()
@@ -81,10 +81,8 @@ class BuckFixingEnvironmentSimulation:
 
     def start_processes(self):
         yield self.env.timeout(self.control_time)
-        # starting processes
-        self.env.process(self.visualisation_simulation.visualize_layout())
-        # self.env.process(self.monitoring_simulation.start_monitoring_process())
 
+        self.env.process(self.visualisation_simulation.visualize_layout())
         self.env.process(self.wr_simulation.start_every_wr_process())
         self.env.process(self.tr_simulation.start_every_tr_process())
         self.env.process(self.machine_simulation.run_machine_process())
@@ -93,7 +91,7 @@ class BuckFixingEnvironmentSimulation:
         self.env.run(until=until)
 
     def initialise_simulation_start(self):
-        self.production.create_production()
+
         current_date = self.production.service_starting_conditions.set_starting_date_of_simulation()
         while True:
             if self.env.now > self.control_time:

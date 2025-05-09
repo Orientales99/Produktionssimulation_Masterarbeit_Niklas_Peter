@@ -7,8 +7,10 @@ class ConvertWrToDict:
         pass
 
     def serialize_complete_working_robot(self, wr: WorkingRobot) -> dict:
+
         if wr.working_status.last_placement_in_production is not None:
             last_placement_in_production = self.get_list_cell_as_str(wr.working_status.last_placement_in_production)
+            print(wr.working_status.last_placement_in_production)
         else:
             last_placement_in_production = None
 
@@ -34,19 +36,21 @@ class ConvertWrToDict:
                     else None
                 ),
                 "driving route": self.safe_coords_list(wr.working_status.driving_route),
-                "side step driving route": wr.working_status.side_step_driving_route if
-                wr.working_status.side_step_driving_route else None,
+                "side step driving route": wr.working_status.side_step_driving_route,
                 "last placement in production": last_placement_in_production
             }
         }
 
-    def safe_coords_list(self, coord_list):
+    def safe_coords_list(self, coord_list) -> list[str]:
         """Secure access to coordinate lists with error handling."""
-        if coord_list is not None:
-            if isinstance(coord_list, list):
-                return coord_list if coord_list else None
-            else:
-                return None
+        coordinate_list = []
+        if not isinstance(coord_list, list):
+            return coordinate_list
+
+        if len(coord_list) != 0:
+            for coordinate in coord_list:
+                coordinate_list.append(coordinate)
+        return coordinate_list
 
     def get_list_cell_as_str(self, cell_list: list[Cell]) -> list[str]:
         str_cells = []

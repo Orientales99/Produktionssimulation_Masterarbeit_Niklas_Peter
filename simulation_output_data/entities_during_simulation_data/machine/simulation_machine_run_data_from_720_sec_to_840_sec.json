@@ -511,7 +511,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 23
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -521,7 +522,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -531,7 +533,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -541,7 +544,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -777,7 +781,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 23
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -787,7 +792,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -797,7 +803,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -807,7 +814,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -878,7 +886,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 488
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -1090,7 +1099,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 488
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -1161,7 +1171,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 119
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -1373,7 +1384,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 119
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -1452,7 +1464,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 16
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -1462,7 +1475,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -1682,7 +1696,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 16
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -1692,7 +1707,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -2609,7 +2625,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 487
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -2821,7 +2838,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 487
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -2916,7 +2934,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 22
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -2926,7 +2945,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -2936,7 +2956,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -2946,7 +2967,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -3182,7 +3204,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 22
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -3192,7 +3215,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -3202,7 +3226,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -3212,7 +3237,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -3291,7 +3317,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 15
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -3301,7 +3328,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -3521,7 +3549,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 15
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -3531,7 +3560,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -3602,7 +3632,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 118
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -3814,7 +3845,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 118
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -4590,7 +4622,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 486
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -4802,7 +4835,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 486
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -5022,7 +5056,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 14
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -5032,7 +5067,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -5252,7 +5288,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 14
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -5262,7 +5299,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -5357,7 +5395,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 21
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -5367,7 +5406,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -5377,7 +5417,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -5387,7 +5428,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -5623,7 +5665,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 21
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -5633,7 +5676,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -5643,7 +5687,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -5653,7 +5698,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -5865,7 +5911,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 117
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -6077,7 +6124,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 117
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -6571,7 +6619,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 485
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -6783,7 +6832,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 485
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -7003,7 +7053,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 13
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -7013,7 +7064,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -7233,7 +7285,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 13
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -7243,7 +7296,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -7620,7 +7674,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 20
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -7630,7 +7685,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -7640,7 +7696,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -7650,7 +7707,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -7886,7 +7944,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 20
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -7896,7 +7955,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -7906,7 +7966,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -7916,7 +7977,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -8128,7 +8190,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 116
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -8340,7 +8403,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 116
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -8552,7 +8616,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 484
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -8764,7 +8829,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 484
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -8984,7 +9050,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 12
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -8994,7 +9061,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -9214,7 +9282,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 12
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -9224,7 +9293,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -9883,7 +9953,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 19
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -9893,7 +9964,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -9903,7 +9975,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -9913,7 +9986,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -10149,7 +10223,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 19
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -10159,7 +10234,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -10169,7 +10245,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -10179,7 +10256,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -10391,7 +10469,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 115
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -10462,7 +10541,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 483
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -10674,7 +10754,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 115
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -10745,7 +10826,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 483
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -10965,7 +11047,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 11
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -10975,7 +11058,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -11195,7 +11279,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 11
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -11205,7 +11290,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -12146,7 +12232,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 18
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -12156,7 +12243,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -12166,7 +12254,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -12176,7 +12265,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -12247,7 +12337,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 482
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -12483,7 +12574,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 18
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -12493,7 +12585,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -12503,7 +12596,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -12513,7 +12607,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -12584,7 +12679,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 482
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -12796,7 +12892,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 114
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -12875,7 +12972,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 10
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -12885,7 +12983,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -13097,7 +13196,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 114
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -13176,7 +13276,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 10
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -13186,7 +13287,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -14103,7 +14205,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 481
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -14315,7 +14418,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 481
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -14551,7 +14655,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 17
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -14561,7 +14666,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -14571,7 +14677,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -14581,7 +14688,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -14660,7 +14768,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 9
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -14670,7 +14779,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -14906,7 +15016,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 17
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -14916,7 +15027,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -14926,7 +15038,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -14936,7 +15049,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -15015,7 +15129,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 9
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -15025,7 +15140,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -15237,7 +15353,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 113
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -15449,7 +15566,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 113
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -16084,7 +16202,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 480
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -16296,7 +16415,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 480
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -16516,7 +16636,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 8
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -16526,7 +16647,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -16746,7 +16868,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 8
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -16756,7 +16879,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -16992,7 +17116,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 16
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -17002,7 +17127,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -17012,7 +17138,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -17022,7 +17149,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -17258,7 +17386,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 16
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -17268,7 +17397,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -17278,7 +17408,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -17288,7 +17419,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -17500,7 +17632,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 112
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -17712,7 +17845,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 112
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -18065,7 +18199,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 479
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -18277,7 +18412,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 479
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -18497,7 +18633,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 7
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -18507,7 +18644,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -18727,7 +18865,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 7
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -18737,7 +18876,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -19255,7 +19395,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 15
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -19265,7 +19406,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -19275,7 +19417,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -19285,7 +19428,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -19521,7 +19665,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 15
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -19531,7 +19676,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -19541,7 +19687,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -19551,7 +19698,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -19763,7 +19911,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 111
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -19975,7 +20124,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 111
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -20046,7 +20196,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 478
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -20258,7 +20409,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 478
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -20478,7 +20630,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 6
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -20488,7 +20641,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -20708,7 +20862,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 6
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -20718,7 +20873,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -21518,7 +21674,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 14
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -21528,7 +21685,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -21538,7 +21696,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -21548,7 +21707,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -21784,7 +21944,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 14
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -21794,7 +21955,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -21804,7 +21966,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -21814,7 +21977,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -21885,7 +22049,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 477
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -22097,7 +22262,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 477
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -22168,7 +22334,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 110
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -22380,7 +22547,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 110
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -22459,7 +22627,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 5
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -22469,7 +22638,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -22689,7 +22859,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 5
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -22699,7 +22870,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -23616,7 +23788,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 476
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -23828,7 +24001,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.1",
                                     "quantity": 476
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -23923,7 +24097,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 13
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -23933,7 +24108,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -23943,7 +24119,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -23953,7 +24130,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -24189,7 +24367,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.THREE.1",
                                     "quantity": 13
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -24199,7 +24378,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.SEVEN.3",
                                     "quantity": 564
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -24209,7 +24389,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TEN.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -24219,7 +24400,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.ELEVEN.1",
                                     "quantity": 24
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -24298,7 +24480,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 4
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -24308,7 +24491,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -24528,7 +24712,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWELVE.3",
                                     "quantity": 4
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             },
                             {
                                 "required_material": {
@@ -24538,7 +24723,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.FOUR.1",
                                     "quantity": 52
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -24609,7 +24795,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 109
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }
@@ -24821,7 +25008,8 @@
                                 "producing_material": {
                                     "id": "ProductGroup.TWO.1",
                                     "quantity": 109
-                                }
+                                },
+                                "required_material_on_tr_for_delivery": 0
                             }
                         ]
                     }

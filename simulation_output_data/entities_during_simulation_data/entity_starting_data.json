@@ -21,7 +21,7 @@
                         "waiting time on path": 2,
                         "working for machine": null,
                         "driving destination coordinates": null,
-                        "driving route": null,
+                        "driving route": [],
                         "side step driving route": null,
                         "last placement in production": null
                     }
@@ -47,7 +47,7 @@
                         "waiting time on path": 4,
                         "working for machine": null,
                         "driving destination coordinates": null,
-                        "driving route": null,
+                        "driving route": [],
                         "side step driving route": null,
                         "last placement in production": null
                     }
@@ -73,7 +73,7 @@
                         "waiting time on path": 6,
                         "working for machine": null,
                         "driving destination coordinates": null,
-                        "driving route": null,
+                        "driving route": [],
                         "side step driving route": null,
                         "last placement in production": null
                     }
@@ -99,7 +99,7 @@
                         "waiting time on path": 8,
                         "working for machine": null,
                         "driving destination coordinates": null,
-                        "driving route": null,
+                        "driving route": [],
                         "side step driving route": null,
                         "last placement in production": null
                     }
@@ -128,9 +128,9 @@
                         "working on status": false,
                         "waiting time on path": 2,
                         "driving destination coordinates": null,
-                        "driving route": null,
+                        "driving route": [],
                         "destination location entity": null,
-                        "side_step_driving_route": null,
+                        "side_step_driving_route": [],
                         "waiting_time_error": null
                     },
                     "transport_order": null
@@ -159,9 +159,9 @@
                         "working on status": false,
                         "waiting time on path": 4,
                         "driving destination coordinates": null,
-                        "driving route": null,
+                        "driving route": [],
                         "destination location entity": null,
-                        "side_step_driving_route": null,
+                        "side_step_driving_route": [],
                         "waiting_time_error": null
                     },
                     "transport_order": null
@@ -190,9 +190,9 @@
                         "working on status": false,
                         "waiting time on path": 6,
                         "driving destination coordinates": null,
-                        "driving route": null,
+                        "driving route": [],
                         "destination location entity": null,
-                        "side_step_driving_route": null,
+                        "side_step_driving_route": [],
                         "waiting_time_error": null
                     },
                     "transport_order": null
@@ -221,9 +221,9 @@
                         "working on status": false,
                         "waiting time on path": 8,
                         "driving destination coordinates": null,
-                        "driving route": null,
+                        "driving route": [],
                         "destination location entity": null,
-                        "side_step_driving_route": null,
+                        "side_step_driving_route": [],
                         "waiting_time_error": null
                     },
                     "transport_order": null
@@ -454,7 +454,8 @@
                             "producing_material": {
                                 "id": "ProductGroup.SEVEN.1",
                                 "quantity": 564
-                            }
+                            },
+                            "required_material_on_tr_for_delivery": 0
                         }
                     ]
                 }
@@ -516,7 +517,8 @@
                             "producing_material": {
                                 "id": "ProductGroup.TWO.1",
                                 "quantity": 180
-                            }
+                            },
+                            "required_material_on_tr_for_delivery": 0
                         }
                     ]
                 }
@@ -594,7 +596,8 @@
                             "producing_material": {
                                 "id": "ProductGroup.NINE.3",
                                 "quantity": 44
-                            }
+                            },
+                            "required_material_on_tr_for_delivery": 0
                         },
                         {
                             "required_material": {
@@ -604,7 +607,8 @@
                             "producing_material": {
                                 "id": "ProductGroup.ONE.1",
                                 "quantity": 32
-                            }
+                            },
+                            "required_material_on_tr_for_delivery": 0
                         },
                         {
                             "required_material": {
@@ -614,7 +618,8 @@
                             "producing_material": {
                                 "id": "ProductGroup.EIGHT.1",
                                 "quantity": 12
-                            }
+                            },
+                            "required_material_on_tr_for_delivery": 0
                         }
                     ]
                 }
@@ -684,7 +689,8 @@
                             "producing_material": {
                                 "id": "ProductGroup.TWELVE.3",
                                 "quantity": 92
-                            }
+                            },
+                            "required_material_on_tr_for_delivery": 0
                         },
                         {
                             "required_material": {
@@ -694,7 +700,8 @@
                             "producing_material": {
                                 "id": "ProductGroup.FOUR.1",
                                 "quantity": 52
-                            }
+                            },
+                            "required_material_on_tr_for_delivery": 0
                         }
                     ]
                 }
@@ -772,7 +779,8 @@
                             "producing_material": {
                                 "id": "ProductGroup.THREE.1",
                                 "quantity": 84
-                            }
+                            },
+                            "required_material_on_tr_for_delivery": 0
                         },
                         {
                             "required_material": {
@@ -782,7 +790,8 @@
                             "producing_material": {
                                 "id": "ProductGroup.TEN.1",
                                 "quantity": 52
-                            }
+                            },
+                            "required_material_on_tr_for_delivery": 0
                         },
                         {
                             "required_material": {
@@ -792,7 +801,8 @@
                             "producing_material": {
                                 "id": "ProductGroup.ELEVEN.1",
                                 "quantity": 24
-                            }
+                            },
+                            "required_material_on_tr_for_delivery": 0
                         }
                     ]
                 }
@@ -854,7 +864,8 @@
                             "producing_material": {
                                 "id": "ProductGroup.FOURTEEN.1",
                                 "quantity": 40
-                            }
+                            },
+                            "required_material_on_tr_for_delivery": 0
                         }
                     ]
                 }
@@ -924,7 +935,8 @@
                             "producing_material": {
                                 "id": "ProductGroup.THIRTEEN.1",
                                 "quantity": 8
-                            }
+                            },
+                            "required_material_on_tr_for_delivery": 0
                         },
                         {
                             "required_material": {
@@ -934,7 +946,8 @@
                             "producing_material": {
                                 "id": "ProductGroup.FIFTEEN.3",
                                 "quantity": 8
-                            }
+                            },
+                            "required_material_on_tr_for_delivery": 0
                         }
                     ]
                 }

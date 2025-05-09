@@ -304,6 +304,9 @@ class TrExecutingOrder:
 
         self.manufacturing_plan.update_goods_issue_order_quantities(sink)
         self.saving_simulation_data.data_order_completed(unload_product, item_to_unload)
+        self.saving_simulation_data.save_entity_action(sink)
+        self.saving_simulation_data.save_entity_action(tr)
+
 
         store_items = self.store_manager.get_str_products_in_store(sink.goods_issue_store)
 

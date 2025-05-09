@@ -13,17 +13,21 @@ from src.order_data.order import Order
 from src.order_data.product import Product
 from src.order_data.production_material import ProductionMaterial
 from src.production.base.coordinates import Coordinates
+from src.provide_input_data.product_information_service import ProductInformationService
 
 
 class ConvertDictToMachine:
     def __init__(self, env):
         self.env = env
 
+        self.product_information_service = ProductInformationService()
+        self.product_information_list = self.product_information_service.create_product_information_list()
+
     def deserialize_complete_machine(self, machine_dict: dict) -> Machine:
         # Extracting basic attributes
         entity_data = machine_dict["entities"][0]["entity_data"]
         size = Coordinates(entity_data["size"]["x"], entity_data["size"]["y"])
-
+        identification_number = self.get_identification_number(entity_data["identification_str"])
         machine_storage = self._rebuild_machine_storage(entity_data["storage"])
         working_status = self._rebuild_working_status(entity_data["working_status"])
 
@@ -36,8 +40,8 @@ class ConvertDictToMachine:
 
         return Machine(
             machine_type=entity_data["machine_type"],
-            identification_number=machine_dict.get("identification_number", 0),
-            ##################################################
+            identification_number=identification_number,
+
             machine_quality=machine_quality,
             driving_speed=entity_data["driving_speed"],
             working_speed=entity_data["working_speed"],
@@ -49,6 +53,10 @@ class ConvertDictToMachine:
             process_material_list=process_materials,
             processing_list_queue_length=entity_data["processing_list_queue_length"]
         )
+
+    def get_identification_number(self, identification_str: str) -> int:
+        """get identification_str: Ma: 0, 2; return identification_number: 2"""
+        return int(identification_str.split(",")[-1].strip())
 
     def _rebuild_machine_storage(self, storage_dict: dict) -> MachineStorage:
         """
@@ -62,7 +70,11 @@ class ConvertDictToMachine:
             for identification_str in storage_dict["before_process"]["Loaded Products"]:
                 production_material = self._rebuild_production_material_from_ident_str(identification_str)
 
-        storage_before_process = Store(self.env, capacity=capacity_store_before_process)
+                storage_before_process = Store(self.env, capacity=capacity_store_before_process)
+                for _ in range(contained_units):
+                    storage_before_process.items.append(production_material)
+        else:
+            storage_before_process = Store(self.env, capacity=capacity_store_before_process)
 
         # Rebuild the 'storage_after_process'
         contained_units = storage_dict["after_process"]["Contained Units"]
@@ -71,7 +83,11 @@ class ConvertDictToMachine:
             for identification_str in storage_dict["after_process"]["Loaded Products"]:
                 production_material = self._rebuild_production_material_from_ident_str(identification_str)
 
-        storage_after_process = Store(self.env, capacity=capacity_store_after_process)
+                storage_after_process = Store(self.env, capacity=capacity_store_after_process)
+                for _ in range(contained_units):
+                    storage_after_process.items.append(production_material)
+        else:
+            storage_after_process = Store(self.env, capacity=capacity_store_after_process)
 
         return MachineStorage(storage_before_process, storage_after_process)
 
@@ -140,14 +156,17 @@ class ConvertDictToMachine:
         return MachineStorageStatus(storage_status_str)
 
     def _rebuild_processing_orders(self, processing_list_dict: list) -> list[ProcessingOrder]:
-        return [self._rebuild_processing_order(po) for po in processing_list_dict]
+        if len(processing_list_dict) == 0:
+            return []
+        else:
+            return [self._rebuild_processing_order(po) for po in processing_list_dict]
 
     def _rebuild_processing_order(self, po_dict: dict) -> ProcessingOrder:
         # Rebuilds the ProcessingOrder from a dictionary
         return ProcessingOrder(
-            order=self._rebuild_order(po_dict.get("order", {})),
-            step_of_the_process=po_dict.get("step_of_the_process", 0),
-            priority=po_dict.get("priority", 0)
+            order=self._rebuild_order(po_dict),
+            step_of_the_process=po_dict["step_of_process"],
+            priority=po_dict["daily_manufacturing_sequence"]
         )
 
     def _rebuild_order(self, order_dict: dict) -> Order:
@@ -156,18 +175,18 @@ class ConvertDictToMachine:
         like Product, OrderPriority, and the attributes related to production steps.
         """
         # Extracting basic information for Order
-        product_data = order_dict.get("product", {})
+        product_data = order_dict["product_identification"]
+        product_data = product_data.split(" ", 1)[1]
         product = self._rebuild_product(product_data)
 
         order_date = order_dict["order_date"]
         if isinstance(order_date, str):
             order_date = self._parse_date(order_date)  # Assuming this method parses the date string to a date object
 
-        priority_str = order_dict.get("priority", "STANDARD_ORDER_1")
-        priority = OrderPriority[
-            priority_str] if priority_str in OrderPriority.__members__ else OrderPriority.STANDARD_ORDER_1
+        priority_str = order_dict["priority"]
+        priority = OrderPriority[priority_str]
 
-        daily_manufacturing_sequence = order_dict.get("daily_manufacturing_sequence", None)
+        daily_manufacturing_sequence = order_dict["daily_manufacturing_sequence"]
 
         return Order(
             product=product,
@@ -177,49 +196,13 @@ class ConvertDictToMachine:
             daily_manufacturing_sequence=daily_manufacturing_sequence
         )
 
-    def _rebuild_product(self, product_data: dict) -> Product:
+    def _rebuild_product(self, product_id: str) -> Product:
         """
-        Rebuilds the Product object from a dictionary.
+        Rebuilds the Product object from a pro.
         """
-        product_id_str = product_data.get("product_id", "")
-        product_id = ProductGroup[product_id_str] if product_id_str in ProductGroup.__members__ else ProductGroup.ONE
-
-        size_data = product_data.get("size", {})
-        size = Coordinates(x=size_data.get("x", 0), y=size_data.get("y", 0))
-
-        item_type_str = product_data.get("item_type")
-
-        # Extracting processing steps and times from product_data
-        processing_data = product_data.get("processing_steps", {})
-        processing_step_1 = processing_data.get("processing_step_1", None)
-        processing_time_step_1 = processing_data.get("processing_time_step_1", None)
-
-        processing_step_2 = processing_data.get("processing_step_2", None)
-        processing_time_step_2 = processing_data.get("processing_time_step_2", None)
-
-        processing_step_3 = processing_data.get("processing_step_3", None)
-        processing_time_step_3 = processing_data.get("processing_time_step_3", None)
-
-        processing_step_4 = processing_data.get("processing_step_4", None)
-        processing_time_step_4 = processing_data.get("processing_time_step_4", None)
-
-        return Product(
-            product_id=product_id,
-            size=size,
-            item_type=item_type_str,
-            required_product_type_step_1=None,  # Or set from some other logic
-            processing_step_1=processing_step_1,
-            processing_time_step_1=processing_time_step_1,
-            required_product_type_step_2=None,
-            processing_step_2=processing_step_2,
-            processing_time_step_2=processing_time_step_2,
-            required_product_type_step_3=None,
-            processing_step_3=processing_step_3,
-            processing_time_step_3=processing_time_step_3,
-            required_product_type_step_4=None,
-            processing_step_4=processing_step_4,
-            processing_time_step_4=processing_time_step_4
-        )
+        for product in self.product_information_list:
+            if str(product.product_id) == product_id:
+                return product
 
     def _parse_date(self, date_str: str) -> date:
         """
@@ -229,14 +212,17 @@ class ConvertDictToMachine:
         return datetime.strptime(date_str, "%Y-%m-%d").date()
 
     def _rebuild_process_materials(self, process_material_list: list) -> list[ProcessMaterial]:
-        return [self._rebuild_process_material(pm) for pm in process_material_list]
+        if len(process_material_list) == 0:
+            return []
+        else:
+            return [self._rebuild_process_material(pm) for pm in process_material_list]
 
     def _rebuild_process_material(self, pm_dict: dict) -> ProcessMaterial:
         # Rebuilds the ProcessMaterial from a dictionary
         return ProcessMaterial(
-            required_material=self._rebuild_production_material_from_ident_str(pm_dict.get("required_material", "")),
+            required_material=self._rebuild_production_material_from_ident_str(pm_dict["required_material"]["id"]),
             quantity_required=pm_dict.get("quantity_required", 0),
-            producing_material=self._rebuild_production_material_from_ident_str(pm_dict.get("producing_material", "")),
-            quantity_producing=pm_dict.get("quantity_producing", 0),
-            required_material_on_tr_for_delivery=pm_dict.get("required_material_on_tr_for_delivery", 0)
+            producing_material=self._rebuild_production_material_from_ident_str(pm_dict["producing_material"]["id"]),
+            quantity_producing=pm_dict["producing_material"]["quantity"],
+            required_material_on_tr_for_delivery=pm_dict["required_material_on_tr_for_delivery"]
         )
