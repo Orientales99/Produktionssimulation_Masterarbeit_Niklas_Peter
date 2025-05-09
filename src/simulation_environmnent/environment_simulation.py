@@ -59,7 +59,7 @@ class EnvironmentSimulation:
         self.env.process(self.initialise_simulation_start())
         # self.env.process(self.visualisation_simulation.visualize_layout())
         self.env.process(self.monitoring_simulation.start_monitoring_process())
-        self.env.process(self.print_simulation_time())
+        # self.env.process(self.print_simulation_time())
         self.env.process(self.wr_simulation.start_every_wr_process())
         self.env.process(self.tr_simulation.start_every_tr_process())
         self.env.process(self.machine_simulation.run_machine_process())

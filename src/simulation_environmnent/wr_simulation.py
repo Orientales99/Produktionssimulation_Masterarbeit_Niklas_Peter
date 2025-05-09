@@ -54,7 +54,6 @@ class WrSimulation:
                         wr.working_status.working_on_status = True
                         if self.working_robot_order_manager.wr_driving_in_machine(wr) is True:
                             wr.working_status.status = WorkingRobotStatus.WORKING_ON_MACHINE
-                            print("start_every_wr_process")
                             self.saving_simulation_data.save_entity_action(wr)
 
                     # working process on the machine happens in the class machine_execution

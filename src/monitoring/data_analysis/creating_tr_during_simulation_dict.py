@@ -15,9 +15,9 @@ class CreatingTrDuringSimulationDict:
         self.every_tr_during_simulation_data = {}
         self.every_tr_identification_str_list = self.get_all_unique_tr_identification_str()
 
-        self.get_sorted_tr_dict()
+        self.sort_tr_dict()
 
-    def get_sorted_tr_dict(self):
+    def sort_tr_dict(self):
 
         for identification_str in self.every_tr_identification_str_list:
             tr_list = self.get_list_tr_with_identification_numbers(identification_str)

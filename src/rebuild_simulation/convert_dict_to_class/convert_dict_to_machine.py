@@ -91,12 +91,14 @@ class ConvertDictToMachine:
 
         return MachineStorage(storage_before_process, storage_after_process)
 
-    def _rebuild_production_material_from_ident_str(self, ident_str: str) -> ProductionMaterial:
+    def _rebuild_production_material_from_ident_str(self, ident_str: str) -> ProductionMaterial | None:
         """
         Rebuilds a ProductionMaterial object from its identification string.
         Extracts information like ProductGroup, ItemType, and Size.
         """
         # Example of how to split the identification string
+        if ident_str is None:
+            return None
         parts = ident_str.split(".")
 
         product_group = ProductGroup[parts[1]]  # z.B. 'FIFTEEN' → ProductGroup.FIFTEEN

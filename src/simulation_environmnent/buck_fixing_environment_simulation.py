@@ -3,6 +3,7 @@ import simpy
 from src.monitoring.SavingSimulationData import SavingSimulationData
 from src.monitoring.data_analysis.convert_json_data import ConvertJsonData
 from src.monitoring.data_analysis.creating_machine_during_simulation_dict import CreatingMachineDuringSimulationDict
+from src.monitoring.data_analysis.creating_sink_during_simulation_dict import CreatingSinkDuringSimulationDict
 from src.monitoring.data_analysis.creating_tr_during_simulation_dict import CreatingTrDuringSimulationDict
 from src.monitoring.data_analysis.creating_wr_during_simulation_dict import CreatingWrDuringSimulationDict
 from src.process_logic.machine.machine_execution import MachineExecution
@@ -68,11 +69,13 @@ class BuckFixingEnvironmentSimulation:
         self.creating_machine_during_simulation_dict = CreatingMachineDuringSimulationDict(self.convert)
         self.creating_tr_during_simulation_dict = CreatingTrDuringSimulationDict(self.convert)
         self.creating_wr_during_simulation_dict = CreatingWrDuringSimulationDict(self.convert)
+        self.creating_sink_during_simulation_dict = CreatingSinkDuringSimulationDict(self.convert)
 
         self.entities_status = EntitiesSpecificSimulationTime(self.env, self.control_time, self.production,
                                                               self.creating_machine_during_simulation_dict,
                                                               self.creating_tr_during_simulation_dict,
-                                                              self.creating_wr_during_simulation_dict)
+                                                              self.creating_wr_during_simulation_dict,
+                                                              self.creating_sink_during_simulation_dict)
         self.entities_status.refactor_production_layout()
         self.env.process(self.print_simulation_time())
         self.env.process(self.start_processes())
@@ -114,5 +117,5 @@ class BuckFixingEnvironmentSimulation:
             yield self.env.timeout(1)
 
     def get_control_time(self) -> int:
-        return 10000
+        return 8000
         # return input("Bei welcher Sekunde soll die Produktion starten?")

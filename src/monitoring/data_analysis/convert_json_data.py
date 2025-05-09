@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Union
 
 from src import SIMULATION_OUTPUT_DATA, ENTITIES_DURING_SIMULATION_DATA, MACHINES_DURING_SIMULATION_DATA, \
-    TR_DURING_SIMULATION_DATA, WR_DURING_SIMULATION_DATA
+    TR_DURING_SIMULATION_DATA, WR_DURING_SIMULATION_DATA, SINK_DURING_SIMULATION_DATA
 
 
 class ConvertJsonData:
@@ -20,6 +20,7 @@ class ConvertJsonData:
         self.simulation_machine_data_df = self.get_machine_simulation_df()
         self.simulation_tr_data_df = self.get_tr_simulation_df()
         self.simulation_wr_data_df = self.get_wr_simulation_df()
+        self.simulation_sink_data_df = self.get_sink_simulation_df()
 
     def get_df_goods_entering_production(self) -> pd.DataFrame:
         """Create a df with all the products entering the production and the time"""
@@ -104,6 +105,32 @@ class ConvertJsonData:
 
         # Collect files and extract start time
         for file in folder.glob("simulation_wr_run_data_from_*_sec_to_*_sec.json"):
+            match = pattern.match(file.name)
+            if match:
+                start_time = int(match.group(1))
+                file_info.append((start_time, file))
+
+        # Sort by start time
+        file_info.sort(key=lambda x: x[0])
+
+        # Read in all JSONs and collect them in a list
+        for _, file in file_info:
+            with open(file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                all_data.extend(data)
+
+        return pd.DataFrame(all_data)
+
+    def get_sink_simulation_df(folder_path: Union[str, Path]) -> pd.DataFrame:
+
+        folder = Path(SINK_DURING_SIMULATION_DATA)
+        pattern = re.compile(r"simulation_sink_run_data_from_(\d+)_sec_to_(\d+)_sec\.json")
+
+        all_data = []
+        file_info = []
+
+        # Collect files and extract start time
+        for file in folder.glob("simulation_sink_run_data_from_*_sec_to_*_sec.json"):
             match = pattern.match(file.name)
             if match:
                 start_time = int(match.group(1))
