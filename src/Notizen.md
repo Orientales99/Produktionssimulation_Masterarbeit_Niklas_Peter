@@ -8,6 +8,7 @@
 
 # Buck-List
 
+- Bei Sekunde 36797 wird der Status der Maschine 3.2 
 - Bei zu vielen initialisierten Entitäten kann das production_layout zu klein sein
 - Entitäten fahren so, dass immer ein Platz unter den Entitäten frei bleibt. (calculation path_finding -> empty space funktioniert nicht wie gowollt)
 - 3:22:30 Uhr fahren 2 WR zu einer Machine

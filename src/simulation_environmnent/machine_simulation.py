@@ -26,8 +26,9 @@ class MachineSimulation:
             if self.stop_event is False:
                 for machine in self.production.machine_list:
 
-                    if self.env.now > 36921:
-                        print("run_machine_process")
+                    if self.env.now == 36797:
+                          print("run_machine_process")
+
                     # set machine process status: idle
                     if len(machine.processing_list) == 0:
                         machine.working_status.process_status = MachineProcessStatus.IDLE
@@ -112,6 +113,7 @@ class MachineSimulation:
                 elif machine.working_status.process_status != MachineProcessStatus.FINISHED_TO_PRODUCE:
                     machine.working_status.process_status = MachineProcessStatus.READY_TO_PRODUCE
                     machine.working_status.storage_status = MachineStorageStatus.STORAGES_READY_FOR_PRODUCTION
+                    self.saving_simulation_data.save_entity_action(machine)
 
                 elif machine.working_status.process_status == MachineProcessStatus.FINISHED_TO_PRODUCE:
                     machine.working_status.working_on_status = False
@@ -119,6 +121,7 @@ class MachineSimulation:
                         machine.working_status.process_status = MachineProcessStatus.IDLE
                     else:
                         machine.working_status.process_status = MachineProcessStatus.WAITING_NEXT_ORDER
+                    self.saving_simulation_data.save_entity_action(machine)
                     break
 
                 else:
@@ -133,4 +136,5 @@ class MachineSimulation:
                         machine.working_status.producing_item = True
                         self.env.process(self.machine_execution.produce_one_item(machine, required_material,
                                                                                  producing_material))
+                    self.saving_simulation_data.save_entity_action(machine)
             yield self.env.timeout(1)

@@ -31,7 +31,7 @@ class MachineExecution:
         output_store = machine.machine_storage.storage_after_process
         working_speed = int(machine.working_speed)
 
-        if machine.machine_quality == MachineQuality.OLD_MACHINE:
+        if machine.machine_quality == MachineQuality.NEW_MACHINE:
             working_speed = working_speed * 0.8
 
         #yield self.env.timeout(1)

@@ -23,4 +23,5 @@ class VisualisationSimulation:
                 self.stop_event = False
             if stop_event is True:
                 self.stop_event = True
-            yield self.env.timeout(1 / driving_speed)
+            # yield self.env.timeout(1 / driving_speed)
+            yield self.env.timeout(1000)

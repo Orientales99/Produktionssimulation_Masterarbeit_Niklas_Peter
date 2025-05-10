@@ -1,5 +1,6 @@
 import simpy
 
+from src.constant.constant import WorkingRobotStatus
 from src.entity.machine.machine import Machine
 from src.entity.sink import Sink
 from src.entity.transport_robot.transport_robot import TransportRobot
@@ -146,7 +147,8 @@ class EntitiesSpecificSimulationTime:
             width = wr.size.x
             height = wr.size.y
 
-            if wr.working_status.working_for_machine is None:
+            if wr.working_status.status is not WorkingRobotStatus.WORKING_ON_MACHINE and \
+                    wr.working_status.status is not WorkingRobotStatus.WAITING_IN_MACHINE_TO_EXIT:
 
                 for dy in range(height):
                     for dx in range(width):
@@ -167,8 +169,6 @@ class EntitiesSpecificSimulationTime:
                     sink_dict = self.get_last_known_states_before_time(self.every_sink_status_during_simulation_data)
                     sink = self.convert_dict_to_sink.deserialize_complete_sink(sink_dict)
                     cell.placed_entity = sink
-
-
 
     def get_last_known_states_before_time(self, entity_dict: dict[str, list[dict]]) -> dict[str, dict]:
         """

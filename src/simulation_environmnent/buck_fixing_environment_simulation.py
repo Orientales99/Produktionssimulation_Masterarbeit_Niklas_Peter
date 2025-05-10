@@ -1,4 +1,5 @@
 import simpy
+import time
 
 from src.monitoring.SavingSimulationData import SavingSimulationData
 from src.monitoring.data_analysis.convert_json_data import ConvertJsonData
@@ -86,9 +87,9 @@ class BuckFixingEnvironmentSimulation:
         yield self.env.timeout(self.control_time)
 
         self.env.process(self.visualisation_simulation.visualize_layout())
-        self.env.process(self.wr_simulation.start_every_wr_process())
-        self.env.process(self.tr_simulation.start_every_tr_process())
-        self.env.process(self.machine_simulation.run_machine_process())
+        # self.env.process(self.wr_simulation.start_every_wr_process())
+        # self.env.process(self.tr_simulation.start_every_tr_process())
+        # self.env.process(self.machine_simulation.run_machine_process())
 
     def run_simulation(self, until: int):
         self.env.run(until=until)
@@ -107,15 +108,13 @@ class BuckFixingEnvironmentSimulation:
 
     def print_simulation_time(self):
         """Printing the current simulation time in h:min:sec."""
+        yield self.env.timeout(self.control_time)
+        sim_time = int(self.env.now)  # Simulationszeit in Sekunden
+        hours = sim_time // 3600
+        minutes = (sim_time % 3600) // 60
+        seconds = sim_time % 60
+        print(f"Simulationszeit: {hours:02d}:{minutes:02d}:{seconds:02d}")
 
-        while True:
-            sim_time = int(self.env.now)  # Simulationszeit in Sekunden
-            hours = sim_time // 3600
-            minutes = (sim_time % 3600) // 60
-            seconds = sim_time % 60
-            print(f"Simulationszeit: {hours:02d}:{minutes:02d}:{seconds:02d}")
-            yield self.env.timeout(1)
 
     def get_control_time(self) -> int:
-        return 8000
-        # return input("Bei welcher Sekunde soll die Produktion starten?")
+        return 36797   # return input("Bei welcher Sekunde soll die Produktion starten?")

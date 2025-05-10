@@ -58,16 +58,18 @@ class SavingSimulationData:
         self.list_every_entity_identification_str = list(self.entities_located.keys())
 
     def save_entity_action(self, entity: Machine | WorkingRobot | TransportRobot | Sink):
+        cell = None
+
+        if isinstance(entity, WorkingRobot):
+            if entity.working_status.last_placement_in_production is not None:
+                if len(entity.working_status.last_placement_in_production) != 0:
+                    cell = Cell(Coordinates(1, 1), entity)
         if isinstance(entity, Sink):
             cell = self.production.get_cell(self.production.sink_coordinates)
-        else:
+        elif cell is None:
             cell = self.save_one_cell_from_entity(entity)
 
         self.append_current_data_to_file_during_simulation(cell)
-
-        if isinstance(cell.placed_entity, WorkingRobot):
-            if cell.placed_entity.working_status.last_placement_in_production is not None:
-                print(cell.placed_entity.working_status.last_placement_in_production)
 
     def save_one_cell_of_every_entity(self):
         self.saving_entity_data_list = []
@@ -104,7 +106,6 @@ class SavingSimulationData:
 
         if isinstance(entity_cell.placed_entity, Sink):
             self.simulation_sink_data_list.append(data_entry)
-
 
     def convert_simulating_machine_data_to_json(self):
 

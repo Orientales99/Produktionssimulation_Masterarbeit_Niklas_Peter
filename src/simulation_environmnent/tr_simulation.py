@@ -129,16 +129,16 @@ class TrSimulation:
                 tr.transport_order.pick_up_station.working_status.waiting_for_arriving_of_tr = False
                 tr.transport_order.pick_up_station.working_status.storage_status = \
                     MachineStorageStatus.STORAGES_READY_FOR_PRODUCTION
-                self.saving_simulation_data.save_entity_action(tr)
+            self.saving_simulation_data.save_entity_action(tr)
 
     def unload_material_off_tr_process(self, tr: TransportRobot):
         loading_speed = self.tr_order_manager.get_loading_speed()
         yield self.env.timeout(loading_speed)
 
         if self.tr_executing_order.unload_material_off_tr(tr):
-            self.saving_simulation_data.save_entity_action(tr)
             tr.working_status.status = TransportRobotStatus.IDLE
             tr.working_status.working_on_status = False
             tr.working_status.waiting_error_time = self.env.now + 60
             if isinstance(tr.transport_order.unload_destination, Machine):
                 tr.transport_order.unload_destination.working_status.waiting_for_arriving_of_tr = False
+            self.saving_simulation_data.save_entity_action(tr)
