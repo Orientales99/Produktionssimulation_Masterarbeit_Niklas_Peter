@@ -138,7 +138,6 @@ class MachineProcessingTime:
 
                 status = entity["entity_data"]["working_status"]
                 current_material = status["producing_production_material"]
-                process_status = status["process_status"]
                 producing_item = status["producing_item"]
 
                 conditions_met = (
