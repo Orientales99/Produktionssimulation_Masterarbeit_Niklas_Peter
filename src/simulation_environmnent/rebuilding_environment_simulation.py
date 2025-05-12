@@ -25,7 +25,7 @@ from src.simulation_environmnent.visualisation_simulation import VisualisationSi
 from src.simulation_environmnent.wr_simulation import WrSimulation
 
 
-class BuckFixingEnvironmentSimulation:
+class RebuildingEnvironmentSimulation:
     def __init__(self):
         self.stop_event = False
 

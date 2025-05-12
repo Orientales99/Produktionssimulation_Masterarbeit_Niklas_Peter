@@ -114,11 +114,10 @@ class MachineProcessingTime:
         :return list of str (product group: ex. "ProductGroup.THREE.1)"""
         unique_products = set()
 
-        for entry in machine_data_during_simulation:
-            for entity in entry.get("entities", []):
-                if entity.get("entity_type") == "Machine":
-                    material = entity.get("entity_data", {}).get("working_status", {}).get(
-                        "producing_production_material")
+        for machine_dict in machine_data_during_simulation:
+            for entity in machine_dict.get("entities", []):
+                if entity["entity_type"] == "Machine":
+                    material = entity["entity_data"]["working_status"]["producing_production_material"]
                     if material:
                         unique_products.add(material)
 
@@ -133,20 +132,20 @@ class MachineProcessingTime:
         is_processing = False
         start_time = None
 
-        for entry in machine_data_during_simulation:
-            timestamp = entry.get("timestamp")
-            for entity in entry.get("entities", []):
+        for machine in machine_data_during_simulation:
+            timestamp = machine["timestamp"]
+            for entity in machine["entities"]:
 
-                status = entity.get("entity_data", {}).get("working_status", {})
-                current_material = status.get("producing_production_material")
-                process_status = status.get("process_status")
-                producing_item = status.get("producing_item")
+                status = entity["entity_data"]["working_status"]
+                current_material = status["producing_production_material"]
+                process_status = status["process_status"]
+                producing_item = status["producing_item"]
 
                 conditions_met = (
                         current_material == product_group and
-                        process_status == "producing product" and
                         producing_item is True
                 )
+
 
                 if conditions_met and not is_processing:
                     # Mark starting point
@@ -222,12 +221,12 @@ class MachineProcessingTime:
         start_time = None
 
         for entry in machine_data_during_simulation:
-            timestamp = entry.get("timestamp")
-            for entity in entry.get("entities", []):
+            timestamp = entry["timestamp"]
+            for entity in entry["entities"]:
 
-                status = entity.get("entity_data", {}).get("working_status", {})
-                current_material = status.get("producing_production_material")
-                storage_status = status.get("storage_status")
+                status = entity["entity_data"]["working_status"]
+                current_material = status["producing_production_material"]
+                storage_status = status["storage_status"]
 
                 conditions_met = (
                         current_material == product_group and

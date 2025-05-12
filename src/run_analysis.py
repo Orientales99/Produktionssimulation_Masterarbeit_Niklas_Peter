@@ -50,8 +50,8 @@ def run_wr_working_status():
     creating_wr_during_simulation_dict = CreatingWrDuringSimulationDict(convert)
 
 if __name__ == '__main__':
-    # run_analysis()
-    #run_machine_working_status()
-    run_tr_working_status()
-    run_wr_working_status()
+    run_analysis()
+    # run_machine_working_status()
+    # run_tr_working_status()
+    # run_wr_working_status()
 

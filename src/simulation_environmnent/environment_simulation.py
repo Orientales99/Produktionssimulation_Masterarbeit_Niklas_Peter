@@ -52,12 +52,12 @@ class EnvironmentSimulation:
         self.tr_simulation = TrSimulation(self.env, self.tr_order_manager, self.tr_executing_order,
                                           self.saving_simulation_data, self.stop_event)
 
-        self.visualisation_simulation = VisualisationSimulation(self.env, self.production, self.tr_order_manager,
-                                                              self.stop_event)
+        #self.visualisation_simulation = VisualisationSimulation(self.env, self.production, self.tr_order_manager,
+        #                                                       self.stop_event)
 
         # starting processes
         self.env.process(self.initialise_simulation_start())
-        self.env.process(self.visualisation_simulation.visualize_layout())
+        #self.env.process(self.visualisation_simulation.visualize_layout())
         self.env.process(self.monitoring_simulation.start_monitoring_process())
         self.env.process(self.print_simulation_time())
         self.env.process(self.wr_simulation.start_every_wr_process())
@@ -83,10 +83,13 @@ class EnvironmentSimulation:
 
         while True:
             sim_time = int(self.env.now)  # Simulationszeit in Sekunden
-            hours = sim_time // 3600
+            working_days = sim_time // 28800
+            hours = (sim_time % 28800) // 3600
             minutes = (sim_time % 3600) // 60
             seconds = sim_time % 60
-            print(f"Simulationszeit: {hours:02d}:{minutes:02d}:{seconds:02d}")
+            print(f"Simulationtime: \n" 
+                  f"Productionday: {working_days:02d}\n"
+                  f"Time: {hours:02d}:{minutes:02d}:{seconds:02d} \n")
             yield self.env.timeout(1)
 
 #
