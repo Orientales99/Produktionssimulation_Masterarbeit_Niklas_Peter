@@ -1,7 +1,9 @@
+import math
 from collections import defaultdict
 
 from simpy import Store
 
+from src.entity.intermediate_store import IntermediateStore
 from src.production.base.cell import Cell
 from src.production.base.coordinates import Coordinates
 from src.provide_input_data.entity_service import EntityService
@@ -22,10 +24,11 @@ class Production:
     source_coordinates: Coordinates
     sink_coordinates: Coordinates
     wr_list: list[WorkingRobot]
-    entities_located: {str, list[Cell]}           # {entity.identification_str, list[Cell]}
+    entities_located: {str, list[Cell]}  # {entity.identification_str, list[Cell]}
     entities_init_located: dict[str, list[Cell]]  # {entity.identification_str, list[Cell]} position of initialisation
     tr_list: list[TransportRobot]
     machine_list: list[Machine]
+    intermediate_store_list: list[IntermediateStore]
 
     max_coordinate: Coordinates
 
@@ -38,6 +41,7 @@ class Production:
         self.entities_init_located = {}
         self.tr_list = []
         self.machine_list = []
+        self.intermediate_store_list = []
 
         self.get_data_from_service_order()
 
@@ -54,6 +58,7 @@ class Production:
         self.get_working_robot_placed_in_production()
         self.get_transport_robot_placed_in_production()
         self.get_every_machine_placed_in_production()
+        self.get_intermediate_store_placed_in_production()
 
     def get_data_from_service_order(self):
         self.wr_list = self.service_entity.generate_wr_list()
@@ -272,6 +277,7 @@ class Production:
                         new_cell.placed_entity = machine_list_flexible[i]
                         location_list.append(new_cell)
                     break
+
                 else:
                     if machine_list_flexible[i].machine_type == machine_list_flexible[i - 1].machine_type or \
                             machine_list_flexible[
@@ -279,10 +285,12 @@ class Production:
                         avoiding_collision_parameter_x += machine_list_flexible[
                                                               i].size.x + space_between_machine + 1
                     else:
+
                         if machine_list_flexible[i].machine_type % 2 != 0:
                             y_upwards += machine_list_flexible[i].size.y + space_between_machine + 3
                             y_parameter = y_upwards
                             avoiding_collision_parameter_x = 0
+
                         elif machine_list_flexible[i].machine_type % 2 == 0:
                             y_downwards -= collusion_parameter + space_between_machine + 3
                             collusion_parameter = machine_list_flexible[
@@ -294,6 +302,80 @@ class Production:
                                 'An error occurred when initialising flexible machines in the production_layout.')
             self.entities_located[machine_list_flexible[i].identification_str] = location_list
             self.entities_init_located[machine_list_flexible[i].identification_str] = location_list
+
+    def get_intermediate_store_placed_in_production(self):
+        """checking every machine in the production. If is space on the right side of the machine place the
+        intermeidate store. Prefer the place in the center of the production."""
+
+        placement_coordinates: Coordinates
+
+        list_coordinates_of_neighbor_machine_of_potential_placement: list[Coordinates]
+        list_coordinates_of_neighbor_machine_of_potential_placement = []
+
+        list_intermediate_stores: list[IntermediateStore]
+        list_intermediate_stores = self.service_entity.generate_intermediate_store_list()
+
+        centered_production_coordinates = Coordinates(int((self.max_coordinate.x / 2)),
+                                                      (int(self.max_coordinate.y / 2)))
+
+        list_possible_cells: list[tuple[int, list[Cell]]]
+        list_possible_cells = []
+
+        space_between_machine = (
+                self.get_max_length_of_tr_or_wr() * 2)
+
+        for intermediate_store in list_intermediate_stores:
+            for machine in self.machine_list:
+                cell_list = self.entities_located.get(machine.identification_str)
+                horizontal_cell = self.get_horizontal_edges_of_coordinates(cell_list)
+                vertical_cell = self.get_vertical_edges_of_coordinates(cell_list)
+
+                list_coordinates_of_neighbor_machine_of_potential_placement.append(
+                    Coordinates(horizontal_cell[1], vertical_cell[1]))
+
+            # find every machine with space on its right side (free space between machine and store for entities to drive)
+            for machine_coordinates in list_coordinates_of_neighbor_machine_of_potential_placement:
+
+                placement_coordinates = Coordinates(machine_coordinates.x + space_between_machine + 2,
+                                                    machine_coordinates.y + 1)
+                placement_cell = self.get_cell(placement_coordinates)
+                free_size_area = intermediate_store.size
+
+                checked_free_area_list = self.check_area_of_cells_is_free_for_entity(placement_cell, free_size_area,
+                                                                                     None)
+
+                # calculate euclidean distance for the best centred place
+                if len(checked_free_area_list) != 0:
+                    euc_distance = self.calculate_euclidean_distance(centered_production_coordinates,
+                                                                     placement_coordinates)
+                    list_possible_cells.append((euc_distance, checked_free_area_list))
+
+            smallest_euc_distance_cell_list = self.find_shortest_distance(list_possible_cells)
+            if smallest_euc_distance_cell_list is None:
+                raise Exception("get_intermediate_store_placed_in_production doesnt work")
+            for cell in smallest_euc_distance_cell_list:
+                cell.placed_entity = intermediate_store
+
+            self.intermediate_store_list.append(intermediate_store)
+            self.entities_located[intermediate_store.identification_str] = smallest_euc_distance_cell_list
+            self.entities_init_located[intermediate_store.identification_str] = smallest_euc_distance_cell_list
+
+    def find_shortest_distance(self, possible_cells: list[tuple[int, list[Cell]]]) -> list[Cell] | None:
+        """get a list[tuple] with the euc distance and return the list[Cells] with the smallest euc distance"""
+        euc_distance: int
+        smallest_euc_distance = 10000000
+
+        for euc_distance, cell_list in possible_cells:
+            if euc_distance < smallest_euc_distance:
+                smallest_euc_distance = euc_distance
+                smallest_cell_list = cell_list
+
+        return smallest_cell_list
+
+    def calculate_euclidean_distance(self, coord1: Coordinates, coord2: Coordinates) -> int:
+        dx = coord1.x - coord2.x
+        dy = coord1.y - coord2.y
+        return int(math.sqrt(dx ** 2 + dy ** 2))
 
     def check_area_of_cells_is_free_for_entity(self, cell: Cell, free_area_size: Coordinates,
                                                free_condition_entity: Machine | WorkingRobot | TransportRobot | None) -> \
@@ -322,7 +404,7 @@ class Production:
         return list_of_checked_cells
 
     def check_area_of_cells_is_free_for_entity_movement(self, cell: Cell, free_area_size: Coordinates,
-                                               free_condition_entity: Machine | WorkingRobot | TransportRobot | None) -> \
+                                                        free_condition_entity: Machine | WorkingRobot | TransportRobot | None) -> \
             list[Cell]:
         """get a cell and is checking if the area downwards and to the right is free; if free
         -> return list with free cells; if not free -> if not free -> return empty list"""

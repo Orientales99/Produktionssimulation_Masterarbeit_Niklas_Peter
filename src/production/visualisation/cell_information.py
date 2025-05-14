@@ -5,6 +5,7 @@ from tkinter.scrolledtext import ScrolledText
 from typing import Set
 from simpy import Store
 
+from src.entity.intermediate_store import IntermediateStore
 from src.entity.machine.machine import Machine
 from src.entity.machine.Process_material import ProcessMaterial
 from src.entity.machine.processing_order import ProcessingOrder
@@ -53,8 +54,28 @@ class CellInformation:
         if isinstance(self.current_cell.placed_entity, Sink):
             self.print_sink_information(self.current_cell.placed_entity)
 
+        if isinstance(self.current_cell.placed_entity, IntermediateStore):
+            self.print_intermediate_store_information(self.current_cell.placed_entity)
+
         if self.current_cell.placed_entity is None:
             self.print_cell_is_none_information()
+
+    def print_intermediate_store_information(self, intermediate_store: IntermediateStore):
+        items_in_store = self.get_str_products_in_store(intermediate_store.intermediate_store)
+
+        title = f"Cell: {intermediate_store.identification_str}"
+
+        info_text = (
+            f"Cell Coordinates:   X: {self.current_cell.cell_coordinates.x}, Y: {self.current_cell.cell_coordinates.y}\n"
+            "\n"
+            f"Store-ID:       {intermediate_store.identification_str}\n"
+            f"\n"
+            f"      Max Capacity:    {intermediate_store.intermediate_store.capacity}\n"
+            f"      Contained Units: {len(intermediate_store.intermediate_store.items)}\n"
+            f"      Loaded_Products: {items_in_store}\n"
+
+        )
+        self.print_information_sheet(title, info_text)
 
     def print_machine_information(self, machine: Machine):
         """Opens a window with information about the machine. If WR is working on this Machine a WR Information sheet
@@ -288,14 +309,15 @@ class CellInformation:
         pick_up_station = ""
         unload_destination = ""
         if transport_order is not None:
-            if isinstance(transport_order.pick_up_station, Machine):
+            if isinstance(transport_order.pick_up_station, Machine | IntermediateStore):
                 pick_up_station = transport_order.pick_up_station.identification_str
             elif isinstance(transport_order.pick_up_station, Source):
                 pick_up_station = "Source"
-            if isinstance(transport_order.unload_destination, Machine):
+            if isinstance(transport_order.unload_destination, Machine | IntermediateStore):
                 unload_destination = transport_order.unload_destination.identification_str
             elif isinstance(transport_order.unload_destination, Sink):
                 unload_destination = Sink
+
             transport_order_str = f"           Transport Order:\n" \
                                   f"                    Transporting Product: {transport_order.transporting_product.identification_str}\n" \
                                   f"                    Pick Up Destination:  {pick_up_station}\n" \

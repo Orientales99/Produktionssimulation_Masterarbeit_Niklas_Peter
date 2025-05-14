@@ -1,4 +1,5 @@
 from src.constant.constant import TransportRobotStatus, MachineWorkingRobotStatus, MachineStorageStatus
+from src.entity.intermediate_store import IntermediateStore
 from src.entity.machine.Process_material import ProcessMaterial
 from src.entity.machine.machine import Machine
 from src.entity.sink import Sink
@@ -11,6 +12,8 @@ from src.process_logic.transport_robot.transport_request import TransportRequest
 
 class TrOrderManager:
     transport_request_list: list[TransportRequest]
+    machine_list: list[Machine]
+    intermediate_store_list: list[IntermediateStore]
 
     def __init__(self, simulation_environment, manufacturing_plan, machine_manager, store_manager):
         self.env = simulation_environment
@@ -22,6 +25,8 @@ class TrOrderManager:
 
         self.tr_list = self.manufacturing_plan.production.tr_list
         self.machine_list = self.manufacturing_plan.production.machine_list
+        self.intermediate_store_list = self.manufacturing_plan.production.intermediate_store_list
+
 
     def create_transport_request_list_from_machines(self):
         """Creates a new list of TransportRequest objects for each machine.
@@ -61,7 +66,7 @@ class TrOrderManager:
             if isinstance(pick_up_station, Machine):
                 if len(pick_up_station.machine_storage.storage_after_process.items) > 4:
                     return TransportRequest(pick_up_station, machine, processing_order, process_material)
-            elif isinstance(pick_up_station, Source):
+            elif isinstance(pick_up_station, Source | IntermediateStore):
                 return TransportRequest(pick_up_station, machine, processing_order, process_material)
         return
 
@@ -88,9 +93,20 @@ class TrOrderManager:
                         processing_order = unload_destination_machine.processing_list[0]
                         return TransportRequest(machine, unload_destination_machine, processing_order, process_material)
 
+            # assignment to intermediate_store must be revised for multiple stores
+            intermediate_store_list = self.manufacturing_plan.production.service_entity.\
+                                                                                    generate_intermediate_store_list()
+            for intermediate_store in intermediate_store_list:
+                intermediate_store_cell_list = self.manufacturing_plan.production.entities_located[
+                    intermediate_store.identification_str]
+                intermediate_store = intermediate_store_cell_list[0].placed_entity
+                for priority_index, process_material in enumerate(machine.process_material_list):
+                    if process_material.producing_material == production_material:
+                        processing_order = machine.processing_list[priority_index]
+                        return TransportRequest(machine, intermediate_store, processing_order, process_material)
         return
 
-    def get_pick_up_station(self, request_material: ProcessMaterial) -> Machine | Source | bool:
+    def get_pick_up_station(self, request_material: ProcessMaterial) -> Machine | Source | IntermediateStore | bool:
         """Determines the pickup station (Machine or Source) for the requested material.
         If the item_type_value of required material is 0 (RAW MATERIAL) the pick_up_station is Source. Otherwise,
         loop machine_list and find the machine with the same required Material in storage_after_process or
@@ -113,6 +129,13 @@ class TrOrderManager:
                     if machine.process_material_list[0].producing_material.identification_str == \
                             request_material.required_material.identification_str:
                         return machine
+            for intermediate_store in self.intermediate_store_list:
+                stored_item_list = intermediate_store.intermediate_store.items
+                for items in stored_item_list:
+                    if items.identification_str == request_material.required_material.identification_str:
+                        return intermediate_store
+
+
         return False
 
     def remove_duplicate_transport_requests(self):
@@ -125,6 +148,7 @@ class TrOrderManager:
         seen_pairs = set()
 
         for request in self.transport_request_list:
+
             pair = (
                 request.destination_pick_up.identification_str,
                 request.destination_unload.identification_str
@@ -175,7 +199,7 @@ class TrOrderManager:
                 transporting_material = transport_request.process_material.required_material
                 quantity = self.calculate_order_quantity(tr, transport_request)
 
-                if isinstance(unload_destination, Sink):
+                if isinstance(unload_destination, Sink | IntermediateStore):
                     transporting_material = pick_up_destination.process_material_list[0].producing_material
 
                 # get transport order for tr
@@ -205,7 +229,7 @@ class TrOrderManager:
             if quantity > empty_space_in_store:
                 quantity = empty_space_in_store
 
-        if isinstance(transport_request.destination_unload, Sink):
+        if isinstance(transport_request.destination_unload, Sink | IntermediateStore):
             products_in_machine = len(transport_request.destination_pick_up.machine_storage.storage_after_process.items)
             if quantity < products_in_machine:
                 quantity = products_in_machine

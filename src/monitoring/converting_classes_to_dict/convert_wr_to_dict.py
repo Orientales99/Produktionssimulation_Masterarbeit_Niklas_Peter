@@ -10,7 +10,6 @@ class ConvertWrToDict:
 
         if wr.working_status.last_placement_in_production is not None:
             last_placement_in_production = self.get_list_cell_as_str(wr.working_status.last_placement_in_production)
-            print(wr.working_status.last_placement_in_production)
         else:
             last_placement_in_production = None
 

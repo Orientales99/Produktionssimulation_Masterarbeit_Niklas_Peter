@@ -1,0 +1,10 @@
+{
+  "intermediate_store": [
+    {
+      "number_of_robots_in_production": "1",
+      "robot_size_x": "6",
+      "robot_size_y":"6",
+      "driving_speed":  "3"
+    }
+  ]
+}

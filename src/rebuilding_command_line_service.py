@@ -11,4 +11,4 @@ class RebuildingCommandLineService:
     def start_simulation(self):
         simulation_duration = self.production.service_starting_conditions.set_simulation_duration_per_day()
         self.rebuilding_environment_simulation.initialise_simulation_start()
-        self.rebuilding_environment_simulation.run_simulation(until=86400)
+        self.rebuilding_environment_simulation.run_simulation(until=200000)

@@ -217,7 +217,7 @@ class MachineManager:
         for wr in self.production.wr_list:
             if wr.working_status.working_for_machine == machine:
                 return wr
-        print(f"No WR is working on {machine.identification_str}")
+        print(f"get_wr_working_on_machine: No WR is working on {machine.identification_str}")
 
     def check_required_material_in_storage_before_process(self, machine: Machine, required_material: ProductionMaterial) \
             -> bool:

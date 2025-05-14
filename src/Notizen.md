@@ -2,9 +2,7 @@
 
 - random machine zuordnung
 - service_entity aufteilen
-- Service klassen umbennnen
-- Auftragsliste der einzelnen Maschinen in Logik packen und von Datenklassen separieren
-- mongo.db
+
 
 # Buck-List
 

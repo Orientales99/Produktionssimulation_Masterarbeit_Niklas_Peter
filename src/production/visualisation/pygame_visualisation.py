@@ -1,5 +1,6 @@
 import pygame
 
+from src.entity.intermediate_store import IntermediateStore
 from src.entity.machine.machine import Machine
 from src.entity.sink import Sink
 from src.entity.source import Source
@@ -223,6 +224,7 @@ class PygameSpot:
 
         self.make_machine_waiting_to_process()
         self.make_machine_processing()
+        self.make_intermediate_store()
 
         self.make_sink()
         self.make_source()
@@ -280,6 +282,10 @@ class PygameSpot:
         if isinstance(self.cell.placed_entity, Machine):
             if self.cell.placed_entity.working_status.working_robot_status == MachineWorkingRobotStatus.WR_PRESENT:
                 self.color = ColorRGB.GREEN.value
+
+    def make_intermediate_store(self):
+        if isinstance(self.cell.placed_entity, IntermediateStore):
+            self.color = ColorRGB.PURPLE.value
 
     def make_source(self):
         if isinstance(self.cell.placed_entity, Source):

@@ -951,6 +951,13 @@
                         }
                     ]
                 }
+            },
+            {
+                "x": 50,
+                "y": 53,
+                "entity_type": "IntermediateStore",
+                "entity_id": null,
+                "entity_data": null
             }
         ]
     }

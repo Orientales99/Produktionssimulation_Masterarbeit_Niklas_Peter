@@ -1,7 +1,10 @@
 import random
 from collections import Counter
 
+import simpy
+
 from src.constant.constant import TransportRobotStatus
+from src.entity.intermediate_store import IntermediateStore
 from src.entity.machine.machine import Machine
 from src.entity.sink import Sink
 from src.entity.source import Source
@@ -17,7 +20,8 @@ class TrExecutingOrder:
     entities_located_after_init = dict[str, list[Cell]]
     goods_receipt_list: list[GoodReceipt]
 
-    def __init__(self, simulation_environment, manufacturing_plan, path_finding, machine_execution, machine_manager,
+    def __init__(self, simulation_environment: simpy.Environment, manufacturing_plan, path_finding, machine_execution,
+                 machine_manager,
                  store_manager, saving_simulation_data):
         self.env = simulation_environment
         self.manufacturing_plan = manufacturing_plan
@@ -56,7 +60,8 @@ class TrExecutingOrder:
         tr.working_status.working_on_status = False
         return False
 
-    def set_driving_parameter_for_tr(self, tr: TransportRobot, destination: Machine | Sink | Source) -> bool:
+    def set_driving_parameter_for_tr(self, tr: TransportRobot,
+                                     destination: Machine | Sink | Source | IntermediateStore) -> bool:
         """Changes the tr.working_status parameter (Location_entity, destination_coordinates, driving_route).
          Return False: If the path cannot be determined or tr.working_status.status is wrong."""
 
@@ -80,7 +85,7 @@ class TrExecutingOrder:
         return False
 
     def get_coordinates_from_pick_up_destination(self, transport_robot: TransportRobot,
-                                                 entity: Machine | Source) -> Coordinates:
+                                                 entity: Machine | Source | IntermediateStore) -> Coordinates:
         """Calculates the coordinates for the destination if a transport_machine wants to pick up material ether from a
         source or a machine. Input: transport_robot and the destination entity Output: Destination Coordinates"""
 
@@ -96,13 +101,13 @@ class TrExecutingOrder:
             return Coordinates(horizontal_edges_of_list[0], vertical_edges_of_list[1])
 
         # calculate path coordinates if the pick_up_destination is a machine:
-        if isinstance(entity, Machine):
-            list_machine_cells = self.manufacturing_plan.production.entities_located.get(
+        if isinstance(entity, Machine | IntermediateStore):
+            list_entity_cells = self.manufacturing_plan.production.entities_located.get(
                 f'{entity.identification_str}', [])
             vertical_edges_of_machine = self.manufacturing_plan.production.get_vertical_edges_of_coordinates(
-                list_machine_cells)
+                list_entity_cells)
             horizontal_edges_of_machine = self.manufacturing_plan.production.get_horizontal_edges_of_coordinates(
-                list_machine_cells)
+                list_entity_cells)
 
             list_transport_robot_cells = self.manufacturing_plan.production.entities_located.get(
                 f'{transport_robot.identification_str}', [])
@@ -114,7 +119,7 @@ class TrExecutingOrder:
                 vertical_edges_of_machine[1])
 
     def get_coordinates_from_unload_destination(self, transport_robot: TransportRobot,
-                                                entity: Machine | Sink) -> Coordinates:
+                                                entity: Machine | Sink | IntermediateStore) -> Coordinates:
         """Calculates the coordinates for the destination if a transport_machine wants to drop off material ether from a
         sink or a machine. Input: transport_robot and the destination entity Output: Destination Coordinates"""
 
@@ -140,13 +145,13 @@ class TrExecutingOrder:
                                vertical_edges_of_list[1])
 
         # calculate path coordinates if the unload_destination is a machine:
-        if isinstance(entity, Machine):
-            list_machine_cells = self.manufacturing_plan.production.entities_located.get(
+        if isinstance(entity, Machine | IntermediateStore):
+            list_entity_cells = self.manufacturing_plan.production.entities_located.get(
                 f'{entity.identification_str}', [])
             vertical_edges_of_machine = self.manufacturing_plan.production.get_vertical_edges_of_coordinates(
-                list_machine_cells)
+                list_entity_cells)
             horizontal_edges_of_machine = self.manufacturing_plan.production.get_horizontal_edges_of_coordinates(
-                list_machine_cells)
+                list_entity_cells)
 
             list_transport_robot_cells = self.manufacturing_plan.production.entities_located.get(
                 f'{transport_robot.identification_str}', [])
@@ -195,7 +200,8 @@ class TrExecutingOrder:
             if isinstance(path, Exception):
                 path = self.path_finding.get_path_for_entity(tr, tr.working_status.driving_destination_coordinates)
                 tr.working_status.driving_route = path
-                return Exception
+                return Exception(f"drive_tr_one_step_trough_production didn't work at the time {self.env.now}. "
+                                 f"{tr.identification_str}")
 
             if len(tr.working_status.driving_route) == 0:
                 return True
@@ -223,7 +229,6 @@ class TrExecutingOrder:
         max_coordinates: Coordinates
         max_coordinates = self.manufacturing_plan.production.max_coordinate
         min_coordinates = Coordinates(0, 0)
-        print(max_coordinates)
 
         side_step_path = self.path_finding.get_path_for_entity(tr, min_coordinates)
         if isinstance(side_step_path, Exception):
@@ -246,6 +251,11 @@ class TrExecutingOrder:
         if isinstance(tr.transport_order.pick_up_station, Machine):
             machine = tr.transport_order.pick_up_station
             self.pick_up_material_from_machine(tr, machine)
+            return True
+
+        if isinstance(tr.transport_order.pick_up_station, IntermediateStore):
+            intermediate_store = tr.transport_order.pick_up_station
+            self.pick_up_material_from_intermediate_store(tr, intermediate_store)
             return True
 
         return False
@@ -278,6 +288,18 @@ class TrExecutingOrder:
 
         self.machine_manager.remove_processing_order_from_machine(machine, pick_up_product)
 
+    def pick_up_material_from_intermediate_store(self, tr: TransportRobot, intermediate_store: IntermediateStore):
+        pick_up_product = tr.transport_order.transporting_product
+        items_to_load = tr.transport_order.quantity
+        items_in_intermediate_store = self.store_manager.count_number_of_one_product_type_in_store(intermediate_store.intermediate_store, pick_up_product)
+
+        if items_to_load > items_in_intermediate_store:
+            items_to_load = items_in_intermediate_store
+
+        for _ in range(items_to_load):
+            tr.material_store.put(pick_up_product)
+            intermediate_store.intermediate_store.items.remove(pick_up_product)
+
     def unload_material_off_tr(self, tr: TransportRobot) -> bool:
         if isinstance(tr.transport_order.unload_destination, Sink):
             self.unload_material_to_sink(tr)
@@ -285,6 +307,10 @@ class TrExecutingOrder:
 
         if isinstance(tr.transport_order.unload_destination, Machine):
             self.unload_material_to_machine(tr)
+            return True
+
+        if isinstance(tr.transport_order.unload_destination, IntermediateStore):
+            self.unload_material_to_intermediate_store(tr)
             return True
 
         return False
@@ -307,7 +333,6 @@ class TrExecutingOrder:
         self.saving_simulation_data.save_entity_action(sink)
         self.saving_simulation_data.save_entity_action(tr)
 
-
         store_items = self.store_manager.get_str_products_in_store(sink.goods_issue_store)
 
     def unload_material_to_machine(self, tr: TransportRobot):
@@ -324,6 +349,20 @@ class TrExecutingOrder:
         for _ in range(item_to_unload):
             # adding material to machine
             machine.machine_storage.storage_before_process.put(unload_product)
+
+            # deleting material from TR
+            tr.material_store = self.store_manager.get_material_out_of_store(tr.material_store, unload_product)
+            tr.transport_order.quantity -= 1
+
+    def unload_material_to_intermediate_store(self, tr: TransportRobot):
+        unload_product = tr.transport_order.transporting_product
+        item_to_unload = self.store_manager.count_number_of_one_product_type_in_store(tr.material_store, unload_product)
+        intermediate_store = tr.transport_order.unload_destination
+        print(f"{tr.identification_str} unloads to intermediate_store: {item_to_unload}")
+        print(self.env.now)
+        for _ in range(item_to_unload):
+            # adding material to intermediate_store
+            intermediate_store.intermediate_store.put(unload_product)
 
             # deleting material from TR
             tr.material_store = self.store_manager.get_material_out_of_store(tr.material_store, unload_product)
