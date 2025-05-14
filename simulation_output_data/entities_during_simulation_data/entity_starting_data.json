@@ -957,7 +957,20 @@
                 "y": 53,
                 "entity_type": "IntermediateStore",
                 "entity_id": null,
-                "entity_data": null
+                "entity_data": {
+                    "identification_number": 1,
+                    "identification_str": "Intermediate Store: 1",
+                    "driving_speed": 3,
+                    "size": {
+                        "x": 6,
+                        "y": 6
+                    },
+                    "intermediate_store": {
+                        "Max Capacity": "Infinity",
+                        "Contained Units": 0,
+                        "Loaded Products": {}
+                    }
+                }
             }
         ]
     }

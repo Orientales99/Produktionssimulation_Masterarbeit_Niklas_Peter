@@ -58,7 +58,7 @@ class EnvironmentSimulation:
         self.env.process(self.initialise_simulation_start())
         # self.env.process(self.visualisation_simulation.visualize_layout())
         self.env.process(self.monitoring_simulation.start_monitoring_process())
-        # self.env.process(self.print_simulation_time())
+        self.env.process(self.print_simulation_time())
         self.env.process(self.wr_simulation.start_every_wr_process())
         self.env.process(self.tr_simulation.start_every_tr_process())
         self.env.process(self.machine_simulation.run_machine_process())
@@ -73,9 +73,11 @@ class EnvironmentSimulation:
             self.manufacturing_plan.set_parameter_for_start_of_a_simulation_day(current_date)
             self.saving_simulation_data.save_daily_manufacturing_plan(current_date,
                                                                       self.manufacturing_plan.daily_manufacturing_plan)
+            print("initialise_simulation_start")
             print(self.manufacturing_plan.daily_manufacturing_plan)
             yield self.env.timeout(28800)  # 8h working time
             current_date = self.manufacturing_plan.get_next_date(current_date)
+            print(f"next_day: {current_date}")
 
     def print_simulation_time(self):
         """Printing the current simulation time in h:min:sec."""
@@ -89,6 +91,6 @@ class EnvironmentSimulation:
             print(f"Simulationtime: \n"
                   f"Productionday: {working_days:02d}\n"
                   f"Time: {hours:02d}:{minutes:02d}:{seconds:02d} \n")
-            yield self.env.timeout(1)
+            yield self.env.timeout(5000)
 
 #

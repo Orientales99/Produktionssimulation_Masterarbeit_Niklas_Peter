@@ -23,4 +23,5 @@ class MonitoringSimulation:
             self.saving_simulation_data.convert_simulating_tr_data_to_json()
             self.saving_simulation_data.convert_simulating_wr_data_to_json()
             self.saving_simulation_data.convert_simulating_sink_data_to_json()
+            self.saving_simulation_data.convert_simulating_intermediate_store_data_to_json()
             yield self.env.timeout(120)

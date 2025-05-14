@@ -26,9 +26,6 @@ class MachineSimulation:
             if self.stop_event is False:
                 for machine in self.production.machine_list:
 
-                    if self.env.now == 36797:
-                          print("run_machine_process")
-
                     # set machine process status: idle
                     if len(machine.processing_list) == 0:
                         machine.working_status.process_status = MachineProcessStatus.IDLE

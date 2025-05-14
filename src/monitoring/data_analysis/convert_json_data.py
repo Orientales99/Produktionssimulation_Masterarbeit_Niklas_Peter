@@ -5,8 +5,8 @@ import re
 from pathlib import Path
 from typing import Union
 
-from src import SIMULATION_OUTPUT_DATA, ENTITIES_DURING_SIMULATION_DATA, MACHINES_DURING_SIMULATION_DATA, \
-    TR_DURING_SIMULATION_DATA, WR_DURING_SIMULATION_DATA, SINK_DURING_SIMULATION_DATA
+from src import SIMULATION_OUTPUT_DATA, MACHINES_DURING_SIMULATION_DATA, \
+    TR_DURING_SIMULATION_DATA, WR_DURING_SIMULATION_DATA, SINK_DURING_SIMULATION_DATA, INTERMEDIATE_STORE_DURING_SIMULATION_DATA
 
 
 class ConvertJsonData:
@@ -38,7 +38,7 @@ class ConvertJsonData:
             data = json.load(finished_products)
             return pd.DataFrame(data)
 
-    def get_machine_simulation_df(folder_path: Union[str, Path]) -> pd.DataFrame:
+    def get_machine_simulation_df(self) -> pd.DataFrame:
 
         folder = Path(MACHINES_DURING_SIMULATION_DATA)
         pattern = re.compile(r"simulation_machine_run_data_from_(\d+)_sec_to_(\d+)_sec\.json")
@@ -69,7 +69,7 @@ class ConvertJsonData:
 
         return pd.DataFrame(all_data)
 
-    def get_tr_simulation_df(folder_path: Union[str, Path]) -> pd.DataFrame:
+    def get_tr_simulation_df(self) -> pd.DataFrame:
 
         folder = Path(TR_DURING_SIMULATION_DATA)
         pattern = re.compile(r"simulation_tr_run_data_from_(\d+)_sec_to_(\d+)_sec\.json")
@@ -95,7 +95,7 @@ class ConvertJsonData:
 
         return pd.DataFrame(all_data)
 
-    def get_wr_simulation_df(folder_path: Union[str, Path]) -> pd.DataFrame:
+    def get_wr_simulation_df(self) -> pd.DataFrame:
 
         folder = Path(WR_DURING_SIMULATION_DATA)
         pattern = re.compile(r"simulation_wr_run_data_from_(\d+)_sec_to_(\d+)_sec\.json")
@@ -121,7 +121,7 @@ class ConvertJsonData:
 
         return pd.DataFrame(all_data)
 
-    def get_sink_simulation_df(folder_path: Union[str, Path]) -> pd.DataFrame:
+    def get_sink_simulation_df(self) -> pd.DataFrame:
 
         folder = Path(SINK_DURING_SIMULATION_DATA)
         pattern = re.compile(r"simulation_sink_run_data_from_(\d+)_sec_to_(\d+)_sec\.json")
@@ -131,6 +131,31 @@ class ConvertJsonData:
 
         # Collect files and extract start time
         for file in folder.glob("simulation_sink_run_data_from_*_sec_to_*_sec.json"):
+            match = pattern.match(file.name)
+            if match:
+                start_time = int(match.group(1))
+                file_info.append((start_time, file))
+
+        # Sort by start time
+        file_info.sort(key=lambda x: x[0])
+
+        # Read in all JSONs and collect them in a list
+        for _, file in file_info:
+            with open(file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                all_data.extend(data)
+
+        return pd.DataFrame(all_data)
+
+    def get_intermediate_simulation_df(self) -> pd.DataFrame:
+        folder = Path(INTERMEDIATE_STORE_DURING_SIMULATION_DATA)
+        pattern = re.compile(r"simulation_intermediate_store_run_data_from_(\d+)_sec_to_(\d+)_sec\.json")
+
+        all_data = []
+        file_info = []
+
+        # Collect files and extract start time
+        for file in folder.glob("simulation_intermediate_store_run_data_from_*_sec_to_*_sec.json"):
             match = pattern.match(file.name)
             if match:
                 start_time = int(match.group(1))

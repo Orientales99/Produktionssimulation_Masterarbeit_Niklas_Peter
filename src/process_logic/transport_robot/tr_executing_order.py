@@ -291,7 +291,8 @@ class TrExecutingOrder:
     def pick_up_material_from_intermediate_store(self, tr: TransportRobot, intermediate_store: IntermediateStore):
         pick_up_product = tr.transport_order.transporting_product
         items_to_load = tr.transport_order.quantity
-        items_in_intermediate_store = self.store_manager.count_number_of_one_product_type_in_store(intermediate_store.intermediate_store, pick_up_product)
+        items_in_intermediate_store = self.store_manager.count_number_of_one_product_type_in_store(
+            intermediate_store.intermediate_store, pick_up_product)
 
         if items_to_load > items_in_intermediate_store:
             items_to_load = items_in_intermediate_store
@@ -299,6 +300,8 @@ class TrExecutingOrder:
         for _ in range(items_to_load):
             tr.material_store.put(pick_up_product)
             intermediate_store.intermediate_store.items.remove(pick_up_product)
+
+        self.saving_simulation_data.save_entity_action(intermediate_store)
 
     def unload_material_off_tr(self, tr: TransportRobot) -> bool:
         if isinstance(tr.transport_order.unload_destination, Sink):
@@ -358,8 +361,6 @@ class TrExecutingOrder:
         unload_product = tr.transport_order.transporting_product
         item_to_unload = self.store_manager.count_number_of_one_product_type_in_store(tr.material_store, unload_product)
         intermediate_store = tr.transport_order.unload_destination
-        print(f"{tr.identification_str} unloads to intermediate_store: {item_to_unload}")
-        print(self.env.now)
         for _ in range(item_to_unload):
             # adding material to intermediate_store
             intermediate_store.intermediate_store.put(unload_product)
@@ -367,6 +368,8 @@ class TrExecutingOrder:
             # deleting material from TR
             tr.material_store = self.store_manager.get_material_out_of_store(tr.material_store, unload_product)
             tr.transport_order.quantity -= 1
+
+        self.saving_simulation_data.save_entity_action(intermediate_store)
 
     def check_if_tr_is_on_waiting_place(self, tr: TransportRobot) -> bool:
         """ Checks if the TR is in the right waiting position. The waiting position is the place where the

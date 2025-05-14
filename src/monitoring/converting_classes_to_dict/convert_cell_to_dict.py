@@ -1,7 +1,9 @@
+from src.entity.intermediate_store import IntermediateStore
 from src.entity.machine.machine import Machine
 from src.entity.sink import Sink
 from src.entity.transport_robot.transport_robot import TransportRobot
 from src.entity.working_robot.working_robot import WorkingRobot
+from src.monitoring.converting_classes_to_dict.convert_intermediate_store_to_dict import ConvertIntermediateStoreToDict
 from src.monitoring.converting_classes_to_dict.convert_machine_to_dict import ConvertMachineToDict
 from src.monitoring.converting_classes_to_dict.convert_sink_to_dict import ConvertSinkTDict
 from src.monitoring.converting_classes_to_dict.convert_tr_to_dict import ConvertTrToDict
@@ -23,6 +25,7 @@ class ConvertCellToDict:
         self.convert_wr_to_dict = ConvertWrToDict()
         self.convert_tr_to_dict = ConvertTrToDict(self.store_manager)
         self.convert_sink_to_dict = ConvertSinkTDict(self.store_manager)
+        self.convert_intermediate_store_to_dict = ConvertIntermediateStoreToDict(self.store_manager)
 
     def start_converting_cell_during_simulation(self, cell: Cell) -> dict:
         base_dict = {
@@ -50,6 +53,9 @@ class ConvertCellToDict:
 
         if isinstance(entity, Sink):
             base_dict["entity_data"] = self.convert_sink_to_dict.serialize_complete_sink(entity)
+
+        if isinstance(entity, IntermediateStore):
+            base_dict["entity_data"] = self.convert_intermediate_store_to_dict.serialize_complete_machine(entity)
 
         return base_dict
 
