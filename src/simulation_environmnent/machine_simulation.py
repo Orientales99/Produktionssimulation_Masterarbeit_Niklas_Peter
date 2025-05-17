@@ -4,26 +4,28 @@ from src.constant.constant import MachineProcessStatus, MachineWorkingRobotStatu
 from src.entity.machine.machine import Machine
 from src.monitoring.SavingSimulationData import SavingSimulationData
 from src.process_logic.machine.machine_execution import MachineExecution
-from src.process_logic.machine.machinemanager import MachineManager
+from src.process_logic.machine.machine_manager import MachineManager
 from src.production.production import Production
 from src.production.store_manager import StoreManager
+from src.simulation_environmnent.simulation_control import SimulationControl
 
 
 class MachineSimulation:
     def __init__(self, env: simpy.Environment, production: Production, machine_manager: MachineManager,
                  machine_execution: MachineExecution, store_manager: StoreManager,
-                 saving_simulation_data: SavingSimulationData, stop_event: bool):
+                 saving_simulation_data: SavingSimulationData, simulation_control: SimulationControl):
         self.env = env
         self.production = production
         self.machine_manager = machine_manager
         self.machine_execution = machine_execution
         self.store_manager = store_manager
         self.saving_simulation_data = saving_simulation_data
-        self.stop_event = stop_event
+        self.simulation_control = simulation_control
 
     def run_machine_process(self):
         while True:
-            if self.stop_event is False:
+            if self.simulation_control.stop_event is False and \
+                    self.simulation_control.stop_production_processes is False:
                 for machine in self.production.machine_list:
 
                     # set machine process status: idle
@@ -85,7 +87,8 @@ class MachineSimulation:
         self.machine_execution.give_order_to_next_machine(producing_material, machine)
 
         while True:
-            if self.stop_event is False:
+            if self.simulation_control.stop_event is False and \
+                    self.simulation_control.stop_production_processes is False:
                 # check if space is in output_store
                 if self.store_manager.count_empty_space_in_store(machine.machine_storage.storage_after_process) == 0 \
                         or self.store_manager.check_no_other_material_is_in_store(
@@ -99,7 +102,7 @@ class MachineSimulation:
 
                 # check if material is in input_store
                 elif self.machine_manager.check_required_material_in_storage_before_process(machine,
-                                                                                            required_material) is False\
+                                                                                            required_material) is False \
                         and machine.working_status.process_status != MachineProcessStatus.FINISHED_TO_PRODUCE:
                     machine.working_status.process_status = MachineProcessStatus.PRODUCING_PAUSED
                     machine.working_status.storage_status = MachineStorageStatus.INPUT_EMPTY

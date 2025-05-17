@@ -15,7 +15,7 @@
 - Die Prozessorder Liste der Maschinen wird nicht regelmäßig überarbeitet, 
 am Ende haben langsame Maschinen trotzdem eine lange Liste die sie abarbeiten müssen, obwohl schnellere Maschinen theoritsch frei sind. 
 Das liegt überwiegend an der geringen anzahl an WR
-- 
+- Maschinen könnten sich nicht drehen
 
 
 Hotkeys:

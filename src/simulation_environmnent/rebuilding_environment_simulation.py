@@ -10,7 +10,7 @@ from src.monitoring.data_analysis.creating_sink_during_simulation_dict import Cr
 from src.monitoring.data_analysis.creating_tr_during_simulation_dict import CreatingTrDuringSimulationDict
 from src.monitoring.data_analysis.creating_wr_during_simulation_dict import CreatingWrDuringSimulationDict
 from src.process_logic.machine.machine_execution import MachineExecution
-from src.process_logic.machine.machinemanager import MachineManager
+from src.process_logic.machine.machine_manager import MachineManager
 from src.process_logic.manufacturing_plan import ManufacturingPlan
 from src.process_logic.path_finding import PathFinding
 from src.process_logic.transport_robot.tr_executing_order import TrExecutingOrder
@@ -124,4 +124,4 @@ class RebuildingEnvironmentSimulation:
 
 
     def get_control_time(self) -> int:
-        return 10024   # return input("Bei welcher Sekunde soll die Produktion starten?")
+        return 12000   # return input("Bei welcher Sekunde soll die Produktion starten?")

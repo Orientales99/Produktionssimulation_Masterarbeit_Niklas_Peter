@@ -6,20 +6,22 @@ from src.entity.transport_robot.transport_robot import TransportRobot
 from src.monitoring.SavingSimulationData import SavingSimulationData
 from src.process_logic.transport_robot.tr_executing_order import TrExecutingOrder
 from src.process_logic.transport_robot.tr_order_manager import TrOrderManager
+from src.simulation_environmnent.simulation_control import SimulationControl
 
 
 class TrSimulation:
-    def __init__(self, env: simpy.Environment, tr_order_manager: TrOrderManager, tr_executing_order:TrExecutingOrder,
-                 saving_simulation_data: SavingSimulationData, stop_event: bool):
+    def __init__(self, env: simpy.Environment, tr_order_manager: TrOrderManager, tr_executing_order: TrExecutingOrder,
+                 saving_simulation_data: SavingSimulationData, simulation_control: SimulationControl):
         self.env = env
         self.tr_order_manager = tr_order_manager
         self.tr_executing_order = tr_executing_order
         self.saving_simulation_data = saving_simulation_data
-        self.stop_event = stop_event
+        self.simulation_control = simulation_control
 
     def start_every_tr_process(self):
         while True:
-            if self.stop_event is False:
+            if self.simulation_control.stop_event is False and \
+                    self.simulation_control.stop_production_processes is False:
 
                 self.tr_order_manager.create_transport_request_list_from_machines()
                 self.tr_order_manager.every_idle_tr_get_order()
@@ -78,7 +80,8 @@ class TrSimulation:
         driving_speed = self.tr_order_manager.get_driving_speed_per_cell()
 
         while True:
-            if self.stop_event is False:
+            if self.simulation_control.stop_event is False and \
+                    self.simulation_control.stop_production_processes is False:
                 self.saving_simulation_data.save_entity_action(tr)
                 yield self.env.timeout(1 / driving_speed)
                 driving_value = self.tr_executing_order.drive_tr_one_step_trough_production(tr)
@@ -106,13 +109,15 @@ class TrSimulation:
                         break
 
                     else:
-                        raise Exception(
-                            f"{tr.identification_str} drives to destination but has wrong working_status.status: "
-                            f"{tr.working_status.status}")
+                        tr.working_status.working_on_status = False
+                        break
+
 
                 elif driving_value is Exception:
                     yield self.env.timeout(1)
                 tr.working_status.waiting_error_time = self.env.now + 60
+            else:
+                yield self.env.timeout(1)
 
     def pick_up_material_on_tr_process(self, tr: TransportRobot):
         loading_speed = self.tr_order_manager.get_loading_speed()

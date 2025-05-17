@@ -1,4 +1,5 @@
 import pygame
+import simpy
 
 from src.entity.intermediate_store import IntermediateStore
 from src.entity.machine.machine import Machine
@@ -11,6 +12,7 @@ from src.production.base.coordinates import Coordinates
 from src.production.production import Production
 from src.constant.constant import ColorRGB, WorkingRobotStatus, MachineWorkingRobotStatus
 from src.production.visualisation.cell_information import CellInformation
+from src.simulation_environmnent.simulation_control import SimulationControl
 
 
 class PygameVisualisation:
@@ -21,10 +23,11 @@ class PygameVisualisation:
     grid_off_set: int
     start: bool
 
-    def __init__(self, production, env):
+    def __init__(self, production: Production, env: simpy.Environment, simulation_control: SimulationControl):
         pygame.init()
         self.env = env
         self.production = production
+        self.simulation_control = simulation_control
         self.cell_information = CellInformation(self.production)
         self.max_coordinates = self.production.service_starting_conditions.set_max_coordinates_for_production_layout()
         self.production_layout = self.production.production_layout
@@ -58,21 +61,15 @@ class PygameVisualisation:
 
                 if button_pressed == "start":
                     # Aktion für Start-Button, z.B. Simulation starten
-                    stop_event = False
-                    return stop_event
+                    self.simulation_control.stop_event = False
+
                 elif button_pressed == "stop":
                     # Aktion für Stop-Button, z.B. Simulation stoppen
-                    stop_event = True
-                    return stop_event
+                    self.simulation_control.stop_event = True
 
                 self.cell_information.run_cell_information_printed(Coordinates(row, col))
                 print(f"Reihe: {row}")
                 print(f"Col: {col}")
-
-            if self.start is True:
-                self.start = False
-                stop_event = True
-                return stop_event
 
     def set_display(self):
         self.window = pygame.display.set_mode((self.width_x, self.width_y))

@@ -1,6 +1,7 @@
 import math
 from collections import defaultdict
 
+import simpy
 from simpy import Store
 
 from src.entity.intermediate_store import IntermediateStore
@@ -32,7 +33,8 @@ class Production:
 
     max_coordinate: Coordinates
 
-    def __init__(self, simulation_environment, service_starting_conditions):
+    def __init__(self, simulation_environment: simpy.Environment,
+                 service_starting_conditions: StartingConditionsService):
         self.env = simulation_environment
         self.service_entity = EntityService(simulation_environment)
         self.service_starting_conditions = service_starting_conditions

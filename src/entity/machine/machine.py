@@ -30,3 +30,10 @@ class Machine:
     @property  # only if identification_str is used; one time calculation -> is cached
     def identification_str(self) -> str:
         return f"Ma: {self.machine_type}, {self.identification_number}"
+
+    @property
+    def producing_efficiency_factor(self) -> float:
+        if self.machine_quality == MachineQuality.NEW_MACHINE:
+            return float(0.8)
+        return float(1)
+

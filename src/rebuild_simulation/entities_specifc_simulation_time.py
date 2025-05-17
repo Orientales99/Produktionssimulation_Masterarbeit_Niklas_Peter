@@ -221,7 +221,9 @@ class EntitiesSpecificSimulationTime:
         last_known_states = {}
         for identification_str, records in entity_dict.items():
             # Filter only those entries where timestamp <= time_limit
-            valid_entries = [entry for entry in records if entry.get("timestamp", float('inf')) <= self.simulation_time]
+            valid_entries = [entry for entry in records if
+                             entry is not None and entry.get("timestamp", float('inf')) <= self.simulation_time]
+
             if valid_entries:
                 # Take the one with the highest timestamp among the valid entries
                 last_entry = max(valid_entries, key=lambda x: x["timestamp"])

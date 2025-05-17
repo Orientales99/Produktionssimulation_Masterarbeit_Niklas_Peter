@@ -107,8 +107,8 @@ class EntityService:
         return Machine(machine_type,
                        identification_number,
                        MachineQuality(machine_quality),
-                       machine_stats["driving_speed"],
-                       machine_stats["working_speed"],
+                       int(machine_stats["driving_speed"]),
+                       int(machine_stats["working_speed"]),
                        Coordinates(
                            int(machine_stats["robot_size_x"]),
                            int(machine_stats["robot_size_y"])),

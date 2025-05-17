@@ -6,7 +6,7 @@ import pandas as pd
 from src.entity.machine.processing_order import ProcessingOrder
 from src.entity.sink import Sink
 from src.process_logic.good_receipt import GoodReceipt
-from src.process_logic.machine.machinemanager import MachineManager
+from src.process_logic.machine.machine_manager import MachineManager
 from src.production.production import Production
 from src.order_data.order import Order
 from src.order_data.production_material import ProductionMaterial
@@ -161,7 +161,6 @@ class ManufacturingPlan:
                     return 3
                 elif product.processing_step_4 == machine.machine_type:
                     return 4
-
 
     def get_machine_str_with_shortest_queue_time(self, machine_type: int,
                                                  number_of_machines_per_machine_type: int) -> str:

@@ -178,7 +178,6 @@ class SavingSimulationData:
             self.simulation_wr_data_list = []
 
     def convert_simulating_sink_data_to_json(self):
-
         if len(self.simulation_sink_data_list) != 0:
             data_file_name = f"simulation_sink_run_data_from_{self.time_variable_sink}_sec_to_{self.env.now}_sec.json"
             output_file = SINK_DURING_SIMULATION_DATA / data_file_name
@@ -289,6 +288,7 @@ class SavingSimulationData:
             TR_DURING_SIMULATION_DATA,
             WR_DURING_SIMULATION_DATA,
             INTERMEDIATE_STORE_DURING_SIMULATION_DATA,
+            SINK_DURING_SIMULATION_DATA
         ]
 
         for folder in folders_to_clean:

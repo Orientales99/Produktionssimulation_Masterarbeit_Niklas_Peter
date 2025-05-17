@@ -4,19 +4,21 @@ from src.constant.constant import WorkingRobotStatus, MachineWorkingRobotStatus
 from src.entity.working_robot.working_robot import WorkingRobot
 from src.monitoring.SavingSimulationData import SavingSimulationData
 from src.process_logic.working_robot_order_manager import WorkingRobotOrderManager
+from src.simulation_environmnent.simulation_control import SimulationControl
 
 
 class WrSimulation:
-    def __init__(self, env: simpy.Environment, working_robot_order_manager:WorkingRobotOrderManager,
-                 saving_simulation_data: SavingSimulationData, stop_event: bool):
+    def __init__(self, env: simpy.Environment, working_robot_order_manager: WorkingRobotOrderManager,
+                 saving_simulation_data: SavingSimulationData, simulation_control: SimulationControl):
         self.env = env
         self.working_robot_order_manager = working_robot_order_manager
         self.saving_simulation_data = saving_simulation_data
-        self.stop_event = stop_event
+        self.simulation_control = simulation_control
 
     def start_every_wr_process(self):
         while True:
-            if self.stop_event is False:
+            if self.simulation_control.stop_event is False and \
+                    self.simulation_control.stop_production_processes is False:
 
                 self.working_robot_order_manager.sort_process_order_list_for_wr()
                 self.working_robot_order_manager.every_idle_wr_get_order()
@@ -70,7 +72,8 @@ class WrSimulation:
         driving_speed = self.working_robot_order_manager.get_driving_speed_per_cell()
 
         while True:
-            if self.stop_event is False:
+            if self.simulation_control.stop_event is False and \
+                    self.simulation_control.stop_production_processes is False:
                 driving_bool = self.working_robot_order_manager.drive_wr_one_step_trough_production(wr)
                 if driving_bool is True:
                     if wr.working_status.status == WorkingRobotStatus.MOVING_TO_MACHINE:

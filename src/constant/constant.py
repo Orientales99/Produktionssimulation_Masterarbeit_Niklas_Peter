@@ -129,3 +129,4 @@ class MachineStorageStatus(Enum):
     STORAGES_READY_FOR_PRODUCTION = "storages are ready for production"
     INPUT_EMPTY = "input storage is empty"
     OUTPUT_FULL = "output storage is full"
+

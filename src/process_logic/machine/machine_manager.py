@@ -26,12 +26,12 @@ class MachineManager:
                 time_to_process_one_product = self.get_time_to_process_one_product(processing_order.order,
                                                                                    processing_order.step_of_the_process)
                 if processing_order.order.product != machine.working_status.producing_production_material:
-                    machine.processing_list_queue_length += (
-                                                                    int(number_of_required_products) * time_to_process_one_product) + \
+                    machine.processing_list_queue_length += ((int(number_of_required_products) * time_to_process_one_product))\
+                                                            * machine.producing_efficiency_factor + \
                                                             machine.setting_up_time
                 elif processing_order.order.product == machine.working_status.producing_production_material:
                     machine.processing_list_queue_length += (
-                            int(number_of_required_products) * time_to_process_one_product)
+                        int(number_of_required_products) * time_to_process_one_product) * machine.producing_efficiency_factor
                 else:
                     return Exception("Queue length cannot be calculated probably")
 
