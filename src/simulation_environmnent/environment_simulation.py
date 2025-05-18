@@ -53,11 +53,11 @@ class EnvironmentSimulation:
         self.tr_simulation = TrSimulation(self.env, self.tr_order_manager, self.tr_executing_order,
                                           self.saving_simulation_data, self.simulation_control)
 
-        self.visualisation_simulation = VisualisationSimulation(self.env, self.production,
-                                                                self.tr_order_manager, self.simulation_control)
+        # self.visualisation_simulation = VisualisationSimulation(self.env, self.production,
+        #                                                         self.tr_order_manager, self.simulation_control)
 
         # starting processes
-        self.env.process(self.visualisation_simulation.visualize_layout())
+        # self.env.process(self.visualisation_simulation.visualize_layout())
         self.env.process(self.monitoring_simulation.start_monitoring_process())
         self.env.process(self.print_simulation_time())
         self.env.process(self.initialise_simulation_start())

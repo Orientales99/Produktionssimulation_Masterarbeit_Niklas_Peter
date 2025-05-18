@@ -29,6 +29,7 @@ class ObjectMaterialFlowMatrix:
 
     def start_creating_material_flow_matrix(self):
         self.save_every_movable_machine_in_production()
+        self.assigning_process_steps_of_products_to_machine()
 
     def save_every_movable_machine_in_production(self):
         """Creating a copy of the movable machine objects in the production"""
@@ -50,8 +51,9 @@ class ObjectMaterialFlowMatrix:
 
             self.give_order_to_next_machine(machine.process_material_list[0].producing_material, machine)
 
+        print(self.movable_machine_list)
 
-#####################################################################################################
+    #####################################################################################################
 
     def get_sort_process_order_list(self) -> list[tuple[Machine, ProcessingOrder]]:
         """
@@ -76,8 +78,6 @@ class ObjectMaterialFlowMatrix:
                            )
         )
         return sorted_list_of_processes
-
-
 
     def get_process_list_of_every_machine(self) -> list[(Machine, ProcessingOrder)]:
         process_list_for_every_machine: [(Machine, ProcessingOrder)]
@@ -118,7 +118,7 @@ class ObjectMaterialFlowMatrix:
                         executing_machine_type)
                     if machine_identification_str_shortest_que_time is not None:
                         self.append_existing_order(machine_identification_str_shortest_que_time, processing_order.order,
-                                                   step_of_the_process)
+                                                   step_of_the_process, machine)
 
     def get_shortest_que_time_for_machine_type(self, executing_machine_type: int) -> str:
         """Get the identification str of the machine with the shortest que time. It is a selection of all
@@ -128,16 +128,17 @@ class ObjectMaterialFlowMatrix:
             if machine.machine_type == executing_machine_type:
                 machine_type_list.append(machine)
 
-        for machine_type in machine_type_list:
+        for machine in machine_type_list:
             number_of_machines_in_production = len(machine_type_list)
-            if executing_machine_type == machine_type:
+            if executing_machine_type == machine.machine_type:
                 identification_str_shortest_que_time = self.get_machine_str_with_shortest_queue_time(
-                    machine_type.machine_type,
+                    machine.machine_type,
                     number_of_machines_in_production)
 
                 return identification_str_shortest_que_time
 
-    def append_existing_order(self, identification_str_shortest_que_time: str, order: Order, step_of_the_process: int):
+    def append_existing_order(self, identification_str_shortest_que_time: str, order: Order, step_of_the_process: int,
+                              origin_machine: Machine):
         """takes the str from the machine with the shortest_que_time and gives it the new order"""
         for machine in self.movable_machine_list:
             if machine.identification_str == identification_str_shortest_que_time:
@@ -146,14 +147,14 @@ class ObjectMaterialFlowMatrix:
 
                 if processing_order not in machine.processing_list:
                     machine.processing_list.append(processing_order)
-                    self.append_existing_process_material_list(machine, processing_order)
+                    self.append_existing_process_material_list(machine, processing_order, origin_machine)
 
-
-    def append_existing_process_material_list(self, machine: Machine, processing_order: ProcessingOrder):
+    def append_existing_process_material_list(self, machine: Machine, processing_order: ProcessingOrder,
+                                              origin_machine: Machine):
         """append required material and quantity based on the processing_list"""
         # required material
         data_processing_step = self.get_data_of_processing_step_for_machine(processing_order.order,
-                                                                                            machine)
+                                                                            machine)
         required_material = data_processing_step[0]
         quantity_of_necessary_material = processing_order.order.number_of_products_per_order
         # producing material
@@ -162,6 +163,17 @@ class ObjectMaterialFlowMatrix:
         machine.process_material_list.append(ProcessMaterial(required_material, quantity_of_necessary_material,
                                                              producing_material,
                                                              quantity_of_producing_material))
+        self.add_object_material_flow_matrix(origin_machine, machine, quantity_of_producing_material)
+
+    def add_object_material_flow_matrix(self, origin_machine: Machine, destination_machine: Machine,
+                                        material_quantity: int):
+        """ add the material flow quantity from one object to another to the """
+
+        self.object_material_flow_matrix[origin_machine.identification_str][
+            destination_machine.identification_str] = material_quantity
+
+        self.object_material_flow_matrix[destination_machine.identification_str][
+            origin_machine.identification_str] = material_quantity
 
     def get_machine_str_with_shortest_queue_time(self, machine_type: int,
                                                  number_of_machines_per_machine_type: int) -> str:

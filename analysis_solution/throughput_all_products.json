@@ -1,54 +1,46 @@
 {
     "SEVEN": {
-        "average": "0:47:18",
-        "std_dev": "0:08:57"
+        "average": "0:55:51",
+        "std_dev": "0:14:52"
     },
     "TWELVE": {
-        "average": "0:26:04",
-        "std_dev": "0:07:44"
+        "average": "0:32:31",
+        "std_dev": "0:00:00"
     },
     "TWO": {
-        "average": "1:28:04",
-        "std_dev": "0:34:21"
+        "average": "0:50:23",
+        "std_dev": "0:00:57"
     },
     "THREE": {
-        "average": "1:40:02",
-        "std_dev": "0:55:29"
-    },
-    "THIRTEEN": {
-        "average": "0:19:37",
-        "std_dev": "0:13:14"
-    },
-    "FOUR": {
-        "average": "0:41:20",
-        "std_dev": "0:15:54"
+        "average": "2:37:25",
+        "std_dev": "0:00:00"
     },
     "TEN": {
-        "average": "0:24:07",
-        "std_dev": "0:08:11"
+        "average": "00:00:00",
+        "std_dev": "00:00:00"
+    },
+    "THIRTEEN": {
+        "average": "0:23:39",
+        "std_dev": "0:00:00"
+    },
+    "FOUR": {
+        "average": "0:39:50",
+        "std_dev": "0:00:00"
     },
     "FIFTEEN": {
-        "average": "0:14:37",
-        "std_dev": "0:04:48"
-    },
-    "ELEVEN": {
-        "average": "0:20:52",
-        "std_dev": "0:07:29"
-    },
-    "FOURTEEN": {
-        "average": "0:38:56",
-        "std_dev": "0:01:12"
+        "average": "0:05:16",
+        "std_dev": "0:00:00"
     },
     "NINE": {
-        "average": "0:29:41",
-        "std_dev": "0:10:44"
+        "average": "00:00:00",
+        "std_dev": "00:00:00"
     },
-    "ONE": {
-        "average": "0:40:50",
-        "std_dev": "0:01:05"
+    "FOURTEEN": {
+        "average": "00:00:00",
+        "std_dev": "00:00:00"
     },
-    "EIGHT": {
-        "average": "0:20:25",
-        "std_dev": "0:13:39"
+    "ELEVEN": {
+        "average": "00:00:00",
+        "std_dev": "00:00:00"
     }
 }

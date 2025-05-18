@@ -4,6 +4,8 @@ from src.monitoring.data_analysis.creating_tr_during_simulation_dict import Crea
 from src.monitoring.data_analysis.creating_wr_during_simulation_dict import CreatingWrDuringSimulationDict
 from src.monitoring.data_analysis.machine_data.machine_processing_time import MachineProcessingTime
 from src.monitoring.data_analysis.product_throughput import ProductThroughput
+from src.monitoring.data_analysis.transport_data.material_flow import MaterialFlow
+from src.monitoring.data_analysis.transport_data.material_flow_heatmap import MaterialFlowHeatmap
 from src.monitoring.data_analysis.visualize_production_material_throughput import VisualizeProductionMaterialThroughput
 from src.rebuild_simulation.entities_specifc_simulation_time import EntitiesSpecificSimulationTime
 
@@ -19,6 +21,13 @@ def run_analysis():
 
     creating_machine_during_simulation_dict = CreatingMachineDuringSimulationDict(convert)
     machine_processing_time = MachineProcessingTime(creating_machine_during_simulation_dict)
+
+    creating_tr_during_simulation_dict = CreatingTrDuringSimulationDict(convert)
+    material_flow = MaterialFlow(creating_tr_during_simulation_dict)
+    material_flow.create_material_flow_matrix()
+
+    material_flow_heatmap = MaterialFlowHeatmap(material_flow.object_material_flow_matrix)
+    material_flow_heatmap.plot()
 
 def run_throughput_visualization():
     convert = ConvertJsonData()

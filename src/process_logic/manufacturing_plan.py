@@ -16,7 +16,7 @@ from src.entity.machine.machine import Machine
 
 class ManufacturingPlan:
     production: Production
-    machine_execution: MachineManager
+    machine_manager: MachineManager
     service_product_information: ProductInformationService
     summarised_order_list: list[Order] | None = None
     dictionary_summarised_order_per_day: dict[date, list[Order]]
@@ -25,9 +25,9 @@ class ManufacturingPlan:
     required_materials_for_every_machine: dict = {}
     completed_orders_list: list[Order]
 
-    def __init__(self, production, machine_execution):
+    def __init__(self, production: Production, machine_manager: MachineManager):
         self.production = production
-        self.machine_execution = machine_execution
+        self.machine_manager = machine_manager
         self.service_product_information = ProductInformationService()
 
         self.dictionary_summarised_order_per_day = {}
@@ -175,7 +175,7 @@ class ManufacturingPlan:
             new_cell = self.production.find_cell_in_production_layout(
                 self.production.entities_located[identification_str][1])
             machine = new_cell.placed_entity
-            shortest_que_time = self.machine_execution.calculating_processing_list_queue_length(machine)
+            shortest_que_time = self.machine_manager.calculating_processing_list_queue_length(machine)
 
             if shortest_que_time < total_shortest_que_time:
                 total_shortest_que_time = shortest_que_time
@@ -198,7 +198,7 @@ class ManufacturingPlan:
                     self.production.entities_located[identification_str][1])
 
                 machine = cell.placed_entity
-                list_with_required_material_for_one_machine = self.machine_execution.get_list_with_process_material(machine)
+                list_with_required_material_for_one_machine = self.machine_manager.get_list_with_process_material(machine)
                 if len(list_with_required_material_for_one_machine) != 0:
                     self.required_materials_for_every_machine.update({identification_str:
                                                                           list_with_required_material_for_one_machine})
