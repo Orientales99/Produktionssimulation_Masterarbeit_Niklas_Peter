@@ -1,3 +1,5 @@
+import random
+
 import simpy
 
 from src.constant.constant import TransportRobotStatus, MachineStorageStatus
@@ -17,6 +19,8 @@ class TrSimulation:
         self.tr_executing_order = tr_executing_order
         self.saving_simulation_data = saving_simulation_data
         self.simulation_control = simulation_control
+
+        self.control_value = 1
 
     def start_every_tr_process(self):
         while True:
@@ -112,10 +116,14 @@ class TrSimulation:
                         tr.working_status.working_on_status = False
                         break
 
-
                 elif driving_value is Exception:
-                    yield self.env.timeout(1)
-                tr.working_status.waiting_error_time = self.env.now + 60
+                    if self.control_value % 2 == 0:
+                        yield self.env.timeout(60)
+                        self.control_value += 1
+                    elif self.control_value % 2 != 0:
+                        yield self.env.timeout(2)
+                        self.control_value += 1
+                # tr.working_status.waiting_error_time = self.env.now + 60
             else:
                 yield self.env.timeout(1)
 

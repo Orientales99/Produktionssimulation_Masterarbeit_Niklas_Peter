@@ -2,7 +2,7 @@
 
 - random machine zuordnung
 - service_entity aufteilen
-
+- random: Wartezeit TR beim Ausweichen
 
 # Buck-List
 

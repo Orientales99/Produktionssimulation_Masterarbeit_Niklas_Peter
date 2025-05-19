@@ -1,9 +1,11 @@
 import simpy
 
-from src.process_logic.machine.machine_execution import MachineExecution
+from src.monitoring.data_analysis.convert_json_data import ConvertJsonData
+from src.monitoring.data_analysis.creating_tr_during_simulation_dict import CreatingTrDuringSimulationDict
+from src.monitoring.data_analysis.transport_data.material_flow import MaterialFlow
+from src.monitoring.data_analysis.transport_data.material_flow_heatmap import MaterialFlowHeatmap
 from src.process_logic.machine.machine_manager import MachineManager
 from src.process_logic.manufacturing_plan import ManufacturingPlan
-from src.process_logic.topologie_manager.object_material_flow_matrix import ObjectMaterialFlowMatrix
 from src.process_logic.topologie_manager.positions_distance_matrix import PositionsDistanceMatrix
 from src.production.production import Production
 from src.production.store_manager import StoreManager
@@ -20,20 +22,18 @@ def run_positions_distance_matrix():
     positions_distance_matrix.start_creating_positions_distance_matrix()
 
 def run_material_flow_matrix():
-    env = simpy.Environment()
-    starting_condition = StartingConditionsService()
+    convert = ConvertJsonData()
 
-    production = Production(env, starting_condition)
-    production.create_production()
-    current_date = production.service_starting_conditions.set_starting_date_of_simulation()
-    store_manager = StoreManager(env)
-    machine_manager = MachineManager(production, store_manager)
-    manufacturing_plan = ManufacturingPlan(production, machine_manager)
+    # Analyse Materialflow in a matrix
+    creating_tr_during_simulation_dict = CreatingTrDuringSimulationDict(convert)
+    material_flow = MaterialFlow(creating_tr_during_simulation_dict)
+    material_flow.create_material_flow_matrix()
 
-    manufacturing_plan.set_parameter_for_start_of_a_simulation_day(current_date)
+    # Analyse Materialflow with a heatmap
+    material_flow_heatmap = MaterialFlowHeatmap(material_flow.object_material_flow_matrix)
+    material_flow_heatmap.plot()
 
-    material_flow_matrix = ObjectMaterialFlowMatrix(production, machine_manager)
-    material_flow_matrix.start_creating_material_flow_matrix()
+
 
 if __name__ == '__main__':
     # run_positions_distance_matrix()

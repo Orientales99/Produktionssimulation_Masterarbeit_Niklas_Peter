@@ -138,7 +138,7 @@ class PathFinding:
 
         return cell_neighbors_list
 
-    def get_start_cell_from_entity(self, entity: Machine | WorkingRobot | TransportRobot) -> Coordinates:
+    def get_start_cell_from_entity(self, entity: Machine | WorkingRobot | TransportRobot) -> Cell:
         """Starting point is the upper right corner of the entity"""
         start_coordinates = self.get_start_coordinates_from_entity(entity)
         start_cell = self.production.get_cell(start_coordinates)

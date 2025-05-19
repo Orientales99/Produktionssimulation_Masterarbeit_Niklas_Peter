@@ -22,6 +22,7 @@ from src.provide_input_data.starting_condition_service import StartingConditions
 from src.rebuild_simulation.entities_specifc_simulation_time import EntitiesSpecificSimulationTime
 from src.simulation_environmnent.machine_simulation import MachineSimulation
 from src.simulation_environmnent.monitoring_simulation import MonitoringSimulation
+from src.simulation_environmnent.simulation_control import SimulationControl
 from src.simulation_environmnent.tr_simulation import TrSimulation
 from src.simulation_environmnent.visualisation_simulation import VisualisationSimulation
 from src.simulation_environmnent.wr_simulation import WrSimulation
@@ -29,7 +30,7 @@ from src.simulation_environmnent.wr_simulation import WrSimulation
 
 class RebuildingEnvironmentSimulation:
     def __init__(self):
-        self.stop_event = False
+        self.simulation_control = SimulationControl(False, False)
 
         self.env = simpy.Environment()
         self.service_starting_conditions = StartingConditionsService()
@@ -45,13 +46,13 @@ class RebuildingEnvironmentSimulation:
                                                            self.store_manager)
         self.monitoring_simulation = MonitoringSimulation(self.env, self.saving_simulation_data)
         self.wr_simulation = WrSimulation(self.env, self.working_robot_order_manager, self.saving_simulation_data,
-                                          self.stop_event)
+                                          self.simulation_control)
 
         self.machine_execution = MachineExecution(self.env, self.manufacturing_plan, self.machine_manager,
                                                   self.store_manager, self.saving_simulation_data)
         self.machine_simulation = MachineSimulation(self.env, self.production, self.machine_manager,
                                                     self.machine_execution, self.store_manager,
-                                                    self.saving_simulation_data, self.stop_event)
+                                                    self.saving_simulation_data, self.simulation_control)
 
         self.tr_order_manager = TrOrderManager(self.env, self.manufacturing_plan, self.machine_manager,
                                                self.store_manager)
@@ -59,10 +60,10 @@ class RebuildingEnvironmentSimulation:
                                                    self.machine_execution, self.machine_manager, self.store_manager,
                                                    self.saving_simulation_data)
         self.tr_simulation = TrSimulation(self.env, self.tr_order_manager, self.tr_executing_order,
-                                          self.saving_simulation_data, self.stop_event)
+                                          self.saving_simulation_data, self.simulation_control)
 
         self.visualisation_simulation = VisualisationSimulation(self.env, self.production, self.tr_order_manager,
-                                                                 self.stop_event)
+                                                                 self.simulation_control)
 
         ####################################################################################################################
         self.production.create_production()
@@ -124,4 +125,4 @@ class RebuildingEnvironmentSimulation:
 
 
     def get_control_time(self) -> int:
-        return 12000   # return input("Bei welcher Sekunde soll die Produktion starten?")
+        return 55000   # return input("Bei welcher Sekunde soll die Produktion starten?")

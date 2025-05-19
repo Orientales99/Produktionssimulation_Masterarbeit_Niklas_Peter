@@ -38,6 +38,8 @@ class TrExecutingOrder:
         self.waiting_time = self.tr_list[0].working_status.waiting_time_on_path
         self.goods_receipt_list = []
 
+        self.side_step_variable = 0
+
     def start__moving_to_pick_up__process_for_tr(self, tr: TransportRobot) -> bool:
         destination = tr.transport_order.pick_up_station
         if self.set_driving_parameter_for_tr(tr, destination):
@@ -180,7 +182,8 @@ class TrExecutingOrder:
             if isinstance(path, Exception):
                 path = self.path_finding.get_path_for_entity(tr, tr.working_status.driving_destination_coordinates)
                 tr.working_status.driving_route = path
-                return False
+                return Exception(f"drive_tr_one_step_trough_production didn't work at the time {self.env.now}. "
+                                 f"{tr.identification_str}")
 
             if len(path) > 0:
                 if self.path_finding.entity_movement.move_entity_one_step(start_cell_coordinates, tr, path[0]) is True:
@@ -195,7 +198,7 @@ class TrExecutingOrder:
                         if isinstance(path, Exception):
                             self.set_side_step_driving_parameter_for_tr(tr)
                         tr.working_status.driving_route = path
-                        tr.working_status.waiting_time_on_path = random.randint(1, 10)
+                        tr.working_status.waiting_time_on_path = random.randint(1, 120)
 
             if isinstance(path, Exception):
                 path = self.path_finding.get_path_for_entity(tr, tr.working_status.driving_destination_coordinates)
@@ -230,10 +233,18 @@ class TrExecutingOrder:
         max_coordinates = self.manufacturing_plan.production.max_coordinate
         min_coordinates = Coordinates(0, 0)
 
-        side_step_path = self.path_finding.get_path_for_entity(tr, min_coordinates)
-        if isinstance(side_step_path, Exception):
+        if self.side_step_variable % 2 == 0:
+            side_step_path = self.path_finding.get_path_for_entity(tr, min_coordinates)
+            if isinstance(side_step_path, Exception):
+                side_step_path = self.path_finding.get_path_for_entity(tr, Coordinates(max_coordinates.x - 2,
+                                                                                       max_coordinates.y - 2))
+            self.side_step_variable += 1
+        else:
             side_step_path = self.path_finding.get_path_for_entity(tr, Coordinates(max_coordinates.x - 2,
-                                                                                   max_coordinates.y - 2))
+                                                                                       max_coordinates.y - 2))
+            if isinstance(side_step_path, Exception):
+                side_step_path = self.path_finding.get_path_for_entity(tr, min_coordinates)
+            self.side_step_variable += 1
 
         if isinstance(side_step_path, Exception):
             tr.working_status.side_step_driving_route = None

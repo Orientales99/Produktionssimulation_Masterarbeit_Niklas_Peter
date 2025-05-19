@@ -9,6 +9,7 @@ from openpyxl import load_workbook
 from openpyxl.worksheet.table import TableStyleInfo, Table
 
 from src import MACHINE_STATISTICS, MACHINE_STATISTICS_GRAPH
+from src.monitoring.data_analysis.creating_machine_during_simulation_dict import CreatingMachineDuringSimulationDict
 
 
 class MachineProcessingTime:
@@ -17,7 +18,7 @@ class MachineProcessingTime:
     machine_statistics_per_product_data: pd.DataFrame
     total_machine_statistics_data: pd.DataFrame
 
-    def __init__(self, creating_machine_during_simulation_dict):
+    def __init__(self, creating_machine_during_simulation_dict: CreatingMachineDuringSimulationDict):
         self.creating_machine_during_simulation_dict = creating_machine_during_simulation_dict
 
         self.every_machine_during_simulation_data = self.creating_machine_during_simulation_dict.every_machine_during_simulation_data

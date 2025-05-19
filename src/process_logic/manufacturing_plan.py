@@ -38,6 +38,8 @@ class ManufacturingPlan:
         self.product_order_list = self.production.service_order.generate_order_list()
         self.product_information_list = self.service_product_information.create_product_information_list()
 
+        self.date_list = self.production.service_starting_conditions.get_date_list()
+
 
 
     def set_parameter_for_start_of_a_simulation_day(self, start_date):
@@ -271,4 +273,8 @@ class ManufacturingPlan:
         sink.goods_issue_order_list = updated_order_list
 
     def get_next_date(self, yesterday: date) -> date:
-        return yesterday + timedelta(days=1)
+        """Returns the next available date in self.date_list after “yesterday”."""
+        for d in sorted(self.date_list):
+            if d > yesterday:
+                return d
+        raise ValueError(f"Kein späteres Datum als {yesterday} in date_list gefunden.")

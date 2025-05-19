@@ -57,7 +57,7 @@ class EnvironmentSimulation:
         #                                                         self.tr_order_manager, self.simulation_control)
 
         # starting processes
-        # self.env.process(self.visualisation_simulation.visualize_layout())
+        #self.env.process(self.visualisation_simulation.visualize_layout())
         self.env.process(self.monitoring_simulation.start_monitoring_process())
         self.env.process(self.print_simulation_time())
         self.env.process(self.initialise_simulation_start())

@@ -192,7 +192,7 @@ class ConvertDictToMachine:
 
         return Order(
             product=product,
-            number_of_products_per_order=order_dict.get("number_of_products_per_order", 0),
+            number_of_products_per_order=order_dict["number_of_products"],
             order_date=order_date,
             priority=priority,
             daily_manufacturing_sequence=daily_manufacturing_sequence
@@ -223,7 +223,7 @@ class ConvertDictToMachine:
         # Rebuilds the ProcessMaterial from a dictionary
         return ProcessMaterial(
             required_material=self._rebuild_production_material_from_ident_str(pm_dict["required_material"]["id"]),
-            quantity_required=pm_dict.get("quantity_required", 0),
+            quantity_required=pm_dict["required_material"]["quantity"],
             producing_material=self._rebuild_production_material_from_ident_str(pm_dict["producing_material"]["id"]),
             quantity_producing=pm_dict["producing_material"]["quantity"],
             required_material_on_tr_for_delivery=pm_dict["required_material_on_tr_for_delivery"]

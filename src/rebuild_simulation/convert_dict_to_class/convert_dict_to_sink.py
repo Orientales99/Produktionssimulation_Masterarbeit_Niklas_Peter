@@ -110,7 +110,7 @@ class ConvertDictToSink:
 
         return Order(
             product=product,
-            number_of_products_per_order=order_dict.get("number_of_products_per_order", 0),
+            number_of_products_per_order=order_dict["number_of_products"],
             order_date=order_date,
             priority=priority,
             daily_manufacturing_sequence=daily_manufacturing_sequence

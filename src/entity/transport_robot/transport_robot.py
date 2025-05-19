@@ -19,3 +19,5 @@ class TransportRobot:
     def identification_str(self) -> str:
         return f"TR: {self.identification_number}"
 
+    def __repr__(self):
+        return f"TransportRobot(id={self.identification_number})"
