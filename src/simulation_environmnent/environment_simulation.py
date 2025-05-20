@@ -1,9 +1,15 @@
 import simpy
 
 from src.monitoring.SavingSimulationData import SavingSimulationData
+from src.monitoring.data_analysis.convert_json_data import ConvertJsonData
+from src.monitoring.data_analysis.creating_tr_during_simulation_dict import CreatingTrDuringSimulationDict
+from src.monitoring.data_analysis.transport_data.material_flow import MaterialFlow
 from src.process_logic.machine.machine_execution import MachineExecution
 from src.process_logic.machine.machine_manager import MachineManager
 from src.process_logic.path_finding import PathFinding
+from src.process_logic.topologie_manager.positions_distance_matrix import PositionsDistanceMatrix
+from src.process_logic.topologie_manager.quadratic_assignment_problem import QuadraticAssignmentProblem
+from src.process_logic.topologie_manager.repositioning_objects import RepositioningObjects
 from src.process_logic.transport_robot.tr_executing_order import TrExecutingOrder
 from src.process_logic.transport_robot.tr_order_manager import TrOrderManager
 from src.process_logic.working_robot_order_manager import WorkingRobotOrderManager
@@ -20,8 +26,15 @@ from src.simulation_environmnent.wr_simulation import WrSimulation
 
 
 class EnvironmentSimulation:
+    class_positions_distance_matrix: PositionsDistanceMatrix
+    convert_json_data: ConvertJsonData
+    creating_tr_during_simulation_dict: CreatingTrDuringSimulationDict
+    class_material_flow: MaterialFlow
+    class_quadratic_assignment_problem: QuadraticAssignmentProblem
+    repositioning_objects: RepositioningObjects
+
     def __init__(self):
-        self.simulation_control = SimulationControl(False, False)
+        self.simulation_control = SimulationControl(False, True)
 
         self.env = simpy.Environment()
         self.service_starting_conditions = StartingConditionsService()
@@ -29,22 +42,27 @@ class EnvironmentSimulation:
         self.store_manager = StoreManager(self.env)
         self.path_finding = PathFinding(self.production)
 
+        # Manufacturing & Machine Manger Classes
         self.machine_manager = MachineManager(self.production, self.store_manager)
         self.manufacturing_plan = ManufacturingPlan(self.production, self.machine_manager)
 
+        # Wr Manager & Monitoring Classes
         self.working_robot_order_manager = WorkingRobotOrderManager(self.manufacturing_plan, self.path_finding)
         self.saving_simulation_data = SavingSimulationData(self.env, self.production, self.working_robot_order_manager,
                                                            self.store_manager)
         self.monitoring_simulation = MonitoringSimulation(self.env, self.saving_simulation_data)
+
         self.wr_simulation = WrSimulation(self.env, self.working_robot_order_manager, self.saving_simulation_data,
                                           self.simulation_control)
 
+        # Machine Execution Classses
         self.machine_execution = MachineExecution(self.env, self.manufacturing_plan, self.machine_manager,
                                                   self.store_manager, self.saving_simulation_data)
         self.machine_simulation = MachineSimulation(self.env, self.production, self.machine_manager,
                                                     self.machine_execution, self.store_manager,
                                                     self.saving_simulation_data, self.simulation_control)
 
+        # Tr Manager Classes
         self.tr_order_manager = TrOrderManager(self.env, self.manufacturing_plan, self.machine_manager,
                                                self.store_manager)
         self.tr_executing_order = TrExecutingOrder(self.env, self.manufacturing_plan, self.path_finding,
@@ -53,15 +71,15 @@ class EnvironmentSimulation:
         self.tr_simulation = TrSimulation(self.env, self.tr_order_manager, self.tr_executing_order,
                                           self.saving_simulation_data, self.simulation_control)
 
-        # self.visualisation_simulation = VisualisationSimulation(self.env, self.production,
-        #                                                         self.tr_order_manager, self.simulation_control)
+        # Visualisation Class
+        self.visualisation_simulation = VisualisationSimulation(self.env, self.production,
+                                                                self.tr_order_manager, self.simulation_control)
 
         # starting processes
-        #self.env.process(self.visualisation_simulation.visualize_layout())
-        self.env.process(self.monitoring_simulation.start_monitoring_process())
+        self.env.process(self.visualisation_simulation.visualize_layout())
+        # self.env.process(self.monitoring_simulation.start_monitoring_process())
         self.env.process(self.print_simulation_time())
         self.env.process(self.initialise_simulation_start())
-        # self.env.process(self.stop_production())
         self.env.process(self.wr_simulation.start_every_wr_process())
         self.env.process(self.tr_simulation.start_every_tr_process())
         self.env.process(self.machine_simulation.run_machine_process())
@@ -76,6 +94,8 @@ class EnvironmentSimulation:
             self.manufacturing_plan.set_parameter_for_start_of_a_simulation_day(current_date)
             self.saving_simulation_data.save_daily_manufacturing_plan(current_date,
                                                                       self.manufacturing_plan.daily_manufacturing_plan)
+            self.topology_manager()
+            self.simulation_control.stop_production_processes = False
             print("initialise_simulation_start")
             print(self.manufacturing_plan.daily_manufacturing_plan)
             yield self.env.timeout(28800)  # 8h working time
@@ -96,10 +116,32 @@ class EnvironmentSimulation:
                   f"Time: {hours:02d}:{minutes:02d}:{seconds:02d} \n")
             yield self.env.timeout(10)
 
-    def stop_production(self):
-        yield self.env.timeout(30)
-        print("stop_production True")
-        self.simulation_control.stop_event = True
-        yield self.env.timeout(30)
-        print("stop_production False")
-        self.simulation_control.stop_event = False
+    def topology_manager(self):
+        self.class_positions_distance_matrix = PositionsDistanceMatrix(self.production)
+        self.convert_json_data = ConvertJsonData()
+        self.creating_tr_during_simulation_dict = CreatingTrDuringSimulationDict(self.convert_json_data)
+        self.class_material_flow = MaterialFlow(self.creating_tr_during_simulation_dict)
+
+        self.class_quadratic_assignment_problem = QuadraticAssignmentProblem(self.class_material_flow,
+                                                                             self.class_positions_distance_matrix)
+
+        self.repositioning_objects = RepositioningObjects(self.production)
+
+        algorithm = self.production.service_starting_conditions.get_topology_manager_method()
+
+        if algorithm == 1:
+            pass
+        elif algorithm == 2:
+            # quadratic_assignment_problem
+            entity_assignment = self.class_quadratic_assignment_problem.start_quadratic_assignment_problem(
+                start_time=self.env.now)
+            self.repositioning_objects.start_repositioning_objects_in_production(entity_assignment)
+
+        elif algorithm == 3:
+            # Genetic algorithm
+            pass
+
+        elif algorithm == 4:
+            #Force directed placement
+            pass
+

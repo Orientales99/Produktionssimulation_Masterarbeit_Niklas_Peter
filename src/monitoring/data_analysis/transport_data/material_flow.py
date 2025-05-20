@@ -3,13 +3,15 @@ from src.monitoring.data_analysis.creating_tr_during_simulation_dict import Crea
 
 class MaterialFlow:
     object_material_flow_matrix: dict[str, dict[str, int]] = {}
+
     def __init__(self, creating_tr_during_simulation_dict: CreatingTrDuringSimulationDict):
         self.creating_tr_during_simulation_dict = creating_tr_during_simulation_dict
         self.every_tr_during_simulation_data = self.creating_tr_during_simulation_dict.every_tr_during_simulation_data
         self.tr_identification_str_list = self.creating_tr_during_simulation_dict.every_tr_identification_str_list
         self.object_material_flow_matrix = {}
 
-    def create_material_flow_matrix(self, start_time: int = 0, end_time: int = float('inf')) -> None:
+    def create_material_flow_matrix(self, start_time: int = 0, end_time: int = float('inf')) -> dict[
+        str, dict[str, int]]:
         """Creates a matrix of material flows with optional time filtering."""
         for tr_id in self.tr_identification_str_list:
             tr_snapshots = self.every_tr_during_simulation_data[tr_id]
@@ -32,7 +34,7 @@ class MaterialFlow:
                         last_counted_order = current_order
                     elif current_order != last_counted_order and quantity == 0:
                         last_counted_order = current_order
-        print(self.object_material_flow_matrix)
+        return self.object_material_flow_matrix
 
     def filter_snapshots_by_time(self, snapshots: list[dict], start: int, end: int) -> list[dict]:
         """Filters snapshots within a time range."""

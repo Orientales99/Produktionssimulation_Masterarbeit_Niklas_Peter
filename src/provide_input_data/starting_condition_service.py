@@ -12,7 +12,6 @@ class StartingConditionsService:
         self.date_information = None
         self.get_starting_condition_files_for_init()
 
-
     def get_starting_condition_files_for_init(self):
         with open(RESOURCES / "simulation_starting_conditions.json", 'r', encoding='utf-8') as psc:
             self.data_process_starting_conditions = json.load(psc)
@@ -55,3 +54,6 @@ class StartingConditionsService:
         else:
             return False
 
+    def get_topology_manager_method(self) -> int:
+        """Return int: No algorithm (1), QAP (2), GA (3), FDP(4)"""
+        return self.data_process_starting_conditions["Topology_manager(No algorithm (1), QAP (2), GA (3), FDP(4)"]

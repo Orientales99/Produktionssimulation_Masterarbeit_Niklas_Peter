@@ -3,6 +3,7 @@
 - random machine zuordnung
 - service_entity aufteilen
 - random: Wartezeit TR beim Ausweichen
+- Heatmap verbindungen zwischen den Maschinen im Graphen sichtbar machen 
 
 # Buck-List
 

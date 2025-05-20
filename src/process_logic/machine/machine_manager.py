@@ -18,7 +18,7 @@ class MachineManager:
         self.list_full_store_after_process = []
         self.material_transport_request_list = []
 
-    def calculating_processing_list_queue_length(self, machine: Machine):
+    def calculating_processing_list_queue_length(self, machine: Machine) -> int:
         if len(machine.processing_list) != 0:
             machine.processing_list_queue_length = float(0)
             for processing_order in machine.processing_list:
@@ -27,11 +27,10 @@ class MachineManager:
                                                                                    processing_order.step_of_the_process)
                 if processing_order.order.product != machine.working_status.producing_production_material:
                     machine.processing_list_queue_length += ((int(number_of_required_products) * time_to_process_one_product))\
-                                                            * machine.producing_efficiency_factor + \
-                                                            machine.setting_up_time
+                                                             + machine.setting_up_time
                 elif processing_order.order.product == machine.working_status.producing_production_material:
                     machine.processing_list_queue_length += (
-                        int(number_of_required_products) * time_to_process_one_product) * machine.producing_efficiency_factor
+                        int(number_of_required_products) * time_to_process_one_product)
                 else:
                     return Exception("Queue length cannot be calculated probably")
 

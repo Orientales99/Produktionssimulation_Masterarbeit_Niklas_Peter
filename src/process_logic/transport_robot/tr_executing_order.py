@@ -231,13 +231,13 @@ class TrExecutingOrder:
             """
         max_coordinates: Coordinates
         max_coordinates = self.manufacturing_plan.production.max_coordinate
-        min_coordinates = Coordinates(0, 0)
+        min_coordinates = Coordinates(4, 4)
 
         if self.side_step_variable % 2 == 0:
             side_step_path = self.path_finding.get_path_for_entity(tr, min_coordinates)
             if isinstance(side_step_path, Exception):
-                side_step_path = self.path_finding.get_path_for_entity(tr, Coordinates(max_coordinates.x - 2,
-                                                                                       max_coordinates.y - 2))
+                side_step_path = self.path_finding.get_path_for_entity(tr, Coordinates(max_coordinates.x - 4,
+                                                                                       max_coordinates.y - 4))
             self.side_step_variable += 1
         else:
             side_step_path = self.path_finding.get_path_for_entity(tr, Coordinates(max_coordinates.x - 2,
