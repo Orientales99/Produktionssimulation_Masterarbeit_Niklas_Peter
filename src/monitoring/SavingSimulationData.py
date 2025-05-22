@@ -270,36 +270,6 @@ class SavingSimulationData:
         with open(output_file, "w") as f:
             json.dump(data, f, indent=4)
 
-    def delete_every_json_file_in_anaylsis_solution(self):
-        """Deleting every .json data in """
-        json_files = glob.glob(os.path.join(SIMULATION_OUTPUT_DATA, "*.json"))
-        for file_path in json_files:
-            try:
-                os.remove(file_path)
-                print(f"Gelöscht: {file_path}")
-            except Exception as e:
-                print(f"Fehler beim Löschen von {file_path}: {e}")
-
-    def delete_every_json_file_in_entities_during_simulation_data(self):
-        """Deleting every .json data in """
-        folders_to_clean = [
-            ENTITIES_DURING_SIMULATION_DATA,
-            MACHINES_DURING_SIMULATION_DATA,
-            TR_DURING_SIMULATION_DATA,
-            WR_DURING_SIMULATION_DATA,
-            INTERMEDIATE_STORE_DURING_SIMULATION_DATA,
-            SINK_DURING_SIMULATION_DATA
-        ]
-
-        for folder in folders_to_clean:
-            json_files = glob.glob(os.path.join(folder, "*.json"))
-            for file_path in json_files:
-                try:
-                    os.remove(file_path)
-                    print(f"Gelöscht: {file_path}")
-                except Exception as e:
-                    print(f"Fehler beim Löschen von {file_path}: {e}")
-
     def save_daily_manufacturing_plan(self, current_date: date, daily_manufacturing_plan: list[Order]):
         """Saves the daily production plan in a JSON file with a date in the file name."""
 

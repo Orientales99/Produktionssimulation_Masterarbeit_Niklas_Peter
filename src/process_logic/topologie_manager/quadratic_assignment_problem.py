@@ -1,5 +1,5 @@
 import pulp as pulp
-
+from collections import defaultdict
 from src.entity.machine.machine import Machine
 from src.entity.sink import Sink
 from src.entity.source import Source
@@ -39,6 +39,7 @@ class QuadraticAssignmentProblem:
 
     def get_material_flow_matrix(self, start_time: int = 0, end_time: int = float('inf')):
         self.material_flow_matrix = self.material_flow.create_material_flow_matrix(start_time, end_time)
+        print(f"QAP: get_material_flow_matrix: {self.material_flow_matrix}")
 
     def save_fixed_assignment(self):
         """Source, Sink are fixed assignments. Every materialflow to the inmobile machines are summerized in the
@@ -65,6 +66,7 @@ class QuadraticAssignmentProblem:
         self._define_constraints()
         self._solve_problem()
         self._extract_final_assignment()
+        self._validate_and_correct_assignment()
 
     def _prepare_fixed_assignments(self):
         """Prepare lists for fixed and free stations and locations."""
@@ -121,7 +123,7 @@ class QuadraticAssignmentProblem:
 
         for i in self.free_stations:
             for j in self.free_locations:
-                if pulp.value(self.x[i, j]) == 1:
+                if pulp.value(self.x[i, j]) is not None and pulp.value(self.x[i, j]) > 0.5:
                     self.entity_assignment.append((j, i))  # (cell_id, station_id)
 
     def _get_assignment_term(self, station, location):
@@ -145,3 +147,42 @@ class QuadraticAssignmentProblem:
             # Approximate: ignore interaction (valid if flow is small)
             return 0  # Optional: ignore bilinear terms to keep it linear
         return 0
+
+    def _validate_and_correct_assignment(self):
+        """Validiert und korrigiert die endgültige Zuordnung, wenn eine Position mehrfach belegt ist."""
+
+        position_to_stations = defaultdict(list)
+        for pos, station in self.entity_assignment:
+            position_to_stations[pos].append(station)
+
+        # Freie Positionen suchen
+        all_positions = set(self.positions_distance_matrix.keys())
+        used_positions = set(position_to_stations.keys())
+        free_positions = list(all_positions - used_positions)
+
+        corrected_assignment = []
+        for pos, stations in position_to_stations.items():
+            if len(stations) == 1:
+                corrected_assignment.append((pos, stations[0]))
+            else:
+                # Doppelte Belegung -> wähle Station mit größtem Materialfluss, lasse schwächere weichen
+                station_flows = []
+                for station in stations:
+                    flow_sum = sum(self.material_flow_matrix.get(station, {}).values()) + \
+                               sum(self.material_flow_matrix.get(other_station, {}).get(station, 0)
+                                   for other_station in self.material_flow_matrix)
+                    station_flows.append((station, flow_sum))
+
+                # Sortiere nach absteigendem Fluss
+                station_flows.sort(key=lambda x: x[1], reverse=True)
+                # Beste bleibt auf Position
+                corrected_assignment.append((pos, station_flows[0][0]))
+                # Alle anderen werden neu zugewiesen
+                for station, _ in station_flows[1:]:
+                    if free_positions:
+                        new_pos = free_positions.pop(0)
+                        corrected_assignment.append((new_pos, station))
+                    else:
+                        print(f"Warnung: Keine freie Position für Station {station} verfügbar.")
+
+        self.entity_assignment = corrected_assignment

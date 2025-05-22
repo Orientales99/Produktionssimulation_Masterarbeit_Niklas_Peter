@@ -27,17 +27,15 @@ class RepositioningObjects:
                 if placed_entity is None:
                     continue
 
-                if not isinstance(placed_entity, (Machine, IntermediateStore)):
-                    continue
+                if isinstance(placed_entity, (Machine, IntermediateStore)):
 
-                for _, station_identification_str in self.entity_assignment:
-                    if placed_entity.identification_str == station_identification_str:
+                    for _, station_identification_str in self.entity_assignment:
+                        if placed_entity.identification_str == station_identification_str:
 
-                        if station_identification_str not in self.replaced_entities:
-                            self.replaced_entities[station_identification_str] = placed_entity
+                            if station_identification_str not in self.replaced_entities:
+                                self.replaced_entities[station_identification_str] = placed_entity
 
-                        cell.placed_entity = None
-
+                            cell.placed_entity = None
 
     def place_objects_in_production_layout(self):
 

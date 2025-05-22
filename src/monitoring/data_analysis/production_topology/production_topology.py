@@ -27,67 +27,57 @@ class ProductionTopology:
 
     def start_plot_production_topology(self):
         self.build_entity_position_snapshots()
-        print(self.entity_position_dict)
         self.plot_all_tags()
 
     def build_entity_position_snapshots(self):
         combined_data = []
-
         for data in self.every_machine_during_simulation_data.values():
             combined_data.extend(data)
         for data in self.every_intermediate_store_during_simulation_data.values():
             combined_data.extend(data)
-
         combined_data.sort(key=lambda entry: entry['timestamp'])
 
-        # Snapshot-Zeitpunkte berechnen
         snapshot_times = set()
-        i = 1
+        max_timestamp = combined_data[-1]['timestamp'] if combined_data else 0
+        i = 0
         while True:
-            t = 29000 * (i - 1) if i > 1 else 6000
+            t = 6000 if i == 0 else 29000 * i
+            if t > max_timestamp:
+                break
             snapshot_times.add(t)
             i += 1
-            if t > combined_data[-1]['timestamp']:
-                break
+        snapshot_times = sorted(snapshot_times)
 
-        self.entity_position_dict = []  # Zurücksetzen
-        seen_timestamps = set()
-        last_known_positions: dict[str, dict] = {}  # key = ident_str, value = {"x": ..., "y": ..., "type": ...}
+        self.entity_position_dict = []
+        last_known_positions: dict[str, dict] = {}
+        data_index = 0
 
-        for entry in combined_data:
-            timestamp = entry['timestamp']
-            entities = entry.get('entities', [])
+        for snapshot_time in snapshot_times:
+            while data_index < len(combined_data) and combined_data[data_index]['timestamp'] <= snapshot_time:
+                entry = combined_data[data_index]
+                for entity in entry.get('entities', []):
+                    ident = entity['entity_data']['identification_str']
+                    last_known_positions[ident] = {
+                        'x': entity['x'],
+                        'y': entity['y'],
+                        'type': entity['entity_type']
+                    }
+                data_index += 1
 
-            # Positionen aktualisieren
-            for entity in entities:
-                ident = entity["entity_data"]["identification_str"]
-                last_known_positions[ident] = {
-                    "x": entity["x"],
-                    "y": entity["y"],
-                    "type": entity["entity_type"]
-                }
+            snapshot_positions = {}
+            for ident in self.machine_identification_str_list:
+                if ident in last_known_positions:
+                    snapshot_positions[ident] = last_known_positions[ident]
+            for ident in self.intermediate_store_identification_str_list:
+                if ident in last_known_positions:
+                    snapshot_positions[ident] = last_known_positions[ident]
 
-            if timestamp in snapshot_times and timestamp not in seen_timestamps:
-                snapshot_positions = {}
-
-                # Alle bekannten Maschinen einfügen
-                for ident in self.machine_identification_str_list:
-                    if ident in last_known_positions:
-                        snapshot_positions[ident] = last_known_positions[ident]
-
-                # Alle bekannten Intermediate Stores einfügen
-                for ident in self.intermediate_store_identification_str_list:
-                    if ident in last_known_positions:
-                        snapshot_positions[ident] = last_known_positions[ident]
-
-                snapshot = {
-                    "tag": f"Tag {len(self.entity_position_dict) + 1}",
-                    "timestamp": timestamp,
-                    "positions": snapshot_positions
-                }
-
-                self.entity_position_dict.append(snapshot)
-                seen_timestamps.add(timestamp)
+            snapshot = {
+                'tag': f"Tag {len(self.entity_position_dict) + 1}",
+                'timestamp': snapshot_time,
+                'positions': snapshot_positions
+            }
+            self.entity_position_dict.append(snapshot)
 
     def plot_all_tags(self):
         for snapshot in self.entity_position_dict:

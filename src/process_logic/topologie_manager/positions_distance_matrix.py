@@ -1,5 +1,6 @@
 import json
 import math
+from json import JSONDecodeError
 
 from src import RESOURCES
 from src.entity.sink import Sink
@@ -33,8 +34,19 @@ class PositionsDistanceMatrix:
         self.calculate_manhattan_distance_between_positions()
 
     def get_potential_position_list_from_json(self):
-        with open(RESOURCES / "potential_machine_and_store_positioning.json", 'r', encoding='utf-8') as w:
-            self.data_position_identification_str_list = json.load(w)
+        file_path = RESOURCES / "potential_machine_and_store_positioning.json"
+
+        if not file_path.exists():
+            print(f"⚠️ Datei {file_path} nicht gefunden.")
+            self.data_position_identification_str_list = []
+            return
+
+        try:
+            with open(file_path, 'r', encoding='utf-8') as w:
+                self.data_position_identification_str_list = json.load(w)
+        except JSONDecodeError as e:
+            print(f"❌ JSON-Fehler beim Laden von {file_path}: {e.msg} (Position: {e.pos})")
+            self.data_position_identification_str_list = []
 
     def save_cells(self):
         for y in self.production.production_layout:

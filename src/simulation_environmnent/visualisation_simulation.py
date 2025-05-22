@@ -17,6 +17,7 @@ class VisualisationSimulation:
 
     def visualize_layout(self):
         driving_speed = self.tr_order_manager.get_driving_speed_per_cell()
+        yield self.env.timeout(29000)
         while True:
             self.visualize_production.visualize_layout()
             yield self.env.timeout(1 / driving_speed)

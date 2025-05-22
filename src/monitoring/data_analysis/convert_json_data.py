@@ -1,12 +1,13 @@
-import json
-
-import pandas as pd
 import re
 from pathlib import Path
-from typing import Union
+
+import json
+import pandas as pd
+from json.decoder import JSONDecodeError
 
 from src import SIMULATION_OUTPUT_DATA, MACHINES_DURING_SIMULATION_DATA, \
-    TR_DURING_SIMULATION_DATA, WR_DURING_SIMULATION_DATA, SINK_DURING_SIMULATION_DATA, INTERMEDIATE_STORE_DURING_SIMULATION_DATA
+    TR_DURING_SIMULATION_DATA, WR_DURING_SIMULATION_DATA, SINK_DURING_SIMULATION_DATA, \
+    INTERMEDIATE_STORE_DURING_SIMULATION_DATA
 
 
 class ConvertJsonData:
@@ -28,21 +29,29 @@ class ConvertJsonData:
         if not file_path.exists():
             print(f"⚠️ Datei {file_path} nicht gefunden. Leeres DataFrame wird zurückgegeben.")
             return pd.DataFrame()
-        with open(file_path, 'r', encoding='utf-8') as receipt_products:
-            data = json.load(receipt_products)
-            return pd.DataFrame(data)
+
+        try:
+            with open(file_path, 'r', encoding='utf-8') as receipt_products:
+                data = json.load(receipt_products)
+                return pd.DataFrame(data)
+        except JSONDecodeError as e:
+            print(f"❌ JSON-Fehler beim Laden von {file_path}: {e.msg} (Position: {e.pos})")
+            return pd.DataFrame()
 
     def get_df_finished_products_leaving_production(self) -> pd.DataFrame:
         """Create a df with all the products leaving the production and the time"""
         file_path = SIMULATION_OUTPUT_DATA / "data_finished_products_leaving_production.json"
-
         if not file_path.exists():
             print(f"⚠️ Datei {file_path} nicht gefunden. Leeres DataFrame wird zurückgegeben.")
             return pd.DataFrame()
-        with open(file_path, 'r',
-                  encoding='utf-8') as finished_products:
-            data = json.load(finished_products)
-            return pd.DataFrame(data)
+
+        try:
+            with open(file_path, 'r', encoding='utf-8') as finished_products:
+                data = json.load(finished_products)
+                return pd.DataFrame(data)
+        except JSONDecodeError as e:
+            print(f"❌ JSON-Fehler beim Laden von {file_path}: {e.msg} (Position: {e.pos})")
+            return pd.DataFrame()
 
     def get_machine_simulation_df(self) -> pd.DataFrame:
 

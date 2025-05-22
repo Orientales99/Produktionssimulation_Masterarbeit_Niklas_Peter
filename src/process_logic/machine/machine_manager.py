@@ -26,11 +26,12 @@ class MachineManager:
                 time_to_process_one_product = self.get_time_to_process_one_product(processing_order.order,
                                                                                    processing_order.step_of_the_process)
                 if processing_order.order.product != machine.working_status.producing_production_material:
-                    machine.processing_list_queue_length += ((int(number_of_required_products) * time_to_process_one_product))\
-                                                             + machine.setting_up_time
+                    machine.processing_list_queue_length += ((
+                            int(number_of_required_products) * time_to_process_one_product)) \
+                                                            + machine.setting_up_time
                 elif processing_order.order.product == machine.working_status.producing_production_material:
                     machine.processing_list_queue_length += (
-                        int(number_of_required_products) * time_to_process_one_product)
+                            int(number_of_required_products) * time_to_process_one_product)
                 else:
                     return Exception("Queue length cannot be calculated probably")
 
@@ -68,15 +69,17 @@ class MachineManager:
         for processing_order in machine.processing_list:
             # required material
             data_processing_step = self.get_data_of_processing_step_for_machine(processing_order.order, machine)
-            required_material = data_processing_step[0]
-            quantity_of_necessary_material = processing_order.order.number_of_products_per_order
+            if data_processing_step is not False:
+                required_material = data_processing_step[0]
+                quantity_of_necessary_material = processing_order.order.number_of_products_per_order
 
-            # producing material
-            producing_material = self.create_new_item_after_process(machine, required_material)
-            quantity_of_producing_material = quantity_of_necessary_material
+                # producing material
+                producing_material = self.create_new_item_after_process(machine, required_material)
+                quantity_of_producing_material = quantity_of_necessary_material
 
-            machine.process_material_list.append(ProcessMaterial(required_material, quantity_of_necessary_material,
-                                                                 producing_material, quantity_of_producing_material))
+                machine.process_material_list.append(ProcessMaterial(required_material, quantity_of_necessary_material,
+                                                                     producing_material,
+                                                                     quantity_of_producing_material))
 
         return machine.process_material_list
 
@@ -119,21 +122,26 @@ class MachineManager:
         new_item_type = ItemType(3)
         return ProductionMaterial(new_identification_str, item.production_material_id, item.size, new_item_type)
 
-    def get_data_of_processing_step_for_machine(self, order: Order, machine: Machine) -> tuple[ProductionMaterial, int]:
+    def get_data_of_processing_step_for_machine(self, order: Order, machine: Machine) -> tuple[
+                                                                                             ProductionMaterial, int] | bool:
         """gives a tuple with required product type for this step and the processing_time_per_product"""
         if order.product.processing_step_1 == machine.machine_type:
             processing_step = (order.product.required_product_type_step_1, order.product.processing_time_step_1)
+            return processing_step
 
         if order.product.processing_step_2 == machine.machine_type:
             processing_step = (order.product.required_product_type_step_2, order.product.processing_time_step_2)
+            return processing_step
 
         if order.product.processing_step_3 == machine.machine_type:
             processing_step = (order.product.required_product_type_step_3, order.product.processing_time_step_3)
+            return processing_step
 
         if order.product.processing_step_4 == machine.machine_type:
             processing_step = (order.product.required_product_type_step_4, order.product.processing_time_step_4)
+            return processing_step
 
-        return processing_step
+        return False
 
     def check_if_order_is_finished(self, machine: Machine, new_item: ProductionMaterial) -> bool:
         """If no more material need to be produced for an order

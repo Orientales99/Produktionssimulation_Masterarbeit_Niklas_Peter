@@ -65,7 +65,8 @@ class RebuildingEnvironmentSimulation:
         self.visualisation_simulation = VisualisationSimulation(self.env, self.production, self.tr_order_manager,
                                                                  self.simulation_control)
 
-        ####################################################################################################################
+        ###############################################################################################################
+
         self.production.create_production()
         self.control_time = self.get_control_time()
 
@@ -125,4 +126,4 @@ class RebuildingEnvironmentSimulation:
 
 
     def get_control_time(self) -> int:
-        return 85500   # return input("Bei welcher Sekunde soll die Produktion starten?")
+        return 29400   # return input("Bei welcher Sekunde soll die Produktion starten?")

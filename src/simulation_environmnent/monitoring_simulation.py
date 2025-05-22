@@ -9,8 +9,7 @@ class MonitoringSimulation:
         self.saving_simulation_data = saving_simulation_data
 
     def start_monitoring_process(self):
-        self.saving_simulation_data.delete_every_json_file_in_anaylsis_solution()
-        self.saving_simulation_data.delete_every_json_file_in_entities_during_simulation_data()
+
         self.saving_simulation_data.save_every_entity_identification_str()
 
         # save all entity Information at the beginning

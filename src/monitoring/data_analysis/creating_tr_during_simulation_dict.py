@@ -39,11 +39,11 @@ class CreatingTrDuringSimulationDict:
                 cell_data = row[col]
                 if cell_data and isinstance(cell_data, dict):  # Wenn die Zelle ein Dictionary ist
                     # Überprüfe, ob es in der aktuellen Zelle eine 'entities'-Liste gibt
-                    entities = cell_data.get('entities', [])
+                    entities = cell_data['entities']
                     for entity in entities:
                         # Extrahiere den 'identification_number' aus den Entitäten
-                        entity_data = entity.get('entity_data', {})
-                        identification_str = entity_data.get('identification_str', None)
+                        entity_data = entity['entity_data']
+                        identification_str = entity_data['identification_str']
                         if identification_str == wanted_tr_identification_str:
                             tr_list.append(cell_data)
 
@@ -73,10 +73,10 @@ class CreatingTrDuringSimulationDict:
                 cell_data = row[col]
                 if cell_data and isinstance(cell_data, dict):
 
-                    entities = cell_data.get('entities', [])
+                    entities = cell_data['entities']
                     for entity in entities:
-                        entity_data = entity.get('entity_data', {})
-                        identification_number = entity_data.get('identification_str', None)
+                        entity_data = entity['entity_data']
+                        identification_number = entity_data['identification_str']
                         if identification_number:
                             identification_numbers.add(identification_number)  # Set only adds unique values
 

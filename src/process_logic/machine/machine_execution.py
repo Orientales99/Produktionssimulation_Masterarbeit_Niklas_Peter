@@ -138,11 +138,13 @@ class MachineExecution:
         # required material
         data_processing_step = self.machine_manager.get_data_of_processing_step_for_machine(processing_order.order,
                                                                                             machine)
-        required_material = data_processing_step[0]
-        quantity_of_necessary_material = processing_order.order.number_of_products_per_order
-        # producing material
-        producing_material = self.machine_manager.create_new_item_after_process(machine, required_material)
-        quantity_of_producing_material = quantity_of_necessary_material
-        machine.process_material_list.append(ProcessMaterial(required_material, quantity_of_necessary_material,
-                                                             producing_material,
-                                                             quantity_of_producing_material))
+        if data_processing_step is not False:
+
+            required_material = data_processing_step[0]
+            quantity_of_necessary_material = processing_order.order.number_of_products_per_order
+            # producing material
+            producing_material = self.machine_manager.create_new_item_after_process(machine, required_material)
+            quantity_of_producing_material = quantity_of_necessary_material
+            machine.process_material_list.append(ProcessMaterial(required_material, quantity_of_necessary_material,
+                                                                 producing_material,
+                                                                 quantity_of_producing_material))
