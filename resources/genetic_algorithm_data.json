@@ -1,0 +1,7 @@
+  {
+    "iterations": 75,
+    "population_per_generation": 100,
+    "surviving_parents": 5,
+    "odds_of_mutation_per_genom_in_percent": 50,
+    "points_of_separation": 2
+  }

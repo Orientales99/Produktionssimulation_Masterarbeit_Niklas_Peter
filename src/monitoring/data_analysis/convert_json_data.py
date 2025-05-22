@@ -24,16 +24,22 @@ class ConvertJsonData:
 
     def get_df_goods_entering_production(self) -> pd.DataFrame:
         """Create a df with all the products entering the production and the time"""
-
-        with open(SIMULATION_OUTPUT_DATA / "data_goods_entering_production.json", 'r',
-                  encoding='utf-8') as receipt_products:
+        file_path = SIMULATION_OUTPUT_DATA / "data_goods_entering_production.json"
+        if not file_path.exists():
+            print(f"⚠️ Datei {file_path} nicht gefunden. Leeres DataFrame wird zurückgegeben.")
+            return pd.DataFrame()
+        with open(file_path, 'r', encoding='utf-8') as receipt_products:
             data = json.load(receipt_products)
             return pd.DataFrame(data)
 
     def get_df_finished_products_leaving_production(self) -> pd.DataFrame:
         """Create a df with all the products leaving the production and the time"""
+        file_path = SIMULATION_OUTPUT_DATA / "data_finished_products_leaving_production.json"
 
-        with open(SIMULATION_OUTPUT_DATA / "data_finished_products_leaving_production.json", 'r',
+        if not file_path.exists():
+            print(f"⚠️ Datei {file_path} nicht gefunden. Leeres DataFrame wird zurückgegeben.")
+            return pd.DataFrame()
+        with open(file_path, 'r',
                   encoding='utf-8') as finished_products:
             data = json.load(finished_products)
             return pd.DataFrame(data)

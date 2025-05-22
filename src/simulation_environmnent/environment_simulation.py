@@ -7,6 +7,7 @@ from src.monitoring.data_analysis.transport_data.material_flow import MaterialFl
 from src.process_logic.machine.machine_execution import MachineExecution
 from src.process_logic.machine.machine_manager import MachineManager
 from src.process_logic.path_finding import PathFinding
+from src.process_logic.topologie_manager.genetic_algorithm import GeneticAlgorithm
 from src.process_logic.topologie_manager.positions_distance_matrix import PositionsDistanceMatrix
 from src.process_logic.topologie_manager.quadratic_assignment_problem import QuadraticAssignmentProblem
 from src.process_logic.topologie_manager.repositioning_objects import RepositioningObjects
@@ -72,17 +73,18 @@ class EnvironmentSimulation:
                                           self.saving_simulation_data, self.simulation_control)
 
         # Visualisation Class
-        self.visualisation_simulation = VisualisationSimulation(self.env, self.production,
-                                                                self.tr_order_manager, self.simulation_control)
+        # self.visualisation_simulation = VisualisationSimulation(self.env, self.production,
+        #                                                         self.tr_order_manager, self.simulation_control)
 
         # starting processes
-        self.env.process(self.visualisation_simulation.visualize_layout())
-        # self.env.process(self.monitoring_simulation.start_monitoring_process())
+        # self.env.process(self.visualisation_simulation.visualize_layout())
+        self.env.process(self.monitoring_simulation.start_monitoring_process())
         self.env.process(self.print_simulation_time())
         self.env.process(self.initialise_simulation_start())
         self.env.process(self.wr_simulation.start_every_wr_process())
         self.env.process(self.tr_simulation.start_every_tr_process())
         self.env.process(self.machine_simulation.run_machine_process())
+        self.env.process(self.topology_manager())
 
     def run_simulation(self, until: int):
         self.env.run(until=until)
@@ -94,7 +96,7 @@ class EnvironmentSimulation:
             self.manufacturing_plan.set_parameter_for_start_of_a_simulation_day(current_date)
             self.saving_simulation_data.save_daily_manufacturing_plan(current_date,
                                                                       self.manufacturing_plan.daily_manufacturing_plan)
-            self.topology_manager()
+
             self.simulation_control.stop_production_processes = False
             print("initialise_simulation_start")
             print(self.manufacturing_plan.daily_manufacturing_plan)
@@ -122,26 +124,48 @@ class EnvironmentSimulation:
         self.creating_tr_during_simulation_dict = CreatingTrDuringSimulationDict(self.convert_json_data)
         self.class_material_flow = MaterialFlow(self.creating_tr_during_simulation_dict)
 
-        self.class_quadratic_assignment_problem = QuadraticAssignmentProblem(self.class_material_flow,
-                                                                             self.class_positions_distance_matrix)
-
         self.repositioning_objects = RepositioningObjects(self.production)
 
         algorithm = self.production.service_starting_conditions.get_topology_manager_method()
 
-        if algorithm == 1:
-            pass
-        elif algorithm == 2:
-            # quadratic_assignment_problem
-            entity_assignment = self.class_quadratic_assignment_problem.start_quadratic_assignment_problem(
-                start_time=self.env.now)
-            self.repositioning_objects.start_repositioning_objects_in_production(entity_assignment)
+        while True:
+            base = 28800
+            current_time = self.env.now
+            endtime = ((current_time // base) + 1) * base
+            self.simulation_control.stop_production_processes = True
 
-        elif algorithm == 3:
-            # Genetic algorithm
-            pass
+            if algorithm == 1:
+                # No Topology changes
+                self.simulation_control.stop_production_processes = False
+                break
 
-        elif algorithm == 4:
-            #Force directed placement
-            pass
+            elif algorithm == 2:
+                # quadratic_assignment_problem
+                self.class_quadratic_assignment_problem = QuadraticAssignmentProblem(self.class_material_flow,
+                                                                                     self.class_positions_distance_matrix)
 
+                entity_assignment = self.class_quadratic_assignment_problem.start_quadratic_assignment_problem(
+                    start_time=self.env.now, end_time=endtime)
+                self.repositioning_objects.start_repositioning_objects_in_production(entity_assignment)
+                yield self.env.timeout(600)
+                self.simulation_control.stop_production_processes = False
+
+            elif algorithm == 3:
+                # Genetic algorithm
+                self.class_genetic_algorithm = GeneticAlgorithm(self.env, self.class_material_flow,
+                                                                self.class_positions_distance_matrix)
+
+                entity_assignment = self.class_genetic_algorithm.start_genetic_algorithm(start_time=self.env.now,
+                                                                                         end_time=endtime)
+                self.repositioning_objects.start_repositioning_objects_in_production(entity_assignment)
+
+                yield self.env.timeout(600)
+                self.simulation_control.stop_production_processes = False
+
+            elif algorithm == 4:
+                # Force directed placement
+                pass
+
+            time_until_next_day = endtime - self.env.now + 10
+
+            yield self.env.timeout(time_until_next_day)
