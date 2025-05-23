@@ -1,4 +1,8 @@
+import json
 import os
+import shutil
+
+from matplotlib import colors
 
 from src.monitoring.data_analysis.convert_json_data import ConvertJsonData
 import matplotlib.pyplot as plt
@@ -70,9 +74,9 @@ class VisualizeProductionMaterialThroughput:
         ax.set_xticks(list(tick_positions))
         ax.set_xticklabels(tick_labels, rotation=45)
 
-        ax.set_title(f'Cumulative Quantity over Time for Product Group: {product_group}')
-        ax.set_xlabel('Time (hh:mm:ss)')
-        ax.set_ylabel('Cumulative Quantity')
+        ax.set_title(f'Kumulierte Menge für Produkt: {product_group}')
+        ax.set_xlabel('Zeit (dd:mm:ss)')
+        ax.set_ylabel('Kumulierte Menge')
         ax.grid(True)
 
         # Annotate each point
@@ -85,7 +89,7 @@ class VisualizeProductionMaterialThroughput:
                         xytext=(0, 10),
                         ha='center', fontsize=8)
 
-        filename = f"Product {product_group} - Production inventory curve.png"
+        filename = f"Produkt {product_group} - Produktionsbestand.png"
         self.save_plot(fig, GRAPH_PRODUCTION_MATERIAL, filename)
 
     def save_plot(self, fig, directory: str, filename: str) -> None:
@@ -108,47 +112,98 @@ class VisualizeProductionMaterialThroughput:
 
     def seconds_to_hours_minutes_seconds(self, seconds: int) -> str:
         """:return a str with 00:00:00; h:min:sec"""
-        hours = seconds // 3600
+        # hours = seconds // 3600
+        # minutes = (seconds % 3600) // 60
+        # secs = seconds % 60
+        # return f"{hours:02}:{minutes:02}:{secs:02}"
+
+        hours = (seconds % 28800) // 3600
         minutes = (seconds % 3600) // 60
-        secs = seconds % 60
-        return f"{hours:02}:{minutes:02}:{secs:02}"
+        seconds = seconds % 60
+        return f"Time: {hours:02d}:{minutes:02d}:{seconds:02d} \n"
 
     def plot_all_product_groups_with_legend(self) -> None:
+        INTERVAL = 28800  # 8 Stunden in Sekunden
+
         all_product_groups = pd.concat([
             self.convert_json_data.goods_receipt_production_df["Product Group"],
             self.convert_json_data.finished_products_leaving_production_df["Product Group"]
         ]).unique()
 
-        fig, ax = plt.subplots(figsize=(19, 11))
+        # Maximaler Zeitpunkt über alle Produktgruppen bestimmen
+        max_time_overall = 0
+        for product_group in all_product_groups:
+            df_combined = self.prepare_data(product_group)
+            max_time = df_combined["Time"].max()
+            if max_time > max_time_overall:
+                max_time_overall = max_time
+        # Auch für Gesamtdaten
+        df_total = self.prepare_total_data()
+        if df_total["Time"].max() > max_time_overall:
+            max_time_overall = df_total["Time"].max()
+
+        # Anzahl der Tage/Intervalle ermitteln (1-basierte Anzahl)
+        num_intervals = int(max_time_overall // INTERVAL) + 1
+
         colors = plt.cm.get_cmap('tab20', len(all_product_groups))
 
-        tick_positions = []
-        tick_labels = []
+        for interval_idx in range(num_intervals):
+            upper_limit = (interval_idx + 1) * INTERVAL
+            lower_limit = interval_idx * INTERVAL
 
-        for idx, product_group in enumerate(all_product_groups):
-            df_combined = self.prepare_data(product_group)
+            fig, ax = plt.subplots(figsize=(19, 11))
 
-            max_time = df_combined["Time"].max()
-            group_tick_positions = self.generate_time_ticks(max_time)
-            tick_positions.extend(group_tick_positions)
-            tick_labels.extend([self.seconds_to_hours_minutes_seconds(t) for t in group_tick_positions])
+            tick_positions = []
+            tick_labels = []
 
-            color = colors(idx)
-            self.plot_lines(ax, df_combined, color=color, label=product_group, with_markers=False)
+            interval_data_exists = False
+            interval_min_time = upper_limit
+            interval_max_time = lower_limit
 
-        # Gesamtdatenlinie hinzufügen
-        df_total = self.prepare_total_data()
-        self.plot_lines(ax, df_total, color="black", label="Total Cumulative", with_markers=False)
+            for idx, product_group in enumerate(all_product_groups):
+                df_combined = self.prepare_data(product_group)
+                df_interval = df_combined[(df_combined["Time"] >= lower_limit) & (df_combined["Time"] <= upper_limit)]
 
-        ax.set_xticks(tick_positions)
-        ax.set_xticklabels(tick_labels, rotation=45)
-        ax.set_title('All Product Groups - Production inventory curve')
-        ax.set_xlabel('Time (hh:mm:ss)')
-        ax.set_ylabel('Cumulative Quantity')
-        ax.grid(True)
-        ax.legend(title="Product Groups", bbox_to_anchor=(-0.15, 1), loc='upper left')
+                if df_interval.empty:
+                    continue
 
-        self.save_plot(fig, GRAPH_PRODUCTION_MATERIAL, "All Product Groups - Production inventory curve.png")
+                interval_data_exists = True
+                interval_min_time = min(interval_min_time, df_interval["Time"].min())
+                interval_max_time = max(interval_max_time, df_interval["Time"].max())
+
+                color = colors(idx)
+                self.plot_lines(ax, df_interval, color=color, label=product_group, with_markers=False)
+
+            # Gesamtdatenlinie im Intervall
+            df_total_interval = df_total[(df_total["Time"] >= lower_limit) & (df_total["Time"] <= upper_limit)]
+            if not df_total_interval.empty:
+                interval_data_exists = True
+                interval_min_time = min(interval_min_time, df_total_interval["Time"].min())
+                interval_max_time = max(interval_max_time, df_total_interval["Time"].max())
+                self.plot_lines(ax, df_total_interval, color="black", label="Total Cumulative", with_markers=False)
+
+            if not interval_data_exists:
+                plt.close(fig)
+                continue  # Skip empty plot
+
+            # Ticks innerhalb des effektiven Zeitbereichs erzeugen
+            tick_positions = self.generate_time_ticks(interval_max_time)
+            tick_positions = [t for t in tick_positions if interval_min_time <= t <= interval_max_time]
+            tick_labels = [self.seconds_to_hours_minutes_seconds(t) for t in tick_positions]
+
+            ax.set_xlim(interval_min_time, interval_max_time)  # Nur aktiver Bereich auf X-Achse
+            ax.set_xticks(tick_positions)
+            ax.set_xticklabels(tick_labels, rotation=45)
+            ax.set_title(f'Alle Produktgruppen - Produktionsbestandskurve (Tag {interval_idx + 1})')
+            ax.set_xlabel('Zeit (hh:mm:ss)')
+            ax.set_ylabel('Kumulierte Menge')
+            ax.grid(True)
+            ax.legend(title="Product Groups", bbox_to_anchor=(-0.15, 1), loc='upper left')
+
+            self.save_plot(fig, GRAPH_PRODUCTION_MATERIAL,
+                           f"Alle Produktgruppen - Produktionsbestandskurve {interval_idx + 1}.png")
+
+            plt.close(fig)
 
     def plot_lines(self, ax, df_combined: pd.DataFrame, color: str, label: str, with_markers: bool = True) -> None:
         previous_time = 0
@@ -160,6 +215,11 @@ class VisualizeProductionMaterialThroughput:
             current_cumulative_quantity = row["Cumulative Quantity"]
 
             marker = 'o' if with_markers else None
+
+            if isinstance(current_time, pd.Series):
+                current_time = current_time.iloc[0]
+            if isinstance(previous_time, pd.Series):
+                previous_time = previous_time.iloc[0]
 
             if current_time > previous_time:
                 ax.plot([previous_time, current_time],
@@ -189,9 +249,9 @@ class VisualizeProductionMaterialThroughput:
 
         ax.set_xticks(tick_positions)
         ax.set_xticklabels(tick_labels, rotation=45)
-        ax.set_title('All Product Groups Cumulative Quantity - Production inventory curve ')
-        ax.set_xlabel('Time (hh:mm:ss)')
-        ax.set_ylabel('Cumulative Quantity')
+        ax.set_title('Alle Produktgruppen Kumulierte Menge - Produktionsbestandskurve')
+        ax.set_xlabel('Zeit (dd:mm:ss)')
+        ax.set_ylabel('Kumulierte Menge')
         ax.grid(True)
         ax.legend()
 

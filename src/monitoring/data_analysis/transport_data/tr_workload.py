@@ -32,13 +32,13 @@ class TrWorkload:
     def calculate_workload(self):
         # Status-Gruppierung
         status_group_map = {
-            "MOVING_TO_PICKUP": "Moving",
-            "MOVING_TO_DROP_OFF": "Moving",
-            "RETURNING": "Moving",
-            "LOADING": "Load/Unload",
-            "UNLOADING": "Load/Unload",
-            "IDLE": "Idle/Paused",
-            "PAUSED": "Idle/Paused"
+            "MOVING_TO_PICKUP": "In Bewegung",
+            "MOVING_TO_DROP_OFF": "In Bewegung",
+            "RETURNING": "In Bewegung",
+            "LOADING": "Be- und Entladen",
+            "UNLOADING": "Be- und Entladen",
+            "IDLE": "Wartend",
+            "PAUSED": "Wartend"
         }
 
         for tr_id in self.tr_identification_str_list:

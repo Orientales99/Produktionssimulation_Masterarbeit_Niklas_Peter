@@ -42,7 +42,7 @@ class MaterialFlowHeatmap:
             return
 
         ANALYSIS_SOLUTION.mkdir(parents=True, exist_ok=True)
-        save_path = ANALYSIS_SOLUTION / "heatmap_material_flow.png"
+        save_path = ANALYSIS_SOLUTION / "Heatmap_Materialfluss.png"
 
         custom_cmap = self.get_custom_cmap()
 

@@ -18,6 +18,7 @@ def run_analysis():
     convert = ConvertJsonData()
     visualize_product_material_throughput = VisualizeProductionMaterialThroughput(convert)
     product_throughput = ProductThroughput(convert)
+    creating_intermediate_store_during_simulation_dict = CreatingIntermediateStoreDuringSimulationDict(convert)
 
     # Analyse Throughput of Material in Production/ Machines
     visualize_product_material_throughput.plot_and_save_for_all_product_groups()
@@ -30,7 +31,7 @@ def run_analysis():
 
     # Analyse Materialflow in a matrix
     creating_tr_during_simulation_dict = CreatingTrDuringSimulationDict(convert)
-    material_flow = MaterialFlow(creating_tr_during_simulation_dict)
+    material_flow = MaterialFlow(creating_tr_during_simulation_dict, creating_machine_during_simulation_dict, creating_intermediate_store_during_simulation_dict)
     material_flow.create_material_flow_matrix()
 
     # Analyse Materialflow with a heatmap
@@ -42,7 +43,7 @@ def run_analysis():
     tr_workload.save_workload_statistics()
 
     # Analyse production topology
-    creating_intermediate_store_during_simulation_dict = CreatingIntermediateStoreDuringSimulationDict(convert)
+
     production_topology = ProductionTopology(creating_machine_during_simulation_dict,
                                              creating_intermediate_store_during_simulation_dict)
     production_topology.start_plot_production_topology()

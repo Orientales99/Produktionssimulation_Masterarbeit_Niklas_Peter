@@ -283,13 +283,13 @@ class MachineProcessingTime:
         index = np.arange(len(self.total_machine_statistics_data))
 
         # Create the 'Mean, Std Dev, and Variance' for Processing Time
-        self._plot_time_stats(machines, index, 'processing_time', 'Processing Time', 'Processing Time', 0)
+        self._plot_time_stats(machines, index, 'processing_time', 'Bearbeitungszeit', 'Bearbeitungszeit', 0)
 
         # Create the 'Mean, Std Dev, and Variance' for Waiting Input Time
-        self._plot_time_stats(machines, index, 'waiting_input_time', 'Waiting Input Time', 'Input', 1)
+        self._plot_time_stats(machines, index, 'waiting_input_time', 'Wartezeit Input', 'Input', 1)
 
         # Create the 'Mean, Std Dev, and Variance' for Waiting Output Time
-        self._plot_time_stats(machines, index, 'waiting_output_time', 'Waiting Output Time', 'Output', 2)
+        self._plot_time_stats(machines, index, 'waiting_output_time', 'Wartezeit Output', 'Output', 2)
 
     def _plot_time_stats(self, machines, index, time_type, time_title, label_suffix, shift):
         """
@@ -309,12 +309,12 @@ class MachineProcessingTime:
 
         # Plot Mean, Std Dev, and Variance for the current time type
         mean_bars = plt.bar(bar_positions, self.total_machine_statistics_data[f"mean_{time_type}"], 0.25,
-                            label=f"Mean {time_title}", color=(113 / 255, 28 / 255, 55 / 255))
+                            label=f"Mittelwert {time_title}", color=(113 / 255, 28 / 255, 55 / 255))
         std_dev_bars = plt.bar(bar_positions + 0.25, self.total_machine_statistics_data[f"std_dev_{time_type}"], 0.25,
-                               label=f"Std Dev {time_title}", color=(161 / 255, 204 / 255, 201 / 255))
+                               label=f"Standardabweichung {time_title}", color=(161 / 255, 204 / 255, 201 / 255))
         if time_type == "processing_time":
             variance_bars = plt.bar(bar_positions + 0.5, self.total_machine_statistics_data[f"variance_{time_type}"], 0.25,
-                                    label=f"Variance {time_title}", color=(219 / 255, 203 / 255, 150 / 255))
+                                    label=f"Varianz {time_title}", color=(219 / 255, 203 / 255, 150 / 255))
             self._add_values_on_bars(variance_bars)
 
         # Add the value labels on top of each bar
@@ -322,9 +322,9 @@ class MachineProcessingTime:
         self._add_values_on_bars(std_dev_bars)
 
         # Customize the plot
-        plt.xlabel('Machines')
-        plt.ylabel('Time (Seconds)')
-        plt.title(f'Mean, Std Dev, and Variance of {time_title}')
+        plt.xlabel('Maschinen')
+        plt.ylabel('Zeit (Sekunden)')
+        plt.title(f'Mittelwert, Standardabweichung und Varianz von {time_title}')
         plt.xticks(bar_positions + 0.25, machines, rotation=90)  # Align X-ticks with the center of the bars
         plt.legend()
         plt.tight_layout()
@@ -344,7 +344,7 @@ class MachineProcessingTime:
             plt.text(bar.get_x() + bar.get_width() / 2, yval, round(yval, 2),
                      ha='center', va='bottom', rotation=90, fontsize=9)
 
-    def save_machine_statistics_table(self, filename: str = "Machine_data.xlsx"):
+    def save_machine_statistics_table(self, filename: str = "Maschinendaten.xlsx"):
         # Check if MACHINE_STATISTICS directory exists, otherwise create it
         os.makedirs(MACHINE_STATISTICS, exist_ok=True)
         filepath = os.path.join(MACHINE_STATISTICS, filename)

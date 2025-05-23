@@ -55,7 +55,7 @@ class MaterialFlow:
             if station not in self.object_material_flow_matrix:
                 self.object_material_flow_matrix[station] = {}
             for target in all_stations:
-                if target not in self.object_material_flow_matrix[station]:
+                if target not in self.object_material_flow_matrix[station] and target != station:
                     self.object_material_flow_matrix[station][target] = 0
 
         # Materialflüsse eintragen

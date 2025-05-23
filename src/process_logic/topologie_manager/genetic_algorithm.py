@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import simpy
 import random
 import matplotlib.pyplot as plt
@@ -26,6 +28,7 @@ class GeneticAlgorithm:
     number_of_surviving_parents: int
     odds_of_mutation_per_genom_in_percent: int
     points_of_separation: int
+    corrected_assignment: list[tuple[str, str]]
 
     def __init__(self, env: simpy.Environment, material_flow: MaterialFlow, position_distance_matrix: PositionsDistanceMatrix):
         self.env = env
@@ -35,6 +38,7 @@ class GeneticAlgorithm:
         self.positions_distance_matrix = self.class_position_distance_matrix.positions_distance_matrix
         self.entity_fixed_assignment = []
         self.entity_assignment = []
+        self.corrected_assignment = []
 
         self.genetic_algorithm_service = GeneticAlgorithmService()
         self.number_of_iterations = self.genetic_algorithm_service.get_number_of_iterations()
@@ -49,6 +53,7 @@ class GeneticAlgorithm:
         self.get_material_flow_matrix(start_time, end_time)
         self.save_fixed_assignment()
         self.run_genetic_loop()
+        print(self.entity_assignment)
         return self.entity_assignment
 
     def get_material_flow_matrix(self, start_time: int = 0, end_time: int = float('inf')):
@@ -129,16 +134,28 @@ class GeneticAlgorithm:
         self.save_performance_data(avg_performances, best_performances, std_devs)
 
     def is_valid_individual(self, individual: list[tuple[str, str]]) -> bool:
-        position_dict = dict(self.entity_fixed_assignment + individual)
-        all_entities = set(self.material_flow_matrix.keys()) | {dst for d in self.material_flow_matrix.values() for dst in d.keys()}
+        combined_assignments = self.entity_fixed_assignment + individual
+        position_dict = dict(combined_assignments)
 
+        # Check auf doppelte Positionsverwendung
+        if len(set(position_dict.keys())) != len(position_dict):
+            return False
+
+        # Check auf doppelte Entitätenzuweisungen
+        if len(set(position_dict.values())) != len(position_dict.values()):
+            return False
+
+        # Sicherstellen, dass alle benötigten Entitäten zugewiesen sind
+        all_entities = set(self.material_flow_matrix.keys()) | {dst for d in self.material_flow_matrix.values() for dst
+                                                                in d.keys()}
         if not all(entity in position_dict.values() for entity in all_entities):
             return False
 
+        # Umgekehrte Zuordnung für Distanzprüfung
+        inverse_position_dict = {v: k for k, v in position_dict.items()}
         for src, dests in self.material_flow_matrix.items():
             for dst in dests:
                 try:
-                    inverse_position_dict = {v: k for k, v in position_dict.items()}
                     pos_src = inverse_position_dict[src]
                     pos_dst = inverse_position_dict[dst]
                     _ = self.positions_distance_matrix[pos_src][pos_dst]
@@ -256,9 +273,9 @@ class GeneticAlgorithm:
         plt.plot(generations, best_performances, label='Best Performance', color='green')
         plt.xlabel('Generation')
         plt.ylabel('Performance')
-        plt.title('Performance of Genetic Algorithm')
+        plt.title(f'Genetischer Algorithmus - Produktionszeit: {self.env.now}s')
         plt.legend()
-        filename = f"generation_plot_envnow_{self.env.now}.png"
+        filename = f"Genetischer Algorithmus-Zeit_{self.env.now}s.png"
         path = os.path.join(GENETIC_ALGORITHM, filename)
         plt.savefig(path)
         plt.close()
@@ -274,7 +291,8 @@ class GeneticAlgorithm:
             for i, (avg, best, std) in enumerate(zip(avg_performances, best_performances, std_devs))
         ]
 
-        filename = f"performance_data_envnow_{self.env.now}.json"
+        filename = f"GA Leistung der Generationen_Produktionszeit-{self.env.now}s.json"
         path = os.path.join(GENETIC_ALGORITHM, filename)
         with open(path, 'w') as f:
             json.dump(data, f, indent=4)
+

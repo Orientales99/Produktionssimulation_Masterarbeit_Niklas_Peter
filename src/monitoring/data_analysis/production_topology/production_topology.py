@@ -96,10 +96,10 @@ class ProductionTopology:
             x, y, typ = info["x"], info["y"], info["type"]
             if typ == 'Machine':
                 color = machine_color
-                label = "Machine"
+                label = "Maschine"
             else:
                 color = store_color
-                label = "Intermediate Store"
+                label = "Zwischenlager"
 
             # Nur ein Label pro Typ (verhindert Duplikate in der Legende)
             already_labels = plt.gca().get_legend_handles_labels()[1]
@@ -107,13 +107,13 @@ class ProductionTopology:
             plt.text(x + 1, y + 1, ident_str, fontsize=9)
 
         plt.title(f"Produktionslayout – {tag_label}")
-        plt.xlabel("x-Axis")
-        plt.ylabel("y-Axis")
+        plt.xlabel("x-Achse")
+        plt.ylabel("y-Achse")
         plt.legend()
         plt.grid(True)
         plt.axis('equal')
 
-        file_path = PRODUCTION_TOPOLOGY / f"production_topology_{tag_label}.png"
+        file_path = PRODUCTION_TOPOLOGY / f"Produktionstopologie_{tag_label}.png"
         plt.savefig(file_path, dpi=300, bbox_inches='tight')
         plt.close()
 
