@@ -30,7 +30,8 @@ class GeneticAlgorithm:
     points_of_separation: int
     corrected_assignment: list[tuple[str, str]]
 
-    def __init__(self, env: simpy.Environment, material_flow: MaterialFlow, position_distance_matrix: PositionsDistanceMatrix):
+    def __init__(self, env: simpy.Environment, material_flow: MaterialFlow,
+                 position_distance_matrix: PositionsDistanceMatrix):
         self.env = env
         self.material_flow = material_flow
         self.class_position_distance_matrix = position_distance_matrix
@@ -41,6 +42,7 @@ class GeneticAlgorithm:
         self.corrected_assignment = []
 
         self.genetic_algorithm_service = GeneticAlgorithmService()
+
         self.number_of_iterations = self.genetic_algorithm_service.get_number_of_iterations()
         self.population_size = self.genetic_algorithm_service.get_population_size_per_generation()
         self.number_of_surviving_parents = self.genetic_algorithm_service.get_number_of_surviving_parents()
@@ -49,7 +51,7 @@ class GeneticAlgorithm:
 
         self.class_position_distance_matrix.start_creating_positions_distance_matrix()
 
-    def start_genetic_algorithm(self, start_time: int = 0, end_time: int = float('inf')):
+    def start_genetic_algorithm(self, start_time: int = 0, end_time: int = float('inf')) -> list[tuple[str, str]]:
         self.get_material_flow_matrix(start_time, end_time)
         self.save_fixed_assignment()
         self.run_genetic_loop()
@@ -62,13 +64,16 @@ class GeneticAlgorithm:
     def save_fixed_assignment(self):
         for y in self.class_position_distance_matrix.production.production_layout:
             for cell in y:
-                if isinstance(cell.placed_entity, (Sink, Source)) or (isinstance(cell.placed_entity, Machine) and cell.placed_entity.driving_speed == 0):
+                if isinstance(cell.placed_entity, (Sink, Source)) or (
+                        isinstance(cell.placed_entity, Machine) and cell.placed_entity.driving_speed == 0):
                     if cell.cell_id in self.positions_distance_matrix:
                         self.entity_fixed_assignment.append((cell.cell_id, cell.placed_entity.identification_str))
 
-    def create_individual(self, available_positions: list[str], unassigned_stations: list[str]) -> list[tuple[str, str]]:
+    def create_individual(self, available_positions: list[str], unassigned_stations: list[str]) -> list[
+        tuple[str, str]]:
         if len(available_positions) < len(unassigned_stations):
-            raise ValueError(f"Nicht genügend freie Positionen ({len(available_positions)}) für die nicht zugewiesenen Stationen ({len(unassigned_stations)}).")
+            raise ValueError(
+                f"Nicht genügend freie Positionen ({len(available_positions)}) für die nicht zugewiesenen Stationen ({len(unassigned_stations)}).")
         return list(zip(
             random.sample(available_positions, len(unassigned_stations)),
             random.sample(unassigned_stations, len(unassigned_stations))
@@ -78,10 +83,12 @@ class GeneticAlgorithm:
         all_stations = [station for subdict in self.material_flow_matrix.values() for station in subdict.keys()]
         assigned_stations = [station for _, station in self.entity_fixed_assignment]
         unassigned_stations = list(set(all_stations) - set(assigned_stations))
-        available_positions = list(set(self.positions_distance_matrix.keys()) - {pos for pos, _ in self.entity_fixed_assignment})
+        available_positions = list(
+            set(self.positions_distance_matrix.keys()) - {pos for pos, _ in self.entity_fixed_assignment})
 
         try:
-            population = [self.create_individual(available_positions, unassigned_stations) for _ in range(self.population_size)]
+            population = [self.create_individual(available_positions, unassigned_stations) for _ in
+                          range(self.population_size)]
         except ValueError as e:
             raise ValueError(f"[ERROR] Fehler beim Erzeugen der Startpopulation: {e}")
 
@@ -91,12 +98,10 @@ class GeneticAlgorithm:
 
         for generation in range(self.number_of_iterations):
             performance_scores = []
+
             for ind in population:
-                if self.is_valid_individual(ind):
-                    performance_scores.append(self.calculate_performance(ind))
-                else:
-                    print(f"[WARN] Ungültiges Individuum in Generation {generation}: {ind}")
-                    performance_scores.append(float('inf'))
+                ind = self.validate_and_correct_assignment(ind)
+                performance_scores.append(self.calculate_performance(ind))
 
             scored_population = list(zip(population, performance_scores))
             scored_population.sort(key=lambda x: x[1])
@@ -133,35 +138,44 @@ class GeneticAlgorithm:
         self.plot_performance(avg_performances, best_performances, std_devs)
         self.save_performance_data(avg_performances, best_performances, std_devs)
 
-    def is_valid_individual(self, individual: list[tuple[str, str]]) -> bool:
-        combined_assignments = self.entity_fixed_assignment + individual
-        position_dict = dict(combined_assignments)
+    def validate_and_correct_assignment(self, individuum: list[tuple[str, str]]) -> list[tuple[str, str]]:
+        """Validates and corrects the final allocation if a position is occupied more than once."""
 
-        # Check auf doppelte Positionsverwendung
-        if len(set(position_dict.keys())) != len(position_dict):
-            return False
+        position_to_stations = defaultdict(list)
+        for pos, station in individuum:
+            position_to_stations[pos].append(station)
 
-        # Check auf doppelte Entitätenzuweisungen
-        if len(set(position_dict.values())) != len(position_dict.values()):
-            return False
+        # Search for vacant positions
+        all_positions = set(self.positions_distance_matrix.keys())
+        used_positions = set(position_to_stations.keys())
+        free_positions = list(all_positions - used_positions)
 
-        # Sicherstellen, dass alle benötigten Entitäten zugewiesen sind
-        all_entities = set(self.material_flow_matrix.keys()) | {dst for d in self.material_flow_matrix.values() for dst
-                                                                in d.keys()}
-        if not all(entity in position_dict.values() for entity in all_entities):
-            return False
+        corrected_assignment = []
+        for pos, stations in position_to_stations.items():
+            if len(stations) == 1:
+                corrected_assignment.append((pos, stations[0]))
+            else:
+                # Double occupancy -> select station with largest material flow, leave weaker ones behind
+                station_flows = []
+                for station in stations:
+                    flow_sum = sum(self.material_flow_matrix.get(station, {}).values()) + \
+                               sum(self.material_flow_matrix.get(other_station, {}).get(station, 0)
+                                   for other_station in self.material_flow_matrix)
+                    station_flows.append((station, flow_sum))
 
-        # Umgekehrte Zuordnung für Distanzprüfung
-        inverse_position_dict = {v: k for k, v in position_dict.items()}
-        for src, dests in self.material_flow_matrix.items():
-            for dst in dests:
-                try:
-                    pos_src = inverse_position_dict[src]
-                    pos_dst = inverse_position_dict[dst]
-                    _ = self.positions_distance_matrix[pos_src][pos_dst]
-                except KeyError:
-                    return False
-        return True
+                # Sort by descending flow
+                station_flows.sort(key=lambda x: x[1], reverse=True)
+                # Best remains in position
+                corrected_assignment.append((pos, station_flows[0][0]))
+                # All others are reassigned
+                for station, _ in station_flows[1:]:
+                    if free_positions:
+                        new_pos = free_positions.pop(0)
+                        corrected_assignment.append((new_pos, station))
+                    else:
+                        print(f"Warnung: Keine freie Position für Station {station} verfügbar.")
+
+        return corrected_assignment
 
     def calculate_performance(self, individual: list[tuple[str, str]]) -> float:
         position_dict = dict(self.entity_fixed_assignment + individual)
@@ -269,7 +283,8 @@ class GeneticAlgorithm:
 
         plt.figure(figsize=(10, 6))
         plt.plot(generations, avg_array, label='Average Performance', color='blue')
-        plt.fill_between(generations, avg_array - std_array, avg_array + std_array, color='blue', alpha=0.3, label='Standard Deviation')
+        plt.fill_between(generations, avg_array - std_array, avg_array + std_array, color='blue', alpha=0.3,
+                         label='Standard Deviation')
         plt.plot(generations, best_performances, label='Best Performance', color='green')
         plt.xlabel('Generation')
         plt.ylabel('Performance')
@@ -295,4 +310,3 @@ class GeneticAlgorithm:
         path = os.path.join(GENETIC_ALGORITHM, filename)
         with open(path, 'w') as f:
             json.dump(data, f, indent=4)
-

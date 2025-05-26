@@ -60,15 +60,15 @@ class QuadraticAssignmentProblem:
 
     def solve_qap_with_fixed_assignments(self):
         """Main method to solve QAP with fixed assignments."""
-        self._prepare_fixed_assignments()
-        self._define_decision_variables()
-        self._define_objective_function()
-        self._define_constraints()
-        self._solve_problem()
-        self._extract_final_assignment()
-        self._validate_and_correct_assignment()
+        self.prepare_fixed_assignments()
+        self.define_decision_variables()
+        self.define_objective_function()
+        self.define_constraints()
+        self.solve_problem()
+        self.extract_final_assignment()
+        self.validate_and_correct_assignment()
 
-    def _prepare_fixed_assignments(self):
+    def prepare_fixed_assignments(self):
         """Prepare lists for fixed and free stations and locations."""
         self.fixed_station_to_location = dict((station, loc) for loc, station in self.entity_fixed_assignment)
         self.assigned_locations = set(self.fixed_station_to_location.values())
@@ -80,7 +80,7 @@ class QuadraticAssignmentProblem:
         self.free_stations = [s for s in self.stations if s not in self.assigned_stations]
         self.free_locations = [l for l in self.locations if l not in self.assigned_locations]
 
-    def _define_decision_variables(self):
+    def define_decision_variables(self):
         """Define binary decision variables for free assignments."""
         self.x = pulp.LpVariable.dicts(
             "x",
@@ -89,7 +89,7 @@ class QuadraticAssignmentProblem:
         )
         self.prob = pulp.LpProblem("QAP_with_fixed_assignments", pulp.LpMinimize)
 
-    def _define_objective_function(self):
+    def define_objective_function(self):
         """Define objective function: minimize flow * distance."""
         obj = 0
         for i in self.stations:
@@ -99,13 +99,13 @@ class QuadraticAssignmentProblem:
                     for q in self.locations:
                         dist = self.positions_distance_matrix.get(j, {}).get(q, 0)
 
-                        term_1 = self._get_assignment_term(i, j)
-                        term_2 = self._get_assignment_term(k, q)
+                        term_1 = self.get_assignment_term(i, j)
+                        term_2 = self.get_assignment_term(k, q)
 
-                        obj += flow * dist * self._multiply_terms(term_1, term_2)
+                        obj += flow * dist * self.multiply_terms(term_1, term_2)
         self.prob += obj
 
-    def _define_constraints(self):
+    def define_constraints(self):
         """Ensure each free station and location gets exactly one assignment."""
         for i in self.free_stations:
             self.prob += pulp.lpSum([self.x[i, j] for j in self.free_locations]) == 1
@@ -113,11 +113,11 @@ class QuadraticAssignmentProblem:
         for j in self.free_locations:
             self.prob += pulp.lpSum([self.x[i, j] for i in self.free_stations]) == 1
 
-    def _solve_problem(self):
+    def solve_problem(self):
         """Solve the optimization problem."""
         self.prob.solve()
 
-    def _extract_final_assignment(self):
+    def extract_final_assignment(self):
         """Combine fixed and optimized assignments."""
         self.entity_assignment = [(loc, station) for loc, station in self.entity_fixed_assignment]
 
@@ -126,7 +126,7 @@ class QuadraticAssignmentProblem:
                 if pulp.value(self.x[i, j]) is not None and pulp.value(self.x[i, j]) > 0.5:
                     self.entity_assignment.append((j, i))  # (cell_id, station_id)
 
-    def _get_assignment_term(self, station, location):
+    def get_assignment_term(self, station, location):
         """Get binary value or variable depending on whether fixed or not."""
         if station in self.free_stations and location in self.free_locations:
             return self.x[station, location]
@@ -135,7 +135,7 @@ class QuadraticAssignmentProblem:
         else:
             return 0
 
-    def _multiply_terms(self, a, b):
+    def multiply_terms(self, a, b):
         """Multiply constants and/or pulp variables safely."""
         if isinstance(a, int) and isinstance(b, int):
             return a * b
@@ -148,14 +148,14 @@ class QuadraticAssignmentProblem:
             return 0  # Optional: ignore bilinear terms to keep it linear
         return 0
 
-    def _validate_and_correct_assignment(self):
-        """Validiert und korrigiert die endgültige Zuordnung, wenn eine Position mehrfach belegt ist."""
+    def validate_and_correct_assignment(self):
+        """Validates and corrects the final allocation if a position is occupied more than once."""
 
         position_to_stations = defaultdict(list)
         for pos, station in self.entity_assignment:
             position_to_stations[pos].append(station)
 
-        # Freie Positionen suchen
+        # Search for vacant positions
         all_positions = set(self.positions_distance_matrix.keys())
         used_positions = set(position_to_stations.keys())
         free_positions = list(all_positions - used_positions)
@@ -165,7 +165,7 @@ class QuadraticAssignmentProblem:
             if len(stations) == 1:
                 corrected_assignment.append((pos, stations[0]))
             else:
-                # Doppelte Belegung -> wähle Station mit größtem Materialfluss, lasse schwächere weichen
+                # Double occupancy -> select station with largest material flow, leave weaker ones behind
                 station_flows = []
                 for station in stations:
                     flow_sum = sum(self.material_flow_matrix.get(station, {}).values()) + \
@@ -173,11 +173,11 @@ class QuadraticAssignmentProblem:
                                    for other_station in self.material_flow_matrix)
                     station_flows.append((station, flow_sum))
 
-                # Sortiere nach absteigendem Fluss
+                # Sort by descending flow
                 station_flows.sort(key=lambda x: x[1], reverse=True)
-                # Beste bleibt auf Position
+                # Best remains in position
                 corrected_assignment.append((pos, station_flows[0][0]))
-                # Alle anderen werden neu zugewiesen
+                # All others are reassigned
                 for station, _ in station_flows[1:]:
                     if free_positions:
                         new_pos = free_positions.pop(0)
