@@ -51,14 +51,6 @@ class MachineSimulation:
                         machine.working_status.working_on_status = True
                         self.env.process(self.producing_process(machine))
 
-                    #   producing product
-                    #       get order for the next machine in the process steps of the product
-                    #       if output full -> wait (other than producing product)
-                    #       if input empty -> wait
-                    #   producing product finished
-                    #       -> release wr; machine status -> wr_leaving -> no wr
-                    #       machine status -> idle or waiting_next_order
-
             yield self.env.timeout(1)
 
     def set_up_machine_process(self, machine: Machine):

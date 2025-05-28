@@ -42,11 +42,6 @@ def run_analysis():
     tr_workload = TrWorkload(creating_tr_during_simulation_dict)
     tr_workload.save_workload_statistics()
 
-    # Analyse production topology
-
-    production_topology = ProductionTopology(creating_machine_during_simulation_dict,
-                                             creating_intermediate_store_during_simulation_dict)
-    production_topology.start_plot_production_topology()
 
 
 def run_throughput_visualization():

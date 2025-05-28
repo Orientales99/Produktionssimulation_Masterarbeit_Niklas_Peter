@@ -140,12 +140,6 @@ class CellInformation:
 
         self.print_information_sheet(title, info_text)
 
-        #if machine.working_status.working_robot_status.WR_PRESENT or \
-        #        machine.working_status.working_robot_status.WAITING_WR or \
-        #        machine.working_status.working_robot_status.WR_LEAVING:
-        #    wr = self.get_wr_working_on_machine(machine)
-        #    self.print_working_robot_information(wr)
-
     def get_wr_working_on_machine(self, machine: Machine) -> WorkingRobot:
         """get a machine and figure out which wr is working on it"""
         wr_list = self.production.wr_list[:]
@@ -288,6 +282,7 @@ class CellInformation:
             f"Working Status:\n"
             f"              {transport_robot.working_status.status.value}\n"
             f"              {working_on_status}\n"
+            f"\n"
             f"      Transport Destination:\n"
             f"              Destination                  {destination}\n"
             f"              Destination Coordinates:     {transport_robot.working_status.driving_destination_coordinates}\n"

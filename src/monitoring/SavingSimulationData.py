@@ -1,11 +1,13 @@
 import json
 import os
-import glob
+
 from datetime import date
+
+from matplotlib import pyplot as plt
 
 from src import SIMULATION_OUTPUT_DATA, ENTITIES_DURING_SIMULATION_DATA, MACHINES_DURING_SIMULATION_DATA, \
     TR_DURING_SIMULATION_DATA, WR_DURING_SIMULATION_DATA, SINK_DURING_SIMULATION_DATA, \
-    INTERMEDIATE_STORE_DURING_SIMULATION_DATA
+    INTERMEDIATE_STORE_DURING_SIMULATION_DATA, PRODUCTION_TOPOLOGY
 from src.entity.intermediate_store import IntermediateStore
 from src.entity.machine.machine import Machine
 from src.entity.sink import Sink
@@ -288,3 +290,70 @@ class SavingSimulationData:
 
         with open(output_path, "w") as f:
             json.dump(plan_data, f, indent=2)
+
+    def save_daily_topology(self, entity_assignment: list[tuple[str, str]], max_coordinates: Coordinates):
+        fig, ax = plt.subplots(figsize=(12, 10))
+
+        #  Define colours (RGB scaled to 0-1)
+        machine_color = (116 / 255, 33 / 255, 40 / 255)
+        store_color = (161 / 255, 204 / 255, 201 / 255)
+
+        #  Dummy handles for the legend
+        machine_handle = None
+        store_handle = None
+
+        for cell_id_str, station_id_str in entity_assignment:
+            try:
+                x_str, y_str = cell_id_str.split(":")
+                x, y = int(x_str), int(y_str)
+            except ValueError:
+                print(f"Ungültiges cell.identification_str: {cell_id_str}")
+                continue
+
+            if station_id_str.startswith("Ma"):
+                color = machine_color
+                label = "Machine"
+                if machine_handle is None:
+                    machine_handle = ax.plot(x, y, 'o', color=color, label=label)[0]
+                else:
+                    ax.plot(x, y, 'o', color=color)
+            else:
+                color = store_color
+                label = "Zwischenlager"
+                if store_handle is None:
+                    store_handle = ax.plot(x, y, 'o', color=color, label=label)[0]
+                else:
+                    ax.plot(x, y, 'o', color=color)
+
+            ax.text(x + 0.2, y + 0.2, station_id_str, fontsize=9)
+
+        #  Axis labelling and limits
+        ax.set_xlim(left=0, right=max_coordinates.x + 1)
+        ax.set_ylim(bottom=0, top=max_coordinates.y + 1)
+        ax.set_xlabel("X")
+        ax.set_ylabel("Y")
+        ax.set_title(f"Produktions-Topologie bei SimTime {self.env.now}")
+        ax.grid(True)
+        ax.set_aspect('equal', adjustable='box')
+
+        #  Add legend if handles exist
+        handles = [h for h in [machine_handle, store_handle] if h is not None]
+        if handles:
+            ax.legend()
+
+        # Create memory path
+        os.makedirs(PRODUCTION_TOPOLOGY, exist_ok=True)
+        file_path = os.path.join(PRODUCTION_TOPOLOGY, f"topology_{int(self.env.now)}.png")
+        plt.savefig(file_path)
+        plt.close()
+
+    def delete_material_production_input_output(self):
+
+        json_files = list(SIMULATION_OUTPUT_DATA.glob("*.json"))
+        for file_path in json_files:
+            try:
+                file_path.unlink()
+                print(f"Gelöscht: {file_path.name}")
+            except Exception as e:
+                print(f"Fehler beim Löschen von {file_path.name}: {e}")
+

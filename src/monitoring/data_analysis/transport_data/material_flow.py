@@ -10,7 +10,9 @@ class MaterialFlow:
     def __init__(self, creating_tr_during_simulation_dict: CreatingTrDuringSimulationDict,
                  creating_machine_during_simulation_dict: CreatingMachineDuringSimulationDict,
                  creating_intermediate_store_during_simulation_dict: CreatingIntermediateStoreDuringSimulationDict):
+
         self.creating_tr_during_simulation_dict = creating_tr_during_simulation_dict
+
         self.every_tr_during_simulation_data = self.creating_tr_during_simulation_dict.every_tr_during_simulation_data
 
         self.tr_identification_str_list = self.creating_tr_during_simulation_dict.every_tr_identification_str_list

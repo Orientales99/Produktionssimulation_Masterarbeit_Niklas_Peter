@@ -1,7 +1,7 @@
 import math
-from collections import defaultdict
-
 import simpy
+
+from collections import defaultdict
 from simpy import Store
 
 from src.entity.intermediate_store import IntermediateStore

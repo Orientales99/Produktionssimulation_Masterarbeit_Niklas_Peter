@@ -126,4 +126,4 @@ class RebuildingEnvironmentSimulation:
 
 
     def get_control_time(self) -> int:
-        return 29400   # return input("Bei welcher Sekunde soll die Produktion starten?")
+        return 26000   # return input("Bei welcher Sekunde soll die Produktion starten?")

@@ -1,5 +1,6 @@
 import simpy
 
+from src.entity.intermediate_store import IntermediateStore
 from src.monitoring.SavingSimulationData import SavingSimulationData
 from src.monitoring.data_analysis.convert_json_data import ConvertJsonData
 from src.monitoring.data_analysis.creating_intermediate_store_during_simulation_dict import \
@@ -95,11 +96,14 @@ class EnvironmentSimulation:
     def initialise_simulation_start(self):
         self.production.create_production()
         current_date = self.production.service_starting_conditions.set_starting_date_of_simulation()
+
+        self.saving_simulation_data.delete_material_production_input_output()
+
         while True:
             self.manufacturing_plan.set_parameter_for_start_of_a_simulation_day(current_date)
             self.saving_simulation_data.save_daily_manufacturing_plan(current_date,
                                                                       self.manufacturing_plan.daily_manufacturing_plan)
-            # self.topology_manager()
+            self.topology_manager()
             print("initialise_simulation_start")
             print(self.manufacturing_plan.daily_manufacturing_plan)
             yield self.env.timeout(28800)  # 8h working time
@@ -152,7 +156,13 @@ class EnvironmentSimulation:
             entity_assignment = self.class_quadratic_assignment_problem.start_quadratic_assignment_problem(
                 start_time=self.env.now, end_time=endtime)
             self.repositioning_objects.start_repositioning_objects_in_production(entity_assignment)
+            self.saving_simulation_data.save_daily_topology(entity_assignment, self.production.max_coordinate)
             print("quadratic_assignment_problem wurde ausgeführt")
+            for y in self.production.production_layout:
+                for cell in y:
+                    if isinstance(cell.placed_entity, IntermediateStore):
+                        self.saving_simulation_data.save_entity_action(cell.placed_entity)
+                        break
 
         elif algorithm == 3:
             # Genetic algorithm
@@ -162,7 +172,13 @@ class EnvironmentSimulation:
             entity_assignment = self.class_genetic_algorithm.start_genetic_algorithm(start_time=self.env.now,
                                                                                      end_time=endtime)
             self.repositioning_objects.start_repositioning_objects_in_production(entity_assignment)
+            self.saving_simulation_data.save_daily_topology(entity_assignment)
             print("Genetic algorithm wurde ausgeführt")
+            for y in self.production.production_layout:
+                for cell in y:
+                    if isinstance(cell.placed_entity, IntermediateStore):
+                        self.saving_simulation_data.save_entity_action(cell.placed_entity)
+                        break
 
         elif algorithm == 4:
             # Force directed placement
@@ -173,6 +189,12 @@ class EnvironmentSimulation:
             entity_assignment = self.class_forced_directed_placement.start_fdp_algorithm(start_time=self.env.now,
                                                                                          end_time=endtime)
             self.repositioning_objects.start_repositioning_objects_in_production(entity_assignment)
+            self.saving_simulation_data.save_daily_topology(entity_assignment)
             print("Force directed placement wurde ausgeführt")
+            for y in self.production.production_layout:
+                for cell in y:
+                    if isinstance(cell.placed_entity, IntermediateStore):
+                        self.saving_simulation_data.save_entity_action(cell.placed_entity)
+                        break
 
         time_until_next_day = endtime - self.env.now + 10
