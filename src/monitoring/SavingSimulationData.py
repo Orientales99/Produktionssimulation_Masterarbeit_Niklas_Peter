@@ -347,13 +347,5 @@ class SavingSimulationData:
         plt.savefig(file_path)
         plt.close()
 
-    def delete_material_production_input_output(self):
 
-        json_files = list(SIMULATION_OUTPUT_DATA.glob("*.json"))
-        for file_path in json_files:
-            try:
-                file_path.unlink()
-                print(f"Gelöscht: {file_path.name}")
-            except Exception as e:
-                print(f"Fehler beim Löschen von {file_path.name}: {e}")
 

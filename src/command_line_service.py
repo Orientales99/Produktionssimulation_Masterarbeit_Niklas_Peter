@@ -1,3 +1,4 @@
+from src import SIMULATION_OUTPUT_DATA
 from src.monitoring.data_analysis.convert_json_data import ConvertJsonData
 from src.monitoring.data_analysis.creating_intermediate_store_during_simulation_dict import \
     CreatingIntermediateStoreDuringSimulationDict
@@ -24,10 +25,10 @@ class CommandLineService:
         simulation_duration = self.production.service_starting_conditions.set_simulation_duration_per_day()
         self.environment_simulation.initialise_simulation_start()
         self.environment_simulation.run_simulation(until=86400)
-        self.start_analyse()
+        # self.start_analyse()
 
     def start_analyse(self):
-        convert = ConvertJsonData()
+        convert = ConvertJsonData(SIMULATION_OUTPUT_DATA)
         visualize_product_material_throughput = VisualizeProductionMaterialThroughput(convert)
         product_throughput = ProductThroughput(convert)
         creating_intermediate_store_during_simulation_dict = CreatingIntermediateStoreDuringSimulationDict(convert)

@@ -1,3 +1,4 @@
+from src import SIMULATION_OUTPUT_DATA
 from src.monitoring.data_analysis.convert_json_data import ConvertJsonData
 from src.monitoring.data_analysis.creating_intermediate_store_during_simulation_dict import \
     CreatingIntermediateStoreDuringSimulationDict
@@ -6,7 +7,6 @@ from src.monitoring.data_analysis.creating_tr_during_simulation_dict import Crea
 from src.monitoring.data_analysis.creating_wr_during_simulation_dict import CreatingWrDuringSimulationDict
 from src.monitoring.data_analysis.machine_data.machine_processing_time import MachineProcessingTime
 from src.monitoring.data_analysis.product_throughput import ProductThroughput
-from src.monitoring.data_analysis.production_topology.production_topology import ProductionTopology
 from src.monitoring.data_analysis.transport_data.material_flow import MaterialFlow
 from src.monitoring.data_analysis.transport_data.material_flow_heatmap import MaterialFlowHeatmap
 from src.monitoring.data_analysis.transport_data.tr_workload import TrWorkload
@@ -15,7 +15,7 @@ from src.rebuild_simulation.entities_specifc_simulation_time import EntitiesSpec
 
 
 def run_analysis():
-    convert = ConvertJsonData()
+    convert = ConvertJsonData(SIMULATION_OUTPUT_DATA)
     visualize_product_material_throughput = VisualizeProductionMaterialThroughput(convert)
     product_throughput = ProductThroughput(convert)
     creating_intermediate_store_during_simulation_dict = CreatingIntermediateStoreDuringSimulationDict(convert)
@@ -45,7 +45,7 @@ def run_analysis():
 
 
 def run_throughput_visualization():
-    convert = ConvertJsonData()
+    convert = ConvertJsonData(SIMULATION_OUTPUT_DATA)
     visualize_product_material_throughput = VisualizeProductionMaterialThroughput(convert)
 
     visualize_product_material_throughput.plot_and_save_for_all_product_groups()
@@ -53,26 +53,26 @@ def run_throughput_visualization():
 
 
 def run_throughput_stats():
-    convert = ConvertJsonData()
+    convert = ConvertJsonData(SIMULATION_OUTPUT_DATA)
     product_throughput = ProductThroughput(convert)
 
     product_throughput.calculate_throughput_for_all_groups()
 
 
 def run_machine_working_status():
-    convert = ConvertJsonData()
+    convert = ConvertJsonData(SIMULATION_OUTPUT_DATA)
     creating_machine_during_simulation_dict = CreatingMachineDuringSimulationDict(convert)
     machine_processing_time = MachineProcessingTime(creating_machine_during_simulation_dict)
     # machine_processing_time.get_production_machine_data()
 
 
 def run_tr_working_status():
-    convert = ConvertJsonData()
+    convert = ConvertJsonData(SIMULATION_OUTPUT_DATA)
     creating_tr_during_simulation_dict = CreatingTrDuringSimulationDict(convert)
 
 
 def run_wr_working_status():
-    convert = ConvertJsonData()
+    convert = ConvertJsonData(SIMULATION_OUTPUT_DATA)
     creating_wr_during_simulation_dict = CreatingWrDuringSimulationDict(convert)
 
 

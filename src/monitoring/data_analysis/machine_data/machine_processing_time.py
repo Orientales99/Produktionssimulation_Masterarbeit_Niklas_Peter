@@ -39,54 +39,44 @@ class MachineProcessingTime:
         total_machine_stats_list = []
 
         for identification_str in self.machine_identification_str_list:
-            machine_dict_list = self.every_machine_during_simulation_data.get(identification_str)
+            machine_dict_list = self.every_machine_during_simulation_data.get(identification_str, [])
 
-            unique_product_list = self.get_list_of_produced_product_group_for_machine(machine_dict_list)
+            unique_product_list = [
+                p for p in self.get_list_of_produced_product_group_for_machine(machine_dict_list) if p
+            ]
 
             machine_total_processing_time_list = []
             machine_total_waiting_input_time_list = []
             machine_total_waiting_output_time_list = []
 
             for product in unique_product_list:
-                # analysing machine stats per product
-                processing_time_per_product_list = self.get_list_processing_time_per_product(machine_dict_list, product)
-                waiting_time_for_material_input_list = self.get_list_waiting_time_machine_input_empty(machine_dict_list,
-                                                                                                      product)
-                waiting_time_for_material_output_list = self.get_list_waiting_time_machine_output_full(
-                    machine_dict_list, product)
+                # Analyse je Produktgruppe
+                processing_times = self.get_list_processing_time_per_product(machine_dict_list, product)
+                input_waiting_times = self.get_list_waiting_time_machine_input_empty(machine_dict_list, product)
+                output_waiting_times = self.get_list_waiting_time_machine_output_full(machine_dict_list, product)
 
-                # add the machine stats to one big list. Cannot just add them because than list[list[int]] and
-                # not list[int]
+                machine_total_processing_time_list.extend(processing_times)
+                machine_total_waiting_input_time_list.extend(input_waiting_times)
+                machine_total_waiting_output_time_list.extend(output_waiting_times)
 
-                for processing_time in processing_time_per_product_list:
-                    machine_total_processing_time_list.append(processing_time)
-
-                for waiting_input_time in waiting_time_for_material_input_list:
-                    machine_total_waiting_input_time_list.append(waiting_input_time)
-
-                for waiting_output_time in waiting_time_for_material_output_list:
-                    machine_total_waiting_output_time_list.append(waiting_output_time)
-
-                # put the machine stats per product in a list
                 machine_stats_per_product_list.append({
                     "machine": identification_str,
                     "product": product,
-                    "number_of_produced_product": len(processing_time_per_product_list),
+                    "number_of_produced_product": len(processing_times),
 
-                    "mean_processing_time": self.get_mean_duration(processing_time_per_product_list),
-                    "std_dev_processing_time": self.get_std_dev_duration(processing_time_per_product_list),
-                    "variance_processing_time": self.get_variance_duration(processing_time_per_product_list),
+                    "mean_processing_time": self.get_mean_duration(processing_times),
+                    "std_dev_processing_time": self.get_std_dev_duration(processing_times),
+                    "variance_processing_time": self.get_variance_duration(processing_times),
 
-                    "mean_waiting_input_time": self.get_mean_duration(waiting_time_for_material_input_list),
-                    "std_dev_waiting_input_time": self.get_std_dev_duration(waiting_time_for_material_input_list),
-                    "variance_waiting_input_time": self.get_variance_duration(waiting_time_for_material_input_list),
+                    "mean_waiting_input_time": self.get_mean_duration(input_waiting_times),
+                    "std_dev_waiting_input_time": self.get_std_dev_duration(input_waiting_times),
+                    "variance_waiting_input_time": self.get_variance_duration(input_waiting_times),
 
-                    "mean_waiting_output_time": self.get_mean_duration(waiting_time_for_material_output_list),
-                    "std_dev_waiting_output_time": self.get_std_dev_duration(waiting_time_for_material_output_list),
-                    "variance_waiting_output_time": self.get_variance_duration(waiting_time_for_material_output_list),
+                    "mean_waiting_output_time": self.get_mean_duration(output_waiting_times),
+                    "std_dev_waiting_output_time": self.get_std_dev_duration(output_waiting_times),
+                    "variance_waiting_output_time": self.get_variance_duration(output_waiting_times),
                 })
 
-            # get total stats for one machine
             total_machine_stats_list.append({
                 "machine": identification_str,
                 "number_of_produced_product": len(machine_total_processing_time_list),
@@ -104,7 +94,6 @@ class MachineProcessingTime:
                 "variance_waiting_output_time": self.get_variance_duration(machine_total_waiting_output_time_list),
             })
 
-        # Umwandlung in ein DataFrame
         self.machine_statistics_per_product_data = pd.DataFrame(machine_stats_per_product_list)
         self.total_machine_statistics_data = pd.DataFrame(total_machine_stats_list)
 
@@ -126,131 +115,96 @@ class MachineProcessingTime:
 
     def get_list_processing_time_per_product(self, machine_data_during_simulation: list[dict], product_group: str) -> \
             list[int]:
-        """ Calculates processing durations for a specific product group based on machine status data over time.
-        :return: A list of processing durations in time units."""
-
+        """Calculates the processing times of a specific product, without being disturbed by other
+            intermediate products."""
         processing_times = []
-        is_processing = False
-        start_time = None
-
-        for machine in machine_data_during_simulation:
-            timestamp = machine["timestamp"]
-            for entity in machine["entities"]:
-
-                status = entity["entity_data"]["working_status"]
-                current_material = status["producing_production_material"]
-                producing_item = status["producing_item"]
-
-                conditions_met = (
-                        current_material == product_group and
-                        producing_item is True
-                )
-
-
-                if conditions_met and not is_processing:
-                    # Mark starting point
-                    start_time = timestamp
-                    is_processing = True
-
-                elif is_processing and (not conditions_met):
-                    # Mark end point
-                    end_time = timestamp
-                    processing_times.append(end_time - start_time)
-                    is_processing = False
-                    start_time = None
-
-        # If an ongoing process has not been completed at the end
-        if is_processing and start_time is not None:
-            end_time = machine_data_during_simulation[-1]["timestamp"]
-            processing_times.append(end_time - start_time)
-
-        return processing_times
-
-    def get_list_waiting_time_machine_input_empty(self, machine_data_during_simulation: list[dict],
-                                                  product_group: str) -> list[int]:
-        """ Calculates waiting for material input durations for a specific product group based on machine status data
-            over time.
-                :return: A list of waiting time ."""
-
-        waiting_time_material_input_list = []
-        is_processing = False
         start_time = None
 
         for entry in machine_data_during_simulation:
             timestamp = entry.get("timestamp")
             for entity in entry.get("entities", []):
+                status = entity.get("entity_data", {}).get("working_status", {})
+                current_material = status.get("producing_production_material")
+                producing_item = status.get("producing_item")
+                storage_status = status.get("storage_status")
 
+                if current_material == product_group and producing_item:
+                    if start_time is None:
+                        start_time = timestamp
+                else:
+                    if start_time is not None:
+                        processing_times.append(timestamp - start_time)
+                        start_time = None
+
+
+        # Falls die Verarbeitung am Ende noch läuft
+        if start_time is not None:
+            last_timestamp = machine_data_during_simulation[-1]["timestamp"]
+            processing_times.append(last_timestamp - start_time)
+
+        return processing_times
+
+    def get_list_waiting_time_machine_input_empty(self, machine_data_during_simulation: list[dict],
+                                                  product_group: str) -> list[int]:
+        """Calculates waiting times due to a lack of input material for a specific product."""
+        waiting_times = []
+        start_time = None
+
+        for entry in machine_data_during_simulation:
+            timestamp = entry.get("timestamp")
+            for entity in entry.get("entities", []):
                 status = entity.get("entity_data", {}).get("working_status", {})
                 current_material = status.get("producing_production_material")
                 process_status = status.get("process_status")
                 storage_status = status.get("storage_status")
 
-                conditions_met = (
+                if (
                         current_material == product_group and
                         process_status == "producing is paused" and
                         storage_status == "input storage is empty"
-                )
+                ):
+                    if start_time is None:
+                        start_time = timestamp
+                else:
+                    if start_time is not None:
+                        waiting_times.append(timestamp - start_time)
+                        start_time = None
 
-                if conditions_met and not is_processing:
-                    # Mark starting point
-                    start_time = timestamp
-                    is_processing = True
+        if start_time is not None:
+            last_timestamp = machine_data_during_simulation[-1]["timestamp"]
+            waiting_times.append(last_timestamp - start_time)
 
-                elif is_processing and (not conditions_met):
-                    # Mark end point
-                    end_time = timestamp
-                    waiting_time_material_input_list.append(end_time - start_time)
-                    is_processing = False
-                    start_time = None
-
-        # If an ongoing process has not been completed at the end
-        if is_processing and start_time is not None:
-            end_time = machine_data_during_simulation[-1]["timestamp"]
-            waiting_time_material_input_list.append(end_time - start_time)
-
-        return waiting_time_material_input_list
+        return waiting_times
 
     def get_list_waiting_time_machine_output_full(self, machine_data_during_simulation: list[dict],
                                                   product_group: str) -> list[int]:
-        """ Calculates waiting for material output durations for a specific product group based on machine status data
-            over time.
-                :return: A list of waiting time ."""
-
-        waiting_time_material_output_list = []
-        is_processing = False
+        """Calculates waiting times due to full output storage for a specific product"""
+        waiting_times = []
         start_time = None
 
         for entry in machine_data_during_simulation:
-            timestamp = entry["timestamp"]
-            for entity in entry["entities"]:
+            timestamp = entry.get("timestamp")
+            for entity in entry.get("entities", []):
+                status = entity.get("entity_data", {}).get("working_status", {})
+                current_material = status.get("producing_production_material")
+                storage_status = status.get("storage_status")
 
-                status = entity["entity_data"]["working_status"]
-                current_material = status["producing_production_material"]
-                storage_status = status["storage_status"]
-
-                conditions_met = (
+                if (
                         current_material == product_group and
                         storage_status == "output storage is full"
-                )
+                ):
+                    if start_time is None:
+                        start_time = timestamp
+                else:
+                    if start_time is not None:
+                        waiting_times.append(timestamp - start_time)
+                        start_time = None
 
-                if conditions_met and not is_processing:
-                    # Mark starting point
-                    start_time = timestamp
-                    is_processing = True
+        if start_time is not None:
+            last_timestamp = machine_data_during_simulation[-1]["timestamp"]
+            waiting_times.append(last_timestamp - start_time)
 
-                elif is_processing and (not conditions_met):
-                    # Mark end point
-                    end_time = timestamp
-                    waiting_time_material_output_list.append(end_time - start_time)
-                    is_processing = False
-                    start_time = None
-
-        # If an ongoing process has not been completed at the end
-        if is_processing and start_time is not None:
-            end_time = machine_data_during_simulation[-1]["timestamp"]
-            waiting_time_material_output_list.append(end_time - start_time)
-
-        return waiting_time_material_output_list
+        return waiting_times
 
     def get_mean_duration(self, durations: list[int]) -> float:
         """Input: durations
@@ -313,7 +267,8 @@ class MachineProcessingTime:
         std_dev_bars = plt.bar(bar_positions + 0.25, self.total_machine_statistics_data[f"std_dev_{time_type}"], 0.25,
                                label=f"Standardabweichung {time_title}", color=(161 / 255, 204 / 255, 201 / 255))
         if time_type == "processing_time":
-            variance_bars = plt.bar(bar_positions + 0.5, self.total_machine_statistics_data[f"variance_{time_type}"], 0.25,
+            variance_bars = plt.bar(bar_positions + 0.5, self.total_machine_statistics_data[f"variance_{time_type}"],
+                                    0.25,
                                     label=f"Varianz {time_title}", color=(219 / 255, 203 / 255, 150 / 255))
             self._add_values_on_bars(variance_bars)
 

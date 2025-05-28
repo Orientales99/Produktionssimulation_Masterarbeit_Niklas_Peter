@@ -1,3 +1,4 @@
+import pathlib
 import re
 from pathlib import Path
 
@@ -5,27 +6,32 @@ import json
 import pandas as pd
 from json.decoder import JSONDecodeError
 
-from src import SIMULATION_OUTPUT_DATA, MACHINES_DURING_SIMULATION_DATA, \
-    TR_DURING_SIMULATION_DATA, WR_DURING_SIMULATION_DATA, SINK_DURING_SIMULATION_DATA, \
-    INTERMEDIATE_STORE_DURING_SIMULATION_DATA
-
 
 class ConvertJsonData:
     goods_receipt_production_df: pd.DataFrame
     finished_products_leaving_production_df: pd.DataFrame
     combined_simulation_entity_data_df: pd.DataFrame
 
-    def __init__(self):
-        self.goods_receipt_production_df = self.get_df_goods_entering_production()
+    def __init__(self, base_path: pathlib.Path):
+        self.base_path = base_path
+
+        self.ENTITIES_DURING_SIMULATION_DATA = self.base_path / 'entities_during_simulation_data'
+        self.MACHINES_DURING_SIMULATION_DATA = self.ENTITIES_DURING_SIMULATION_DATA / 'machine'
+        self.TR_DURING_SIMULATION_DATA = self.ENTITIES_DURING_SIMULATION_DATA / 'transport_robot'
+        self.WR_DURING_SIMULATION_DATA = self.ENTITIES_DURING_SIMULATION_DATA / 'working_robot'
+        self.SINK_DURING_SIMULATION_DATA = self.ENTITIES_DURING_SIMULATION_DATA / 'sink'
+        self.INTERMEDIATE_STORE_DURING_SIMULATION_DATA = self.ENTITIES_DURING_SIMULATION_DATA / 'intermediate_store'
+
         self.finished_products_leaving_production_df = self.get_df_finished_products_leaving_production()
         self.simulation_machine_data_df = self.get_machine_simulation_df()
         self.simulation_tr_data_df = self.get_tr_simulation_df()
         self.simulation_wr_data_df = self.get_wr_simulation_df()
         self.simulation_sink_data_df = self.get_sink_simulation_df()
 
-    def get_df_goods_entering_production(self) -> pd.DataFrame:
+    @property
+    def goods_receipt_production_df(self) -> pd.DataFrame:
         """Create a df with all the products entering the production and the time"""
-        file_path = SIMULATION_OUTPUT_DATA / "data_goods_entering_production.json"
+        file_path = self.base_path / "data_goods_entering_production.json"
         if not file_path.exists():
             print(f"⚠️ Datei {file_path} nicht gefunden. Leeres DataFrame wird zurückgegeben.")
             return pd.DataFrame()
@@ -40,7 +46,7 @@ class ConvertJsonData:
 
     def get_df_finished_products_leaving_production(self) -> pd.DataFrame:
         """Create a df with all the products leaving the production and the time"""
-        file_path = SIMULATION_OUTPUT_DATA / "data_finished_products_leaving_production.json"
+        file_path = self.base_path / "data_finished_products_leaving_production.json"
         if not file_path.exists():
             print(f"⚠️ Datei {file_path} nicht gefunden. Leeres DataFrame wird zurückgegeben.")
             return pd.DataFrame()
@@ -55,7 +61,7 @@ class ConvertJsonData:
 
     def get_machine_simulation_df(self) -> pd.DataFrame:
 
-        folder = Path(MACHINES_DURING_SIMULATION_DATA)
+        folder = Path(self.MACHINES_DURING_SIMULATION_DATA)
         pattern = re.compile(r"simulation_machine_run_data_from_(\d+)_sec_to_(\d+)_sec\.json")
 
         all_data = []
@@ -86,7 +92,7 @@ class ConvertJsonData:
 
     def get_tr_simulation_df(self) -> pd.DataFrame:
 
-        folder = Path(TR_DURING_SIMULATION_DATA)
+        folder = Path(self.TR_DURING_SIMULATION_DATA)
         pattern = re.compile(r"simulation_tr_run_data_from_(\d+)_sec_to_(\d+)_sec\.json")
 
         all_data = []
@@ -112,7 +118,7 @@ class ConvertJsonData:
 
     def get_wr_simulation_df(self) -> pd.DataFrame:
 
-        folder = Path(WR_DURING_SIMULATION_DATA)
+        folder = Path(self.WR_DURING_SIMULATION_DATA)
         pattern = re.compile(r"simulation_wr_run_data_from_(\d+)_sec_to_(\d+)_sec\.json")
 
         all_data = []
@@ -138,7 +144,7 @@ class ConvertJsonData:
 
     def get_sink_simulation_df(self) -> pd.DataFrame:
 
-        folder = Path(SINK_DURING_SIMULATION_DATA)
+        folder = Path(self.SINK_DURING_SIMULATION_DATA)
         pattern = re.compile(r"simulation_sink_run_data_from_(\d+)_sec_to_(\d+)_sec\.json")
 
         all_data = []
@@ -163,7 +169,7 @@ class ConvertJsonData:
         return pd.DataFrame(all_data)
 
     def get_intermediate_simulation_df(self) -> pd.DataFrame:
-        folder = Path(INTERMEDIATE_STORE_DURING_SIMULATION_DATA)
+        folder = Path(self.INTERMEDIATE_STORE_DURING_SIMULATION_DATA)
         pattern = re.compile(r"simulation_intermediate_store_run_data_from_(\d+)_sec_to_(\d+)_sec\.json")
 
         all_data = []

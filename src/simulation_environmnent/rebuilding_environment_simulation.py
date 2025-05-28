@@ -1,6 +1,7 @@
 import simpy
 import time
 
+from src import SIMULATION_OUTPUT_DATA
 from src.monitoring.SavingSimulationData import SavingSimulationData
 from src.monitoring.data_analysis.convert_json_data import ConvertJsonData
 from src.monitoring.data_analysis.creating_intermediate_store_during_simulation_dict import \
@@ -70,7 +71,7 @@ class RebuildingEnvironmentSimulation:
         self.production.create_production()
         self.control_time = self.get_control_time()
 
-        self.convert = ConvertJsonData()
+        self.convert = ConvertJsonData(SIMULATION_OUTPUT_DATA)
         self.creating_machine_during_simulation_dict = CreatingMachineDuringSimulationDict(self.convert)
         self.creating_tr_during_simulation_dict = CreatingTrDuringSimulationDict(self.convert)
         self.creating_wr_during_simulation_dict = CreatingWrDuringSimulationDict(self.convert)

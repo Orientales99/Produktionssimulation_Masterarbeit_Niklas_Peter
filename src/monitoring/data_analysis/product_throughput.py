@@ -9,7 +9,7 @@ from src import ANALYSIS_SOLUTION
 class ProductThroughput:
     def __init__(self, convert_json_data):
         self.convert_json_data = convert_json_data
-        self.entry_products_df = self.convert_json_data.get_df_goods_entering_production()
+        self.entry_products_df = self.convert_json_data.goods_receipt_production_df
         self.exit_products_df = self.convert_json_data.get_df_finished_products_leaving_production()
 
     def filter_and_sort_by_product_group(self, df: pd.DataFrame, product_group: str) -> pd.DataFrame:

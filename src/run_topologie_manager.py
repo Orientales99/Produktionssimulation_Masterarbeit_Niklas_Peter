@@ -1,5 +1,6 @@
 import simpy
 
+from src import SIMULATION_OUTPUT_DATA
 from src.monitoring.data_analysis.convert_json_data import ConvertJsonData
 from src.monitoring.data_analysis.creating_tr_during_simulation_dict import CreatingTrDuringSimulationDict
 from src.monitoring.data_analysis.transport_data.material_flow import MaterialFlow
@@ -23,7 +24,7 @@ def run_positions_distance_matrix():
     positions_distance_matrix.start_creating_positions_distance_matrix()
 
 def run_material_flow_matrix():
-    convert = ConvertJsonData()
+    convert = ConvertJsonData(SIMULATION_OUTPUT_DATA)
 
     # Analyse Materialflow in a matrix
     creating_tr_during_simulation_dict = CreatingTrDuringSimulationDict(convert)
@@ -44,7 +45,7 @@ def run_quadratic_assignment_problem():
     positions_distance_matrix = PositionsDistanceMatrix(production)
 
     # material flow matrix
-    convert = ConvertJsonData()
+    convert = ConvertJsonData(SIMULATION_OUTPUT_DATA)
 
     # Analyse Materialflow in a matrix
     creating_tr_during_simulation_dict = CreatingTrDuringSimulationDict(convert)
