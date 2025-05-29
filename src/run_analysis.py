@@ -11,10 +11,15 @@ from src.monitoring.data_analysis.transport_data.material_flow import MaterialFl
 from src.monitoring.data_analysis.transport_data.material_flow_heatmap import MaterialFlowHeatmap
 from src.monitoring.data_analysis.transport_data.tr_workload import TrWorkload
 from src.monitoring.data_analysis.visualize_production_material_throughput import VisualizeProductionMaterialThroughput
+from src.monitoring.deleting_data import DeletingData
+from src.monitoring.simulation_data_saver import SimulationDataSaver
 from src.rebuild_simulation.entities_specifc_simulation_time import EntitiesSpecificSimulationTime
 
 
 def run_analysis():
+    deleting_data = DeletingData()
+    deleting_data.delete_analysis_data()
+
     convert = ConvertJsonData(SIMULATION_OUTPUT_DATA)
     visualize_product_material_throughput = VisualizeProductionMaterialThroughput(convert)
     product_throughput = ProductThroughput(convert)
@@ -75,9 +80,13 @@ def run_wr_working_status():
     convert = ConvertJsonData(SIMULATION_OUTPUT_DATA)
     creating_wr_during_simulation_dict = CreatingWrDuringSimulationDict(convert)
 
+def run_copy_data():
+    simulation_data_saver = SimulationDataSaver()
+    simulation_data_saver.copy_folder(1)
 
 if __name__ == '__main__':
-    run_analysis()
+    # run_analysis()
     # run_machine_working_status()
     # run_tr_working_status()
     # run_wr_working_status()
+    run_copy_data()

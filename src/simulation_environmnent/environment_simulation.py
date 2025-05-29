@@ -9,7 +9,7 @@ from src.monitoring.data_analysis.creating_intermediate_store_during_simulation_
 from src.monitoring.data_analysis.creating_machine_during_simulation_dict import CreatingMachineDuringSimulationDict
 from src.monitoring.data_analysis.creating_tr_during_simulation_dict import CreatingTrDuringSimulationDict
 from src.monitoring.data_analysis.transport_data.material_flow import MaterialFlow
-from src.monitoring.deleting_simulation_output_data import DeletingSimulationOutputData
+from src.monitoring.deleting_data import DeletingData
 from src.process_logic.machine.machine_execution import MachineExecution
 from src.process_logic.machine.machine_manager import MachineManager
 from src.process_logic.path_finding import PathFinding
@@ -80,7 +80,7 @@ class EnvironmentSimulation:
                                           self.saving_simulation_data, self.simulation_control)
 
         # Deleting Class
-        self.deleting_simulation_output_data = DeletingSimulationOutputData()
+        self.deleting_data = DeletingData()
 
         # Visualisation Class
         # self.visualisation_simulation = VisualisationSimulation(self.env, self.production,
@@ -102,13 +102,13 @@ class EnvironmentSimulation:
         self.production.create_production()
         current_date = self.production.service_starting_conditions.set_starting_date_of_simulation()
 
-        self.deleting_simulation_output_data.delete_every_simulation_output_data_json()
+        self.deleting_data.delete_every_simulation_output_data_json()
 
         while True:
             self.manufacturing_plan.set_parameter_for_start_of_a_simulation_day(current_date)
             self.saving_simulation_data.save_daily_manufacturing_plan(current_date,
                                                                       self.manufacturing_plan.daily_manufacturing_plan)
-            # self.topology_manager()
+            self.topology_manager()
             print("initialise_simulation_start")
             print(self.manufacturing_plan.daily_manufacturing_plan)
             yield self.env.timeout(28800)  # 8h working time
@@ -177,7 +177,7 @@ class EnvironmentSimulation:
             entity_assignment = self.class_genetic_algorithm.start_genetic_algorithm(start_time=self.env.now,
                                                                                      end_time=endtime)
             self.repositioning_objects.start_repositioning_objects_in_production(entity_assignment)
-            self.saving_simulation_data.save_daily_topology(entity_assignment)
+            self.saving_simulation_data.save_daily_topology(entity_assignment, self.production.max_coordinate)
             print("Genetic algorithm wurde ausgeführt")
             for y in self.production.production_layout:
                 for cell in y:
@@ -194,7 +194,7 @@ class EnvironmentSimulation:
             entity_assignment = self.class_forced_directed_placement.start_fdp_algorithm(start_time=self.env.now,
                                                                                          end_time=endtime)
             self.repositioning_objects.start_repositioning_objects_in_production(entity_assignment)
-            self.saving_simulation_data.save_daily_topology(entity_assignment)
+            self.saving_simulation_data.save_daily_topology(entity_assignment, self.production.max_coordinate)
             print("Force directed placement wurde ausgeführt")
             for y in self.production.production_layout:
                 for cell in y:

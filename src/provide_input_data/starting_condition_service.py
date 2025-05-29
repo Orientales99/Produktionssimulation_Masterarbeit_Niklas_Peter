@@ -57,3 +57,6 @@ class StartingConditionsService:
     def get_topology_manager_method(self) -> int:
         """Return int: No algorithm (1), QAP (2), GA (3), FDP(4)"""
         return self.data_process_starting_conditions["Topology_manager(No algorithm (1), QAP (2), GA (3), FDP(4)"]
+
+    def get_number_of_simulation_runs(self) -> int:
+        return self.data_process_starting_conditions["number_of_simulation_runs"]

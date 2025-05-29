@@ -3,6 +3,8 @@ from pathlib import Path
 ROOT = Path(__file__).parent.parent
 SRC = ROOT / 'src'
 
+SIMULATION_RUNS = ROOT.parent / "simulation_runs"
+
 RESOURCES = ROOT / 'resources'
 SIMULATION_BASIS_FOR_TOPOLOGIE_MANAGER = RESOURCES/ "simulation_basis_for_topologie_manager"
 

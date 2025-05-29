@@ -35,6 +35,7 @@ class GeneticAlgorithm:
         self.env = env
         self.material_flow = material_flow
         self.class_position_distance_matrix = position_distance_matrix
+        self.class_position_distance_matrix.start_creating_positions_distance_matrix()
 
         self.positions_distance_matrix = self.class_position_distance_matrix.positions_distance_matrix
         self.entity_fixed_assignment = []
@@ -48,8 +49,6 @@ class GeneticAlgorithm:
         self.number_of_surviving_parents = self.genetic_algorithm_service.get_number_of_surviving_parents()
         self.odds_of_mutation_per_genom_in_percent = self.genetic_algorithm_service.get_odds_of_mutation_per_genom_in_percent()
         self.points_of_separation = self.genetic_algorithm_service.get_points_of_separation()
-
-        self.class_position_distance_matrix.start_creating_positions_distance_matrix()
 
     def start_genetic_algorithm(self, start_time: int = 0, end_time: int = float('inf')) -> list[tuple[str, str]]:
         self.get_material_flow_matrix(start_time, end_time)

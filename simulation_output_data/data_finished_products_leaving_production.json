@@ -1,0 +1,257 @@
+[
+    {
+        "Time": 2202,
+        "Product Group": "TWELVE",
+        "Quantity": 92
+    },
+    {
+        "Time": 3675,
+        "Product Group": "TWO",
+        "Quantity": 100
+    },
+    {
+        "Time": 4656,
+        "Product Group": "TWO",
+        "Quantity": 80
+    },
+    {
+        "Time": 5215,
+        "Product Group": "SEVEN",
+        "Quantity": 100
+    },
+    {
+        "Time": 5595,
+        "Product Group": "FIFTEEN",
+        "Quantity": 8
+    },
+    {
+        "Time": 6275,
+        "Product Group": "SEVEN",
+        "Quantity": 100
+    },
+    {
+        "Time": 6502,
+        "Product Group": "ELEVEN",
+        "Quantity": 24
+    },
+    {
+        "Time": 7275,
+        "Product Group": "SEVEN",
+        "Quantity": 100
+    },
+    {
+        "Time": 8336,
+        "Product Group": "SEVEN",
+        "Quantity": 100
+    },
+    {
+        "Time": 9311,
+        "Product Group": "THREE",
+        "Quantity": 84
+    },
+    {
+        "Time": 9392,
+        "Product Group": "SEVEN",
+        "Quantity": 100
+    },
+    {
+        "Time": 10016,
+        "Product Group": "SEVEN",
+        "Quantity": 64
+    },
+    {
+        "Time": 10258,
+        "Product Group": "TEN",
+        "Quantity": 52
+    },
+    {
+        "Time": 10859,
+        "Product Group": "FOURTEEN",
+        "Quantity": 40
+    },
+    {
+        "Time": 11603,
+        "Product Group": "FOUR",
+        "Quantity": 52
+    },
+    {
+        "Time": 11832,
+        "Product Group": "THIRTEEN",
+        "Quantity": 8
+    },
+    {
+        "Time": 12471,
+        "Product Group": "NINE",
+        "Quantity": 44
+    },
+    {
+        "Time": 12973,
+        "Product Group": "ONE",
+        "Quantity": 32
+    },
+    {
+        "Time": 13255,
+        "Product Group": "EIGHT",
+        "Quantity": 12
+    },
+    {
+        "Time": 29060,
+        "Product Group": "FIFTEEN",
+        "Quantity": 4
+    },
+    {
+        "Time": 29970,
+        "Product Group": "TWELVE",
+        "Quantity": 64
+    },
+    {
+        "Time": 30293,
+        "Product Group": "FOURTEEN",
+        "Quantity": 16
+    },
+    {
+        "Time": 31650,
+        "Product Group": "SEVEN",
+        "Quantity": 100
+    },
+    {
+        "Time": 32902,
+        "Product Group": "SEVEN",
+        "Quantity": 100
+    },
+    {
+        "Time": 34102,
+        "Product Group": "SEVEN",
+        "Quantity": 100
+    },
+    {
+        "Time": 34762,
+        "Product Group": "SEVEN",
+        "Quantity": 56
+    },
+    {
+        "Time": 35043,
+        "Product Group": "THIRTEEN",
+        "Quantity": 12
+    },
+    {
+        "Time": 35321,
+        "Product Group": "NINE",
+        "Quantity": 60
+    },
+    {
+        "Time": 35500,
+        "Product Group": "EIGHT",
+        "Quantity": 24
+    },
+    {
+        "Time": 35989,
+        "Product Group": "TEN",
+        "Quantity": 44
+    },
+    {
+        "Time": 36517,
+        "Product Group": "TWO",
+        "Quantity": 76
+    },
+    {
+        "Time": 36650,
+        "Product Group": "THREE",
+        "Quantity": 36
+    },
+    {
+        "Time": 37069,
+        "Product Group": "ELEVEN",
+        "Quantity": 28
+    },
+    {
+        "Time": 37363,
+        "Product Group": "ONE",
+        "Quantity": 16
+    },
+    {
+        "Time": 37650,
+        "Product Group": "FOUR",
+        "Quantity": 16
+    },
+    {
+        "Time": 58670,
+        "Product Group": "TWELVE",
+        "Quantity": 68
+    },
+    {
+        "Time": 58873,
+        "Product Group": "FIFTEEN",
+        "Quantity": 4
+    },
+    {
+        "Time": 60188,
+        "Product Group": "SEVEN",
+        "Quantity": 100
+    },
+    {
+        "Time": 61353,
+        "Product Group": "SEVEN",
+        "Quantity": 100
+    },
+    {
+        "Time": 61897,
+        "Product Group": "SIX",
+        "Quantity": 12
+    },
+    {
+        "Time": 62174,
+        "Product Group": "THIRTEEN",
+        "Quantity": 12
+    },
+    {
+        "Time": 62540,
+        "Product Group": "SEVEN",
+        "Quantity": 100
+    },
+    {
+        "Time": 62948,
+        "Product Group": "SEVEN",
+        "Quantity": 40
+    },
+    {
+        "Time": 64240,
+        "Product Group": "TWO",
+        "Quantity": 96
+    },
+    {
+        "Time": 64909,
+        "Product Group": "NINE",
+        "Quantity": 48
+    },
+    {
+        "Time": 65184,
+        "Product Group": "EIGHT",
+        "Quantity": 8
+    },
+    {
+        "Time": 65377,
+        "Product Group": "FOURTEEN",
+        "Quantity": 4
+    },
+    {
+        "Time": 65811,
+        "Product Group": "FOUR",
+        "Quantity": 24
+    },
+    {
+        "Time": 66358,
+        "Product Group": "TEN",
+        "Quantity": 36
+    },
+    {
+        "Time": 66860,
+        "Product Group": "THREE",
+        "Quantity": 32
+    },
+    {
+        "Time": 67142,
+        "Product Group": "ELEVEN",
+        "Quantity": 12
+    }
+]
