@@ -8,7 +8,6 @@ from src.entity.intermediate_store import IntermediateStore
 from src.production.base.cell import Cell
 from src.production.base.coordinates import Coordinates
 from src.provide_input_data.entity_service import EntityService
-from src.provide_input_data.order_service import OrderService
 from src.provide_input_data.starting_condition_service import StartingConditionsService
 from src.entity.machine.machine import Machine
 from src.entity.sink import Sink
@@ -19,7 +18,6 @@ from src.entity.working_robot.working_robot import WorkingRobot
 
 class Production:
     production_layout: list[list[Cell]] = []
-    service_order = OrderService()
 
     service_starting_conditions = StartingConditionsService
     source_coordinates: Coordinates

@@ -332,7 +332,7 @@ class SavingSimulationData:
         ax.set_ylim(bottom=0, top=max_coordinates.y + 1)
         ax.set_xlabel("X")
         ax.set_ylabel("Y")
-        ax.set_title(f"Produktions-Topologie bei SimTime {self.env.now}")
+        ax.set_title(f"Produktions-Topologie bei Produktionszeit {self.env.now}")
         ax.grid(True)
         ax.set_aspect('equal', adjustable='box')
 

@@ -13,32 +13,33 @@ from src.monitoring.data_analysis.visualize_production_material_throughput impor
 from src.monitoring.deleting_data import DeletingData
 from src.monitoring.simulation_data_saver import SimulationDataSaver
 from src.production.production import Production
+from src.provide_input_data.order_service import OrderService
 from src.provide_input_data.starting_condition_service import StartingConditionsService
 from src.simulation_environmnent.environment_simulation import EnvironmentSimulation
 
 
 class CommandLineService:
+    environment_simulation: EnvironmentSimulation
 
     def __init__(self):
         self.simulation_data_saver = SimulationDataSaver()
-        self.environment_simulation = EnvironmentSimulation()
+        self.order_service = OrderService()
+        self.environment_simulation_test = EnvironmentSimulation(self.order_service)
         self.service_starting_conditions = StartingConditionsService()
-        self.production = Production(self.environment_simulation, self.service_starting_conditions)
+
+        self.production = Production(self.environment_simulation_test.env, self.service_starting_conditions)
 
     def start_simulation(self):
         simulation_duration = self.production.service_starting_conditions.set_simulation_duration_per_day()
-        number_of_simulation_runs = self.production.service_starting_conditions.get_number_of_simulation_runs()
+        print(f"Start_simulation: {simulation_duration}")
 
-        for simulation_run in range(number_of_simulation_runs):
-            self.environment_testing_simulation = EnvironmentSimulation()
+        self.environment_simulation = EnvironmentSimulation(self.order_service)
+        self.environment_simulation.initialise_simulation_start()
+        # self.environment_simulation.run_simulation(until=86400)
+        self.environment_simulation.run_simulation(until=28800)
+        self.start_analyse()
 
-            self.environment_testing_simulation.initialise_simulation_start()
-            # self.environment_simulation.run_simulation(until=86400)
-            self.environment_testing_simulation.run_simulation(until=28800)
-
-            self.start_analyse()
-
-            self.secure_simulation_data(simulation_run)
+        self.secure_simulation_data(1)
 
     def start_analyse(self):
         deleting_data = DeletingData()

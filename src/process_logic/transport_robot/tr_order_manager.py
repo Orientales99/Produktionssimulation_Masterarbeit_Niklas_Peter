@@ -64,7 +64,7 @@ class TrOrderManager:
         pick_up_station = self.get_pick_up_station(process_material)
         if pick_up_station is not False:
             if isinstance(pick_up_station, Machine):
-                if len(pick_up_station.machine_storage.storage_after_process.items) > 4:
+                if len(pick_up_station.machine_storage.storage_after_process.items) > 1:
                     return TransportRequest(pick_up_station, machine, processing_order, process_material)
             elif isinstance(pick_up_station, Source | IntermediateStore):
                 return TransportRequest(pick_up_station, machine, processing_order, process_material)

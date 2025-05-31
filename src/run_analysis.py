@@ -85,8 +85,8 @@ def run_copy_data():
     simulation_data_saver.copy_folder(1)
 
 if __name__ == '__main__':
-    # run_analysis()
+    run_analysis()
     # run_machine_working_status()
     # run_tr_working_status()
     # run_wr_working_status()
-    run_copy_data()
+    # run_copy_data()

@@ -1,15 +1,15 @@
 from collections import defaultdict
-from datetime import date, timedelta
+from datetime import date
 
 import pandas as pd
 
 from src.entity.machine.processing_order import ProcessingOrder
 from src.entity.sink import Sink
-from src.process_logic.good_receipt import GoodReceipt
 from src.process_logic.machine.machine_manager import MachineManager
 from src.production.production import Production
 from src.order_data.order import Order
 from src.order_data.production_material import ProductionMaterial
+from src.provide_input_data.order_service import OrderService
 from src.provide_input_data.product_information_service import ProductInformationService
 from src.entity.machine.machine import Machine
 
@@ -25,17 +25,18 @@ class ManufacturingPlan:
     required_materials_for_every_machine: dict = {}
     completed_orders_list: list[Order]
 
-    def __init__(self, production: Production, machine_manager: MachineManager):
+    def __init__(self, production: Production, machine_manager: MachineManager, order_service: OrderService):
         self.production = production
         self.machine_manager = machine_manager
         self.service_product_information = ProductInformationService()
+        self.order_service = order_service
 
         self.dictionary_summarised_order_per_day = {}
         self.daily_manufacturing_plan = []
         self.process_list_for_every_machine = []
         self.completed_orders_list = []
 
-        self.product_order_list = self.production.service_order.generate_order_list()
+        self.product_order_list = self.order_service.get_order_list()
         self.product_information_list = self.service_product_information.create_product_information_list()
 
         self.date_list = self.production.service_starting_conditions.get_date_list()

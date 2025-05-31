@@ -53,7 +53,7 @@ def test_order_list__always__order_list_is_correct_init():
     service_order = OrderService()
 
     # when
-    order_list = service_order.generate_order_list()
+    order_list = service_order.get_order_list()
 
 
     # then

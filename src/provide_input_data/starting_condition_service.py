@@ -27,8 +27,9 @@ class StartingConditionsService:
                            int(self.data_process_starting_conditions["production_layout_size_y"]))
 
     def set_simulation_duration_per_day(self):
+        number_of_days = int(self.data_process_starting_conditions["number_of_simulation_runs"])
         duration_per_day_in_h = int(self.data_process_starting_conditions["production_day_duration_in_h"])
-        total_duration = duration_per_day_in_h * 60 * 60
+        total_duration = (duration_per_day_in_h * 60 * 60) * number_of_days
         return total_duration
 
     def set_starting_date_of_simulation(self) -> date:
@@ -59,4 +60,4 @@ class StartingConditionsService:
         return self.data_process_starting_conditions["Topology_manager(No algorithm (1), QAP (2), GA (3), FDP(4)"]
 
     def get_number_of_simulation_runs(self) -> int:
-        return self.data_process_starting_conditions["number_of_simulation_runs"]
+        return int(self.data_process_starting_conditions["number_of_simulation_runs"])

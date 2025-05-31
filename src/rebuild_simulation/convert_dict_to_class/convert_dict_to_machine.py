@@ -45,6 +45,7 @@ class ConvertDictToMachine:
             machine_quality=machine_quality,
             driving_speed=entity_data["driving_speed"],
             working_speed=entity_data["working_speed"],
+            working_speed_deviation=entity_data["working_speed_deviation_in_percent"],
             size=size,
             machine_storage=machine_storage,
             working_status=working_status,

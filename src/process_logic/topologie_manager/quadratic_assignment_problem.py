@@ -39,7 +39,6 @@ class QuadraticAssignmentProblem:
 
     def get_material_flow_matrix(self, start_time: int = 0, end_time: int = float('inf')):
         self.material_flow_matrix = self.material_flow.create_material_flow_matrix(start_time, end_time)
-        print(f"QAP: get_material_flow_matrix: {self.material_flow_matrix}")
 
     def save_fixed_assignment(self):
         """Source, Sink are fixed assignments. Every materialflow to the inmobile machines are summerized in the

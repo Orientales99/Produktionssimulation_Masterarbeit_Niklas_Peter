@@ -16,6 +16,7 @@ class Machine:
     machine_quality: MachineQuality
     driving_speed: int
     working_speed: int
+    working_speed_deviation: float
     size: Coordinates
     machine_storage: MachineStorage
     working_status: MachineWorkingStatus

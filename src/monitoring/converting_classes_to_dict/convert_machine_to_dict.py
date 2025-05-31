@@ -28,6 +28,7 @@ class ConvertMachineToDict:
             "machine_quality": machine.machine_quality.name,
             "driving_speed": machine.driving_speed,
             "working_speed": machine.working_speed,
+            "working_speed_deviation_in_percent": machine.working_speed_deviation * 100,
             "setting_up_time": machine.setting_up_time,
             "processing_list_queue_length": machine.processing_list_queue_length,
             "size": {

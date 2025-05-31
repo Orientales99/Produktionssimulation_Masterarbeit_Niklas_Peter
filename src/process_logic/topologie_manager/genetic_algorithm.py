@@ -38,6 +38,7 @@ class GeneticAlgorithm:
         self.class_position_distance_matrix.start_creating_positions_distance_matrix()
 
         self.positions_distance_matrix = self.class_position_distance_matrix.positions_distance_matrix
+
         self.entity_fixed_assignment = []
         self.entity_assignment = []
         self.corrected_assignment = []
@@ -281,10 +282,10 @@ class GeneticAlgorithm:
         std_array = np.array(std_devs)
 
         plt.figure(figsize=(10, 6))
-        plt.plot(generations, avg_array, label='Average Performance', color='blue')
+        plt.plot(generations, avg_array, label='Durchschnittliche Performance', color='blue')
         plt.fill_between(generations, avg_array - std_array, avg_array + std_array, color='blue', alpha=0.3,
-                         label='Standard Deviation')
-        plt.plot(generations, best_performances, label='Best Performance', color='green')
+                         label='Standardabweichung')
+        plt.plot(generations, best_performances, label='Beste Performance', color='green')
         plt.xlabel('Generation')
         plt.ylabel('Performance')
         plt.title(f'Genetischer Algorithmus - Produktionszeit: {self.env.now}s')

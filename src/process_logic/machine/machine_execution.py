@@ -1,3 +1,5 @@
+import random
+
 from src.constant.constant import MachineProcessStatus, MachineStorageStatus, WorkingRobotStatus, \
     MachineWorkingRobotStatus, ProductGroup, MachineQuality
 from src.entity.machine.Process_material import ProcessMaterial
@@ -24,20 +26,28 @@ class MachineExecution:
         machine.working_status.working_on_status = False
         self.saving_simulation_data.save_entity_action(machine)
 
+
     def produce_one_item(self, machine: Machine, required_material: ProductionMaterial,
                          producing_material: ProductionMaterial):
         self.saving_simulation_data.save_entity_action(machine)
         input_store = machine.machine_storage.storage_before_process
         output_store = machine.machine_storage.storage_after_process
-        working_speed = int(machine.working_speed)
+        base_speed = machine.working_speed
 
+        # For new machines, the basic duration is extended by 20%
         if machine.machine_quality == MachineQuality.NEW_MACHINE:
-            working_speed = working_speed * 0.8
+            base_speed *= 0.8
 
-        #yield self.env.timeout(1)
-        yield self.env.timeout(working_speed)
-        machine.machine_storage.storage_before_process = self.store_manager.get_material_out_of_store(input_store,
-                                                                                                required_material)
+        # Operating speed with Gaussian variation
+        mu = base_speed
+        sigma = base_speed * machine.working_speed_deviation  # Deviation
+        randomized_speed = max(1, int(random.gauss(mu, sigma)))  # Minimum duration 1 time unit
+
+        yield self.env.timeout(randomized_speed)
+
+        machine.machine_storage.storage_before_process = self.store_manager.get_material_out_of_store(
+            input_store, required_material
+        )
         yield output_store.put(producing_material)
         self.reduce_producing_material_by_one(machine, producing_material)
 

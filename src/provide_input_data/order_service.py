@@ -17,14 +17,17 @@ class OrderService:
         self.service_product_information = ProductInformationService()
         self.service_product_information.create_product_information_list()
 
-    def get_order_files_for_init(self):
-        self.df_order_list = pd.read_excel(RESOURCES / 'Bestellauftraege.xlsx', header=None)
-
-    def generate_order_list(self) -> list:
         self.remove_quotes_from_order_list()
         self.set_head_as_column_name()
         self.create_new_column_for_product_group()
         self.set_product_order_list()
+
+
+
+    def get_order_files_for_init(self):
+        self.df_order_list = pd.read_excel(RESOURCES / 'Bestellauftraege.xlsx', header=None)
+
+    def get_order_list(self) -> list:
         return self.product_order_list
 
     def remove_quotes_from_order_list(self):

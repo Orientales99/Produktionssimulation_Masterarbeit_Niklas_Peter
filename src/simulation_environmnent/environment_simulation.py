@@ -13,6 +13,7 @@ from src.monitoring.deleting_data import DeletingData
 from src.process_logic.machine.machine_execution import MachineExecution
 from src.process_logic.machine.machine_manager import MachineManager
 from src.process_logic.path_finding import PathFinding
+from src.process_logic.topologie_manager.entity_assignment_current_status import EntityAssignmentCurrentStatus
 from src.process_logic.topologie_manager.forced_directed_placement import ForcedDirectedPlacement
 from src.process_logic.topologie_manager.genetic_algorithm import GeneticAlgorithm
 from src.process_logic.topologie_manager.positions_distance_matrix import PositionsDistanceMatrix
@@ -24,6 +25,7 @@ from src.process_logic.working_robot_order_manager import WorkingRobotOrderManag
 from src.production.production import Production
 from src.process_logic.manufacturing_plan import ManufacturingPlan
 from src.production.store_manager import StoreManager
+from src.provide_input_data.order_service import OrderService
 from src.provide_input_data.starting_condition_service import StartingConditionsService
 from src.simulation_environmnent.machine_simulation import MachineSimulation
 from src.simulation_environmnent.monitoring_simulation import MonitoringSimulation
@@ -41,9 +43,9 @@ class EnvironmentSimulation:
     class_quadratic_assignment_problem: QuadraticAssignmentProblem
     repositioning_objects: RepositioningObjects
 
-    def __init__(self):
+    def __init__(self, order_service: OrderService):
         self.simulation_control = SimulationControl(False, False)
-
+        self.order_service = order_service
         self.env = simpy.Environment()
         self.service_starting_conditions = StartingConditionsService()
         self.production = Production(self.env, self.service_starting_conditions)
@@ -52,7 +54,7 @@ class EnvironmentSimulation:
 
         # Manufacturing & Machine Manger Classes
         self.machine_manager = MachineManager(self.production, self.store_manager)
-        self.manufacturing_plan = ManufacturingPlan(self.production, self.machine_manager)
+        self.manufacturing_plan = ManufacturingPlan(self.production, self.machine_manager, self.order_service)
 
         # Wr Manager & Monitoring Classes
         self.working_robot_order_manager = WorkingRobotOrderManager(self.manufacturing_plan, self.path_finding)
@@ -83,11 +85,11 @@ class EnvironmentSimulation:
         self.deleting_data = DeletingData()
 
         # Visualisation Class
-        # self.visualisation_simulation = VisualisationSimulation(self.env, self.production,
-        #                                                         self.tr_order_manager, self.simulation_control)
+        self.visualisation_simulation = VisualisationSimulation(self.env, self.production,
+                                                               self.tr_order_manager, self.simulation_control)
 
         # starting processes
-        # self.env.process(self.visualisation_simulation.visualize_layout())
+        self.env.process(self.visualisation_simulation.visualize_layout())
         self.env.process(self.monitoring_simulation.start_monitoring_process())
         self.env.process(self.print_simulation_time())
         self.env.process(self.initialise_simulation_start())
@@ -151,7 +153,12 @@ class EnvironmentSimulation:
 
         if algorithm == 1:
             # No Topology changes
-            pass
+            if self.env.now < 1000:
+                self.entity_assignment_current_status = EntityAssignmentCurrentStatus(self.production,
+                                                                                      self.class_positions_distance_matrix)
+            entity_assignment = self.entity_assignment_current_status.get_entity_assignment()
+            self.saving_simulation_data.save_daily_topology(entity_assignment, self.production.max_coordinate)
+            print("Kein Topologie Manager wurde ausgeführt")
 
         elif algorithm == 2:
             # quadratic_assignment_problem
@@ -168,6 +175,7 @@ class EnvironmentSimulation:
                     if isinstance(cell.placed_entity, IntermediateStore):
                         self.saving_simulation_data.save_entity_action(cell.placed_entity)
                         break
+
 
         elif algorithm == 3:
             # Genetic algorithm

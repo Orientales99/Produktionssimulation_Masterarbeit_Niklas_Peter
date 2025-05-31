@@ -4,11 +4,10 @@
   "production_layout_size_y": "100",
   "starting_date_of_simulation": [2024, 5, 2],
   "number_of_simulation_runs": "3",
-  "simulation_duration_in_days": "7",
+  "simulation_duration_in_days": "3",
   "production_day_duration_in_h": "8",
   "visualising_via_terminal(y/n)": "n",
   "visualising_via_matplotlib(y/n)": "n",
-  "visualising_via_pygame(y/n)": "y",
-  "Topology_manager(No algorithm (1), QAP (2), GA (3), FDP(4)": 4,
-
+  "visualising_via_pygame(y/n)": "n",
+  "Topology_manager(No algorithm (1), QAP (2), GA (3), FDP(4)": 1
 }

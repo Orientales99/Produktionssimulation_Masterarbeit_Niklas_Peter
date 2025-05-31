@@ -104,11 +104,13 @@ class EntityService:
 
     def create_machine(self, machine_type, identification_number, machine_quality) -> Machine:
         machine_stats = self.data_production_machine["production_machine"][machine_type]
+        working_speed_deviation = float(machine_stats["working_speed_deviation_in_percent"]/ 100)
         return Machine(machine_type,
                        identification_number,
                        MachineQuality(machine_quality),
                        int(machine_stats["driving_speed"]),
                        int(machine_stats["working_speed"]),
+                       working_speed_deviation,
                        Coordinates(
                            int(machine_stats["robot_size_x"]),
                            int(machine_stats["robot_size_y"])),
@@ -131,13 +133,13 @@ class EntityService:
         for machine_type in range(0, quantity_of_types):
             quantity_of_machines_per_type = int(quantity_of_machines_per_type_list[machine_type][1])
             machines_with_good_quality = int(
-                self.data_production_machine["production_machine"][0]["number_of_new_machines"])
+                self.data_production_machine["production_machine"][machine_type]["number_of_new_machines"])
             for identification_number in range(0, quantity_of_machines_per_type):
                 if machines_with_good_quality > 0:
-                    machine_quality = 1
+                    machine_quality = 0
                     machines_with_good_quality -= 1
                 else:
-                    machine_quality = 0
+                    machine_quality = 1
                 machine_list.append(self.create_machine(machine_type, identification_number + 1, machine_quality))
         return machine_list
 
