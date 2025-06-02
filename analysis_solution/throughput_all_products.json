@@ -1,0 +1,58 @@
+{
+    "SEVEN": {
+        "average": "1:28:15",
+        "std_dev": "0:04:32"
+    },
+    "TWELVE": {
+        "average": "0:29:51",
+        "std_dev": "0:00:00"
+    },
+    "TWO": {
+        "average": "0:50:49",
+        "std_dev": "0:02:36"
+    },
+    "THREE": {
+        "average": "2:03:55",
+        "std_dev": "0:00:00"
+    },
+    "TEN": {
+        "average": "1:12:18",
+        "std_dev": "0:00:00"
+    },
+    "THIRTEEN": {
+        "average": "1:18:38",
+        "std_dev": "0:00:00"
+    },
+    "ELEVEN": {
+        "average": "0:14:12",
+        "std_dev": "0:00:00"
+    },
+    "FOURTEEN": {
+        "average": "0:25:40",
+        "std_dev": "0:00:00"
+    },
+    "FIFTEEN": {
+        "average": "0:24:11",
+        "std_dev": "0:00:00"
+    },
+    "NINE": {
+        "average": "0:31:02",
+        "std_dev": "0:00:00"
+    },
+    "ONE": {
+        "average": "0:29:04",
+        "std_dev": "0:00:00"
+    },
+    "EIGHT": {
+        "average": "0:25:31",
+        "std_dev": "0:00:00"
+    },
+    "FOUR": {
+        "average": "00:00:00",
+        "std_dev": "00:00:00"
+    },
+    "GLOBAL_WEIGHTED_AVERAGE": {
+        "average": "1:10:44",
+        "std_dev": "0:29:14"
+    }
+}

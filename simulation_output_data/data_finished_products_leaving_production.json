@@ -1,97 +1,92 @@
 [
     {
-        "Time": 1729,
+        "Time": 1817,
         "Product Group": "TWELVE",
         "Quantity": 92
     },
     {
-        "Time": 3120,
+        "Time": 3247,
         "Product Group": "TWO",
         "Quantity": 100
     },
     {
-        "Time": 3843,
+        "Time": 4064,
         "Product Group": "TWO",
         "Quantity": 80
     },
     {
-        "Time": 4627,
+        "Time": 4866,
         "Product Group": "SEVEN",
         "Quantity": 100
     },
     {
-        "Time": 5335,
+        "Time": 5621,
         "Product Group": "ELEVEN",
         "Quantity": 24
     },
     {
-        "Time": 5772,
+        "Time": 6077,
         "Product Group": "SEVEN",
         "Quantity": 100
     },
     {
-        "Time": 6964,
+        "Time": 7277,
         "Product Group": "SEVEN",
         "Quantity": 100
     },
     {
-        "Time": 7162,
+        "Time": 7515,
         "Product Group": "THREE",
         "Quantity": 84
     },
     {
-        "Time": 8016,
+        "Time": 8423,
         "Product Group": "TEN",
         "Quantity": 52
     },
     {
-        "Time": 8109,
+        "Time": 8441,
         "Product Group": "SEVEN",
         "Quantity": 100
     },
     {
-        "Time": 8509,
+        "Time": 8940,
         "Product Group": "FOURTEEN",
         "Quantity": 40
     },
     {
-        "Time": 8981,
+        "Time": 9363,
         "Product Group": "THIRTEEN",
         "Quantity": 8
     },
     {
-        "Time": 9216,
+        "Time": 9586,
         "Product Group": "SEVEN",
         "Quantity": 100
     },
     {
-        "Time": 9235,
+        "Time": 9622,
         "Product Group": "FIFTEEN",
         "Quantity": 8
     },
     {
-        "Time": 9944,
-        "Product Group": "SEVEN",
-        "Quantity": 64
-    },
-    {
-        "Time": 9975,
+        "Time": 10182,
         "Product Group": "NINE",
         "Quantity": 44
     },
     {
-        "Time": 10403,
+        "Time": 10407,
+        "Product Group": "SEVEN",
+        "Quantity": 64
+    },
+    {
+        "Time": 10627,
         "Product Group": "ONE",
         "Quantity": 32
     },
     {
-        "Time": 10658,
+        "Time": 10877,
         "Product Group": "EIGHT",
         "Quantity": 12
-    },
-    {
-        "Time": 11254,
-        "Product Group": "FOUR",
-        "Quantity": 52
     }
 ]

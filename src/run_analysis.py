@@ -6,11 +6,13 @@ from src.monitoring.data_analysis.creating_machine_during_simulation_dict import
 from src.monitoring.data_analysis.creating_tr_during_simulation_dict import CreatingTrDuringSimulationDict
 from src.monitoring.data_analysis.creating_wr_during_simulation_dict import CreatingWrDuringSimulationDict
 from src.monitoring.data_analysis.machine_data.machine_processing_time import MachineProcessingTime
+from src.monitoring.data_analysis.machine_data.machine_workload import MachineWorkload
 from src.monitoring.data_analysis.product_throughput import ProductThroughput
 from src.monitoring.data_analysis.transport_data.material_flow import MaterialFlow
 from src.monitoring.data_analysis.transport_data.material_flow_heatmap import MaterialFlowHeatmap
 from src.monitoring.data_analysis.transport_data.tr_workload import TrWorkload
 from src.monitoring.data_analysis.visualize_production_material_throughput import VisualizeProductionMaterialThroughput
+from src.monitoring.data_analysis.wr_data.wr_workload import WrWorkload
 from src.monitoring.deleting_data import DeletingData
 from src.monitoring.simulation_data_saver import SimulationDataSaver
 from src.rebuild_simulation.entities_specifc_simulation_time import EntitiesSpecificSimulationTime
@@ -47,7 +49,14 @@ def run_analysis():
     tr_workload = TrWorkload(creating_tr_during_simulation_dict)
     tr_workload.save_workload_statistics()
 
+    # Analyse Workload of WR
+    creating_wr_during_simulation_dict = CreatingWrDuringSimulationDict(convert)
+    wr_workload = WrWorkload(creating_wr_during_simulation_dict)
+    wr_workload.save_workload_statistics()
 
+    # Analyse Workload of Machine
+    machine_workload = MachineWorkload(creating_machine_during_simulation_dict)
+    machine_workload.save_workload_statistics()
 
 def run_throughput_visualization():
     convert = ConvertJsonData(SIMULATION_OUTPUT_DATA)
