@@ -8,3 +8,4 @@ openpyxl~=3.1.5
 seaborn~=0.13.2
 networkx~=3.4.2
 pulp~=3.1.1
+intervaltree~=3.1.0

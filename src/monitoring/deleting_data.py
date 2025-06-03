@@ -3,7 +3,7 @@ import pathlib
 from src import SIMULATION_OUTPUT_DATA, MACHINES_DURING_SIMULATION_DATA, SINK_DURING_SIMULATION_DATA, \
     WR_DURING_SIMULATION_DATA, TR_DURING_SIMULATION_DATA, INTERMEDIATE_STORE_DURING_SIMULATION_DATA, DAILY_PLANS, \
     GRAPH_PRODUCTION_MATERIAL, MACHINE_STATISTICS, MACHINE_STATISTICS_GRAPH, TR_STATISTICS, ANALYSIS_SOLUTION, \
-    FORCED_DIRECTED_PLACEMENT, GENETIC_ALGORITHM, PRODUCTION_TOPOLOGY, WR_STATISTICS, MACHINE_WORKLOAD
+    FORCED_DIRECTED_PLACEMENT, GENETIC_ALGORITHM, PRODUCTION_TOPOLOGY, WR_STATISTICS, MACHINE_WORKLOAD, PRODUCT_TRANSPORTING_TIME
 
 
 class DeletingData:
@@ -38,6 +38,8 @@ class DeletingData:
         self.delete_json_data_in_path(WR_STATISTICS)
         self.delete_json_data_in_path(ANALYSIS_SOLUTION)
         self.delete_json_data_in_path(MACHINE_WORKLOAD)
+        self.delete_json_data_in_path(GRAPH_PRODUCTION_MATERIAL)
+        self.delete_json_data_in_path(PRODUCT_TRANSPORTING_TIME)
 
 
     def delete_analysis_data_png(self):
@@ -47,6 +49,7 @@ class DeletingData:
         self.delete_png_data_in_path(WR_STATISTICS)
         self.delete_png_data_in_path(ANALYSIS_SOLUTION)
         self.delete_png_data_in_path(MACHINE_WORKLOAD)
+        self.delete_png_data_in_path(PRODUCT_TRANSPORTING_TIME)
 
     def delete_analysis_data_xlsx(self):
         self.delete_xlsx_data_in_path(MACHINE_STATISTICS)

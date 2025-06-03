@@ -91,7 +91,8 @@ class TrOrderManager:
                     process_material = unload_destination_machine.process_material_list[0]
                     if process_material.required_material == production_material:
                         processing_order = unload_destination_machine.processing_list[0]
-                        return TransportRequest(machine, unload_destination_machine, processing_order, process_material)
+                        if len(unload_destination_machine.machine_storage.storage_before_process.items) < unload_destination_machine.machine_storage.storage_before_process.capacity:
+                            return TransportRequest(machine, unload_destination_machine, processing_order, process_material)
 
             # assignment to intermediate_store must be revised for multiple stores
             intermediate_store_list = self.manufacturing_plan.production.service_entity.\

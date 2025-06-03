@@ -26,7 +26,6 @@ class MachineExecution:
         machine.working_status.working_on_status = False
         self.saving_simulation_data.save_entity_action(machine)
 
-
     def produce_one_item(self, machine: Machine, required_material: ProductionMaterial,
                          producing_material: ProductionMaterial):
         self.saving_simulation_data.save_entity_action(machine)
@@ -35,8 +34,8 @@ class MachineExecution:
         base_speed = machine.working_speed
 
         # For new machines, the basic duration is extended by 20%
-        if machine.machine_quality == MachineQuality.NEW_MACHINE:
-            base_speed *= 0.8
+        if machine.machine_quality == MachineQuality.OLD_MACHINE:
+            base_speed *= 1.2
 
         # Operating speed with Gaussian variation
         mu = base_speed
@@ -74,7 +73,6 @@ class MachineExecution:
             wr = self.machine_manager.get_wr_working_on_machine(machine)
 
             if wr is not None:
-
                 wr.working_status.working_on_status = False
                 wr.working_status.status = WorkingRobotStatus.WAITING_IN_MACHINE_TO_EXIT
             self.saving_simulation_data.save_entity_action(machine)
@@ -149,7 +147,6 @@ class MachineExecution:
         data_processing_step = self.machine_manager.get_data_of_processing_step_for_machine(processing_order.order,
                                                                                             machine)
         if data_processing_step is not False:
-
             required_material = data_processing_step[0]
             quantity_of_necessary_material = processing_order.order.number_of_products_per_order
             # producing material

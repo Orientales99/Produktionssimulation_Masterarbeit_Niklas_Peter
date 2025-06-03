@@ -18,16 +18,25 @@ class VisualizeProductionMaterialThroughput:
         self.convert_json_data = convert_json_data
 
     def plot_and_save_for_all_product_groups(self) -> None:
-        """Get all unique product groups from the DataFrames (df_1 and df_2)"""
+        """Generates a plot for each product group and also saves the data as JSON."""
         all_product_groups = pd.concat([
             self.convert_json_data.goods_receipt_production_df["Product Group"],
             self.convert_json_data.finished_products_leaving_production_df["Product Group"]
         ]).unique()
 
+        all_data = {}
         for product_group in all_product_groups:
+            df = self.prepare_data(product_group)
+            all_data[product_group] = df
             self.plot_goods_receipt_over_time(product_group)
 
+        # Gesamtdaten auch in JSON integrieren
+        df_total = self.prepare_total_data()
+        all_data["Total"] = df_total
+
         self.plot_total_cumulative_line()
+        self.save_plot_data_as_json(all_data)
+
 
     def prepare_data(self, product_group: str) -> pd.DataFrame:
         # Prepare incoming goods data
@@ -182,6 +191,8 @@ class VisualizeProductionMaterialThroughput:
                 interval_max_time = max(interval_max_time, df_total_interval["Time"].max())
                 self.plot_lines(ax, df_total_interval, color="black", label="Total Cumulative", with_markers=False)
 
+
+
             if not interval_data_exists:
                 plt.close(fig)
                 continue  # Skip empty plot
@@ -204,6 +215,7 @@ class VisualizeProductionMaterialThroughput:
                            f"Alle Produktgruppen - Produktionsbestandskurve {interval_idx + 1}.png")
 
             plt.close(fig)
+
 
     def plot_lines(self, ax, df_combined: pd.DataFrame, color: str, label: str, with_markers: bool = True) -> None:
         previous_time = 0
@@ -237,7 +249,7 @@ class VisualizeProductionMaterialThroughput:
             previous_cumulative_quantity = current_cumulative_quantity
 
     def plot_total_cumulative_line(self) -> None:
-        """Erzeugt einen separaten Graphen für alle Produkte zusammen."""
+        """Creates a separate graph for all products together."""
         df_total = self.prepare_total_data()
 
         max_time = df_total["Time"].max()
@@ -258,11 +270,13 @@ class VisualizeProductionMaterialThroughput:
         self.save_plot(fig, GRAPH_PRODUCTION_MATERIAL, "Cumulative Quantity - Production inventory curve.png")
 
     def prepare_total_data(self) -> pd.DataFrame:
-        """Berechnet die kumulierte Menge aller Produkte über die Zeit"""
         df_in = self.convert_json_data.goods_receipt_production_df.copy()
+        df_out = self.convert_json_data.finished_products_leaving_production_df.copy()
+
+        df_in = df_in[["Time", "Quantity"]]
         df_in["Quantity Change"] = df_in["Quantity"]
 
-        df_out = self.convert_json_data.finished_products_leaving_production_df.copy()
+        df_out = df_out[["Time", "Quantity"]]
         df_out["Quantity Change"] = -df_out["Quantity"]
 
         df_combined = pd.concat([df_in, df_out], ignore_index=True)
@@ -276,3 +290,21 @@ class VisualizeProductionMaterialThroughput:
             ], ignore_index=True)
 
         return df_combined
+
+
+    def save_plot_data_as_json(self, all_data: dict) -> None:
+        """Saves the history of cumulative quantities per product group as a JSON file."""
+        os.makedirs(GRAPH_PRODUCTION_MATERIAL, exist_ok=True)
+        json_path = os.path.join(GRAPH_PRODUCTION_MATERIAL, "production_throughput_data.json")
+
+        clean_data = {
+            group: [{"time": int(d["Time"]), "cumulative_quantity": int(d["Cumulative Quantity"])}
+                    for d in data.to_dict(orient="records")]
+            for group, data in all_data.items()
+        }
+
+        with open(json_path, "w") as f:
+            json.dump(clean_data, f, indent=4)
+        print(f"JSON-Daten gespeichert unter: {json_path}")
+
+

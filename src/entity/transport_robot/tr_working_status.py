@@ -9,7 +9,6 @@ from src.constant.constant import TransportRobotStatus
 
 @dataclass
 class TrWorkingStatus:
-    # Every Entity
     status: TransportRobotStatus
     working_on_status: bool
     waiting_time_on_path: int

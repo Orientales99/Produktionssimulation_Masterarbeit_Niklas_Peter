@@ -10,6 +10,7 @@ from src.monitoring.data_analysis.machine_data.machine_workload import MachineWo
 from src.monitoring.data_analysis.product_throughput import ProductThroughput
 from src.monitoring.data_analysis.transport_data.material_flow import MaterialFlow
 from src.monitoring.data_analysis.transport_data.material_flow_heatmap import MaterialFlowHeatmap
+from src.monitoring.data_analysis.transport_data.product_transporting_time import ProductTransportingTime
 from src.monitoring.data_analysis.transport_data.tr_workload import TrWorkload
 from src.monitoring.data_analysis.visualize_production_material_throughput import VisualizeProductionMaterialThroughput
 from src.monitoring.data_analysis.wr_data.wr_workload import WrWorkload
@@ -26,6 +27,7 @@ def run_analysis():
     visualize_product_material_throughput = VisualizeProductionMaterialThroughput(convert)
     product_throughput = ProductThroughput(convert)
     creating_intermediate_store_during_simulation_dict = CreatingIntermediateStoreDuringSimulationDict(convert)
+    creating_wr_during_simulation_dict = CreatingWrDuringSimulationDict(convert)
 
     # Analyse Throughput of Material in Production/ Machines
     visualize_product_material_throughput.plot_and_save_for_all_product_groups()
@@ -49,8 +51,11 @@ def run_analysis():
     tr_workload = TrWorkload(creating_tr_during_simulation_dict)
     tr_workload.save_workload_statistics()
 
+    product_transporting_time = ProductTransportingTime(creating_tr_during_simulation_dict)
+    product_transporting_time.calculate_transporting_time()
+
     # Analyse Workload of WR
-    creating_wr_during_simulation_dict = CreatingWrDuringSimulationDict(convert)
+
     wr_workload = WrWorkload(creating_wr_during_simulation_dict)
     wr_workload.save_workload_statistics()
 
