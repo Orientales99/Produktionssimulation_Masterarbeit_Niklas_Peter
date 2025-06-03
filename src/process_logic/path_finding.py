@@ -1,6 +1,6 @@
 from queue import PriorityQueue
 
-from src.production.entity_movement import EntityMovement
+from src.production.entity_move_serivce import EntityMoveService
 from src.production.production import Production
 from src.production.base.coordinates import Coordinates
 from src.production.base.cell import Cell
@@ -15,7 +15,7 @@ class PathFinding:
 
     def __init__(self, production: Production):
         self.production = production
-        self.entity_movement = EntityMovement(self.production)
+        self.entity_move_service = EntityMoveService(self.production)
         self.path_line_list = []
 
     def get_path_for_entity(self, entity: Machine | WorkingRobot | TransportRobot, end_coordinate: Coordinates)\

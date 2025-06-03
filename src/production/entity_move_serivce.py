@@ -1,19 +1,18 @@
 from src.entity.machine.machine import Machine
 from src.entity.transport_robot.transport_robot import TransportRobot
 from src.entity.working_robot.working_robot import WorkingRobot
+from src.production.base.cell import Cell
 from src.production.base.coordinates import Coordinates
 from src.production.production import Production
 
 
-
-class EntityMovement:
+class EntityMoveService:
     production: Production
 
     def __init__(self, production):
         self.production = production
 
-
-    def move_entity_one_step(self, start_cell, entity: Machine | WorkingRobot | TransportRobot, path) -> bool:
+    def move_entity_one_step(self, start_cell: Cell, entity: Machine | WorkingRobot | TransportRobot, path: str) -> bool:
         cell = start_cell
 
         x, y = map(int, path.split(":"))
@@ -23,20 +22,15 @@ class EntityMovement:
             if self.move_entity_upwards(entity) is True:
                 return True
 
-
-
         # down
         if Coordinates(cell.cell_coordinates.x, cell.cell_coordinates.y - 1) == Coordinates(x, y):
             if self.move_entity_downwards(entity) is True:
                 return True
 
-
         # left
         if Coordinates(cell.cell_coordinates.x - 1, cell.cell_coordinates.y) == Coordinates(x, y):
             if self.move_entity_left(entity) is True:
                 return True
-
-
 
         # right
         if Coordinates(cell.cell_coordinates.x + 1, cell.cell_coordinates.y) == Coordinates(x, y):
@@ -45,15 +39,17 @@ class EntityMovement:
 
         return False
 
-
     def check_move_possible(self, new_coordinates: Coordinates) -> bool:
         check_coordinates_in_layout = self.production.coordinates_in_layout(new_coordinates)
         if check_coordinates_in_layout is True:
-            new_cell = self.production.get_cell(new_coordinates)
-            if new_cell.placed_entity is not None:
+            try:
+                new_cell = self.production.get_cell(new_coordinates)
+                if new_cell.placed_entity is not None:
+                    return False
+                else:
+                    return True
+            except IndexError:
                 return False
-            else:
-                return True
         else:
             return False
         pass
@@ -115,9 +111,6 @@ class EntityMovement:
                 for y in range(lowest_highest_y_coordinate[0], lowest_highest_y_coordinate[1] + 1):
                     new_cell = self.production.get_cell(Coordinates(lowest_highest_x_coordinate[0] - 1, y))
 
-                    if self.check_move_possible(new_cell.cell_coordinates) is False:
-                        break
-
                     new_cell.placed_entity = entity
                     self.production.entities_located.setdefault(entity.identification_str, []).append(new_cell)
 
@@ -156,8 +149,6 @@ class EntityMovement:
 
                 for x in range(lowest_highest_x_coordinate[0], lowest_highest_x_coordinate[1] + 1):
                     new_cell = self.production.get_cell(Coordinates(x, lowest_highest_y_coordinate[1] + 1))
-                    if self.check_move_possible(new_cell.cell_coordinates) is False:
-                        break
                     new_cell.placed_entity = entity
                     self.production.entities_located.setdefault(entity.identification_str, []).append(new_cell)
 
@@ -195,8 +186,6 @@ class EntityMovement:
 
                 for x in range(lowest_highest_x_coordinate[0], lowest_highest_x_coordinate[1] + 1):
                     new_cell = self.production.get_cell(Coordinates(x, lowest_highest_y_coordinate[0] - 1))
-                    if self.check_move_possible(new_cell.cell_coordinates) is False:
-                        break
                     new_cell.placed_entity = entity
                     self.production.entities_located.setdefault(entity.identification_str, []).append(new_cell)
 

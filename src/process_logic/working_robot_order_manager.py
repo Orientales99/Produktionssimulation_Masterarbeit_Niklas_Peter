@@ -169,8 +169,8 @@ class WorkingRobotOrderManager:
 
             if path is not None:
                 if len(path) > 0:
-                    if self.path_finding.entity_movement.move_entity_one_step(start_cell_coordinates, wr,
-                                                                              path[0]) is True:
+                    if self.path_finding.entity_move_service.move_entity_one_step(start_cell_coordinates, wr,
+                                                                                  path[0]) is True:
                         wr.working_status.driving_route.pop(0)
                         wr.working_status.waiting_time_on_path = self.waiting_time
 
@@ -202,8 +202,8 @@ class WorkingRobotOrderManager:
 
     def drive_side_step_route_one_step(self, wr: WorkingRobot, start_cell_coordinates: Coordinates):
         side_step_path = wr.working_status.side_step_driving_route
-        if self.path_finding.entity_movement.move_entity_one_step(start_cell_coordinates, wr,
-                                                                  side_step_path[0]) is True:
+        if self.path_finding.entity_move_service.move_entity_one_step(start_cell_coordinates, wr,
+                                                                      side_step_path[0]) is True:
             wr.working_status.side_step_driving_route.pop(0)
 
         if len(wr.working_status.side_step_driving_route) == 0:

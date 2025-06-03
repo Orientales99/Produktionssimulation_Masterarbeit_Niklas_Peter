@@ -186,7 +186,7 @@ class TrExecutingOrder:
                                  f"{tr.identification_str}")
 
             if len(path) > 0:
-                if self.path_finding.entity_movement.move_entity_one_step(start_cell_coordinates, tr, path[0]) is True:
+                if self.path_finding.entity_move_service.move_entity_one_step(start_cell_coordinates, tr, path[0]) is True:
                     tr.working_status.driving_route.pop(0)
                     tr.working_status.waiting_time_on_path = self.waiting_time
 
@@ -216,8 +216,8 @@ class TrExecutingOrder:
 
     def drive_side_step_route_one_step(self, tr: TransportRobot, start_cell_coordinates: Coordinates):
         side_step_path = tr.working_status.side_step_driving_route
-        if self.path_finding.entity_movement.move_entity_one_step(start_cell_coordinates, tr,
-                                                                  side_step_path[0]) is True:
+        if self.path_finding.entity_move_service.move_entity_one_step(start_cell_coordinates, tr,
+                                                                      side_step_path[0]) is True:
             tr.working_status.side_step_driving_route.pop(0)
 
         if len(tr.working_status.side_step_driving_route) == 0:
