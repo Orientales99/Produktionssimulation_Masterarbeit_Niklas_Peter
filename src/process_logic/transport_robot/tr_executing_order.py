@@ -1,3 +1,4 @@
+import copy
 import random
 from collections import Counter
 
@@ -273,7 +274,7 @@ class TrExecutingOrder:
 
     def pick_up_material_from_source(self, tr: TransportRobot):
         pick_up_product = tr.transport_order.transporting_product
-        items_to_load = tr.transport_order.quantity
+        items_to_load = min(tr.transport_order.quantity, tr.material_store.capacity)
 
         for _ in range(items_to_load):
             tr.material_store.put(pick_up_product)
@@ -286,10 +287,11 @@ class TrExecutingOrder:
         machine.machine_storage.storage_after_process. Deleting the product from the machine_storage"""
 
         pick_up_product = tr.transport_order.transporting_product
+
         available_product_in_machine_store = self.store_manager.count_number_of_one_product_type_in_store(
             machine.machine_storage.storage_after_process, pick_up_product)
 
-        items_to_load = min(tr.transport_order.quantity, available_product_in_machine_store)
+        items_to_load = min(tr.transport_order.quantity, available_product_in_machine_store, tr.material_store.capacity)
 
         for _ in range(items_to_load):
             # adding material to TR
@@ -301,12 +303,10 @@ class TrExecutingOrder:
 
     def pick_up_material_from_intermediate_store(self, tr: TransportRobot, intermediate_store: IntermediateStore):
         pick_up_product = tr.transport_order.transporting_product
-        items_to_load = tr.transport_order.quantity
         items_in_intermediate_store = self.store_manager.count_number_of_one_product_type_in_store(
             intermediate_store.intermediate_store, pick_up_product)
 
-        if items_to_load > items_in_intermediate_store:
-            items_to_load = items_in_intermediate_store
+        items_to_load = min(tr.transport_order.quantity,items_in_intermediate_store, tr.material_store.capacity)
 
         for _ in range(items_to_load):
             tr.material_store.put(pick_up_product)

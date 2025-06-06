@@ -135,6 +135,8 @@ class CellInformation:
             f"Processing List:\n{processing_list_str}\n"
             "\n"
             f"{process_material_list_str}\n"
+            "\n"
+            f"Queue length: {machine.processing_list_queue_length}"
 
         )
 

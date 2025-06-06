@@ -1,4 +1,3 @@
-
 {
   "production_layout_size_x": "100",
   "production_layout_size_y": "100",
@@ -9,5 +8,5 @@
   "visualising_via_terminal(y/n)": "n",
   "visualising_via_matplotlib(y/n)": "n",
   "visualising_via_pygame(y/n)": "n",
-  "Topology_manager(No algorithm (1), QAP (2), GA (3), FDP(4)": 2
+  "Topology_manager(No algorithm (1), QAP (2), GA (3), FDP(4)": 3
 }

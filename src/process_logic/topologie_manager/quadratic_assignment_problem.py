@@ -123,7 +123,5 @@ class QuadraticAssignmentProblem:
                     if free_positions:
                         new_pos = free_positions.pop(0)
                         corrected_assignment.append((new_pos, station))
-                    else:
-                        print(f"Warning: No free position available for station {station}")
 
         self.entity_assignment = corrected_assignment

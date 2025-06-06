@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 k_list = [0.6, 6]
-iteration_steps = [0, 5, 50000]
+iteration_steps = [0, 5, 50]
 fig, axes = plt.subplots(len(iteration_steps), len(k_list), figsize=(12, 18))
 
 for row, iterations in enumerate(iteration_steps):
@@ -23,7 +23,7 @@ for row, iterations in enumerate(iteration_steps):
         elif iterations == 5:
             ax.set_title(f"Spring Layout nach 5 Iterationen (k={k})")
         else:
-            ax.set_title(f"Spring Layout nach 500 Iterationen (k={k})")
+            ax.set_title(f"Spring Layout nach 50 Iterationen (k={k})")
 
         # Zeichne Knoten + Kanten
         nx.draw(G, pos, with_labels=True, node_color='lightblue', edge_color='gray', ax=ax)
@@ -46,6 +46,7 @@ for row, iterations in enumerate(iteration_steps):
         ax.set_xlabel("X-Koordinate")
         ax.set_ylabel("Y-Koordinate")
 
-plt.subplots_adjust(top=5)
 plt.tight_layout()
+plt.subplots_adjust(top=0.91)  # Wert < 1.0 erhöht oberen Rand
 plt.show()
+

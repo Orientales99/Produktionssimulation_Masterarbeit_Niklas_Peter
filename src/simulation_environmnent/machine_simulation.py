@@ -119,7 +119,7 @@ class MachineSimulation:
                 else:
                     raise Exception(self.env.now)
 
-                # start producing process und einen begriff für den Process in
+                # start producing process
                 if machine.working_status.process_status == MachineProcessStatus.READY_TO_PRODUCE and \
                         machine.working_status.working_robot_status == MachineWorkingRobotStatus.WR_PRESENT:
                     machine.working_status.process_status = MachineProcessStatus.PRODUCING_PRODUCT

@@ -27,7 +27,7 @@ class StartingConditionsService:
                            int(self.data_process_starting_conditions["production_layout_size_y"]))
 
     def set_simulation_duration_per_day(self):
-        number_of_days = int(self.data_process_starting_conditions["number_of_simulation_runs"])
+        number_of_days = int(self.data_process_starting_conditions["simulation_duration_in_days"])
         duration_per_day_in_h = int(self.data_process_starting_conditions["production_day_duration_in_h"])
         total_duration = (duration_per_day_in_h * 60 * 60) * number_of_days
         return total_duration

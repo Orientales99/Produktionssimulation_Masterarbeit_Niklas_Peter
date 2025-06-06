@@ -27,7 +27,6 @@ class TrOrderManager:
         self.machine_list = self.manufacturing_plan.production.machine_list
         self.intermediate_store_list = self.manufacturing_plan.production.intermediate_store_list
 
-
     def create_transport_request_list_from_machines(self):
         """Creates a new list of TransportRequest objects for each machine.
             If this method is called, the list gets reset and a new list is created.
@@ -64,7 +63,7 @@ class TrOrderManager:
         pick_up_station = self.get_pick_up_station(process_material)
         if pick_up_station is not False:
             if isinstance(pick_up_station, Machine):
-                if len(pick_up_station.machine_storage.storage_after_process.items) > 1:
+                if len(pick_up_station.machine_storage.storage_after_process.items) >= 1:
                     return TransportRequest(pick_up_station, machine, processing_order, process_material)
             elif isinstance(pick_up_station, Source | IntermediateStore):
                 return TransportRequest(pick_up_station, machine, processing_order, process_material)

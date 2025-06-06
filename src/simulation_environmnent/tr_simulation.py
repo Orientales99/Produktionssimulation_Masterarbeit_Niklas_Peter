@@ -140,8 +140,9 @@ class TrSimulation:
 
             if isinstance(tr.transport_order.pick_up_station, Machine):
                 tr.transport_order.pick_up_station.working_status.waiting_for_arriving_of_tr = False
-                tr.transport_order.pick_up_station.working_status.storage_status = \
-                    MachineStorageStatus.STORAGES_READY_FOR_PRODUCTION
+                if len(tr.transport_order.pick_up_station.machine_storage.storage_after_process.items) == 0:
+                    tr.transport_order.pick_up_station.working_status.storage_status = \
+                        MachineStorageStatus.STORAGES_READY_FOR_PRODUCTION
             self.saving_simulation_data.save_entity_action(tr)
 
     def unload_material_off_tr_process(self, tr: TransportRobot):
