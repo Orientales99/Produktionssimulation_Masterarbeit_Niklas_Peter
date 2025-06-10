@@ -1,11 +1,11 @@
+from datetime import date
+
 import pandas as pd
 
-
 from src import RESOURCES, ANALYSIS_SOLUTION
+from src.constant.constant import ProductGroup, OrderPriority
 from src.order_data.order import Order
 from src.provide_input_data.product_information_service import ProductInformationService
-from src.constant.constant import ProductGroup, OrderPriority
-from datetime import date
 
 
 class OrderService:
@@ -21,8 +21,6 @@ class OrderService:
         self.set_head_as_column_name()
         self.create_new_column_for_product_group()
         self.set_product_order_list()
-
-
 
     def get_order_files_for_init(self):
         self.df_order_list = pd.read_excel(RESOURCES / 'Bestellauftraege.xlsx', header=None)
@@ -59,7 +57,8 @@ class OrderService:
 
         for _, row in self.df_order_list.iterrows():
             product_group = row["product"]
-            product = next((product for product in self.service_product_information.product_list if product.product_id == product_group), None)
+            product = next((product for product in self.service_product_information.product_list if
+                            product.product_id == product_group), None)
             order = Order(
                 product,
                 row["AnzahlProArtikel"],
@@ -69,5 +68,6 @@ class OrderService:
 
     def print_as_xlsx(self):
         """printing the Order list in Excel"""
-        self.df_order_list.to_excel(ANALYSIS_SOLUTION / 'bestellauftraege_auswertung.xlsx', sheet_name='Bestellauftraege',
+        self.df_order_list.to_excel(ANALYSIS_SOLUTION / 'bestellauftraege_auswertung.xlsx',
+                                    sheet_name='Bestellauftraege',
                                     index=False)

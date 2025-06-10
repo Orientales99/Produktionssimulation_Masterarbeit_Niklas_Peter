@@ -1,9 +1,9 @@
-from src.command_line_service import CommandLineService
+from src.simulation_starter import SimulationStarter
 import cProfile
 
 
 def main():
-    command_line_service = CommandLineService()
+    command_line_service = SimulationStarter()
     command_line_service.create_production()
     command_line_service.visualise_layout()
 

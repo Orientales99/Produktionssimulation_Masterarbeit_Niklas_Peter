@@ -1,11 +1,12 @@
 {
-  "working_robot": [
-    {
-      "number_of_robots_in_production": "4",
-      "robot_size_x": "2",
-      "robot_size_y":"3",
-      "driving_speed":  "3",
-      "product_transfer_rate_units_per_minute": "10"
-    }
-  ]
+    "working_robot": [
+        {
+            "number_of_robots_in_production": "4",
+            "robot_size_x": "2",
+            "robot_size_y": "3",
+            "driving_speed": "3",
+            "product_transfer_rate_units_per_minute": "10"
+        }
+    ],
+    "number_of_robots_in_production": "1"
 }

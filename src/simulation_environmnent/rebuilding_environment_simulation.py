@@ -19,6 +19,7 @@ from src.process_logic.transport_robot.tr_order_manager import TrOrderManager
 from src.process_logic.working_robot_order_manager import WorkingRobotOrderManager
 from src.production.production import Production
 from src.production.store_manager import StoreManager
+from src.provide_input_data.order_service import OrderService
 from src.provide_input_data.starting_condition_service import StartingConditionsService
 from src.rebuild_simulation.entities_specifc_simulation_time import EntitiesSpecificSimulationTime
 from src.simulation_environmnent.machine_simulation import MachineSimulation
@@ -30,7 +31,7 @@ from src.simulation_environmnent.wr_simulation import WrSimulation
 
 
 class RebuildingEnvironmentSimulation:
-    def __init__(self):
+    def __init__(self, order_service: OrderService, control_time):
         self.simulation_control = SimulationControl(False, False)
 
         self.env = simpy.Environment()
@@ -40,7 +41,7 @@ class RebuildingEnvironmentSimulation:
         self.path_finding = PathFinding(self.production)
 
         self.machine_manager = MachineManager(self.production, self.store_manager)
-        self.manufacturing_plan = ManufacturingPlan(self.production, self.machine_manager)
+        self.manufacturing_plan = ManufacturingPlan(self.production, self.machine_manager, order_service)
 
         self.working_robot_order_manager = WorkingRobotOrderManager(self.manufacturing_plan, self.path_finding)
         self.saving_simulation_data = SavingSimulationData(self.env, self.production, self.working_robot_order_manager,
@@ -69,7 +70,7 @@ class RebuildingEnvironmentSimulation:
         ###############################################################################################################
 
         self.production.create_production()
-        self.control_time = self.get_control_time()
+        self.control_time = control_time
 
         self.convert = ConvertJsonData(SIMULATION_OUTPUT_DATA)
         self.creating_machine_during_simulation_dict = CreatingMachineDuringSimulationDict(self.convert)
@@ -94,9 +95,6 @@ class RebuildingEnvironmentSimulation:
         yield self.env.timeout(self.control_time)
 
         self.env.process(self.visualisation_simulation.visualize_layout())
-        # self.env.process(self.wr_simulation.start_every_wr_process())
-        # self.env.process(self.tr_simulation.start_every_tr_process())
-        # self.env.process(self.machine_simulation.run_machine_process())
 
     def run_simulation(self, until: int):
         self.env.run(until=until)
@@ -126,5 +124,3 @@ class RebuildingEnvironmentSimulation:
               f"Time: {hours:02d}:{minutes:02d}:{seconds:02d} \n")
 
 
-    def get_control_time(self) -> int:
-        return 26000   # return input("Bei welcher Sekunde soll die Produktion starten?")

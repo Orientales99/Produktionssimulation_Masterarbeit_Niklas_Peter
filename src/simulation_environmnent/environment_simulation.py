@@ -89,7 +89,6 @@ class EnvironmentSimulation:
                                                                self.tr_order_manager, self.simulation_control)
 
         # starting processes
-        self.env.process(self.visualisation_simulation.visualize_layout())
         self.env.process(self.monitoring_simulation.start_monitoring_process())
         self.env.process(self.print_simulation_time())
         self.env.process(self.initialise_simulation_start())
@@ -97,13 +96,14 @@ class EnvironmentSimulation:
         self.env.process(self.tr_simulation.start_every_tr_process())
         self.env.process(self.machine_simulation.run_machine_process())
 
-    def run_simulation(self, until: int):
-        self.env.run(until=until)
+    def run_simulation(self):
+        simulation_duration = self.production.service_starting_conditions.set_simulation_duration_per_day()
+        self.env.run(until=simulation_duration)
 
     def initialise_simulation_start(self):
         self.production.create_production()
         current_date = self.production.service_starting_conditions.set_starting_date_of_simulation()
-
+        self.start_simulation_visualisation_process()
         self.deleting_data.delete_every_simulation_output_data_json()
 
         while True:
@@ -129,7 +129,7 @@ class EnvironmentSimulation:
             print(f"Simulationtime: \n"
                   f"Productionday: {working_days:02d}\n"
                   f"Time: {hours:02d}:{minutes:02d}:{seconds:02d} \n")
-            yield self.env.timeout(10)
+            yield self.env.timeout(60)
 
     def topology_manager(self):
         if self.env.now < 1000:
@@ -211,3 +211,12 @@ class EnvironmentSimulation:
                         break
 
         time_until_next_day = endtime - self.env.now + 10
+
+    def start_simulation_visualisation_process(self):
+        if self.service_starting_conditions.set_visualising_via_matplotlib() or self.service_starting_conditions.set_visualising_via_terminal() or self.service_starting_conditions.set_visualising_via_pygames():
+            self.env.process(self.visualisation_simulation.visualize_layout())
+
+
+    def get_simulation_progress(self) -> float:
+        progress = self.env.now / self.production.service_starting_conditions.set_simulation_duration_per_day()
+        return progress

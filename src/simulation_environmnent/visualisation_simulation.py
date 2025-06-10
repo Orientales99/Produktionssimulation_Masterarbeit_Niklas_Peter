@@ -12,10 +12,11 @@ class VisualisationSimulation:
         self.env = env
         self.production = production
         self.tr_order_manager = tr_order_manager
+        self.simulation_control = simulation_control
 
-        self.visualize_production = ProductionVisualisation(self.production, self.env, simulation_control)
 
     def visualize_layout(self):
+        self.visualize_production = ProductionVisualisation(self.production, self.env, self.simulation_control)
         driving_speed = self.tr_order_manager.get_driving_speed_per_cell()
         #yield self.env.timeout(20000)
         while True:

@@ -16,34 +16,24 @@ from src.monitoring.data_analysis.visualize_production_material_throughput impor
 from src.monitoring.data_analysis.wr_data.wr_workload import WrWorkload
 from src.monitoring.deleting_data import DeletingData
 from src.monitoring.simulation_data_saver import SimulationDataSaver
-from src.production.production import Production
 from src.provide_input_data.order_service import OrderService
-from src.provide_input_data.starting_condition_service import StartingConditionsService
 from src.simulation_environmnent.environment_simulation import EnvironmentSimulation
 
 
-class CommandLineService:
+class SimulationStarter:
     environment_simulation: EnvironmentSimulation
 
     def __init__(self):
         self.simulation_data_saver = SimulationDataSaver()
         self.order_service = OrderService()
-        self.environment_simulation_test = EnvironmentSimulation(self.order_service)
-        self.service_starting_conditions = StartingConditionsService()
-
-        self.production = Production(self.environment_simulation_test.env, self.service_starting_conditions)
 
     def start_simulation(self):
-        simulation_duration = self.production.service_starting_conditions.set_simulation_duration_per_day()
-        print(f"Start_simulation: {simulation_duration}")
-
+        # start simulation
         self.environment_simulation = EnvironmentSimulation(self.order_service)
         self.environment_simulation.initialise_simulation_start()
-        # self.environment_simulation.run_simulation(until=86400)
-        self.environment_simulation.run_simulation(simulation_duration)
-        self.start_analyse()
+        self.environment_simulation.run_simulation()
 
-        self.secure_simulation_data(5)
+
 
     def start_analyse(self):
         deleting_data = DeletingData()

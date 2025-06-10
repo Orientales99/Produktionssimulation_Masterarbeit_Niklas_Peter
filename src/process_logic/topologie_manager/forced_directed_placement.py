@@ -59,19 +59,19 @@ class ForcedDirectedPlacement:
                         self.entity_fixed_assignment.append((cell.cell_id, ent.identification_str))
 
     def run_networkx_force_directed_layout(self):
-        # 1. Graph erstellen
+        # 1. create graph
         G = nx.DiGraph()
         for src, targets in self.material_flow_matrix.items():
             for tgt, weight in targets.items():
                 if weight > 0:
                     G.add_edge(src, tgt, weight=weight)
 
-        # 2. Startpositionen
+        # 2. starting position
         self.save_starting_positions()
         fixed_nodes = {station for _, station in self.entity_fixed_assignment}
         pos_init = {ent: (coord.x, coord.y) for ent, coord in self.starting_position_entity.items()}
 
-        # 3. Schrittweise Berechnung mit Zwischenständen
+        # 3. Step-by-step calculation with intermediate results
         n_iter = self.number_of_iterations
         k = self.k
         half_iter = n_iter // 2
@@ -79,21 +79,21 @@ class ForcedDirectedPlacement:
         # Iteration 0
         self._plot_networkx_positions(G, pos_init, suffix="vor_Iteration_1")
 
-        # Hälfte der Iterationen
+        # half of the iterations
         pos_half = nx.spring_layout(
             G, pos=pos_init, fixed=fixed_nodes,
             iterations=half_iter, k=k, weight='weight', seed=10
         )
         self._plot_networkx_positions(G, pos_half, suffix=f"nach_Iteration_{half_iter}")
 
-        # Restliche Iterationen
+        # all Iterationen
         pos_result = nx.spring_layout(
             G, pos=pos_half, fixed=fixed_nodes,
             iterations=n_iter - half_iter, k=k, weight='weight', seed=10
         )
         self._plot_networkx_positions(G, pos_result, suffix=f"nach_Iteration_{n_iter}")
 
-        # 4. Mapping auf Grid
+        # 4. Mapping of Grid
         fdp_coords = {ent: Coordinates(x=coord[0], y=coord[1]) for ent, coord in pos_result.items()}
         nearest_mapping = self.map_fdp_coordinates_to_nearest_positions(fdp_coords)
         self.entity_assignment = self._greedy_assignment(nearest_mapping)
