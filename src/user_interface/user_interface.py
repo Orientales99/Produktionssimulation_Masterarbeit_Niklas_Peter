@@ -14,7 +14,7 @@ algorithmus_dict = {"Kein Algorithmus": 1, "QAPFA": 2, "GA": 3, "FDP": 4}
 visualization_dict = {0: "n", 1: "y"}
 
 
-class App(customtkinter.CTk):
+class UserInterface(customtkinter.CTk):
     def __init__(self):
         super().__init__()
         self.title("Masterarbeit - Niklas Peter - 3048575")

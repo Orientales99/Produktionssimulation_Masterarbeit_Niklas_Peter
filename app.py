@@ -1,5 +1,5 @@
-from src.user_interface.user_interface import App
+from src.user_interface.user_interface import UserInterface
 
 if __name__ == '__main__':
-    app = App()
-    app.mainloop()
+    user_interface = UserInterface()
+    user_interface.mainloop()
