@@ -1,0 +1,54 @@
+{
+    "SEVEN": {
+        "cumulative_seconds": 743.34,
+        "cumulative_time": "12:23"
+    },
+    "TWO": {
+        "cumulative_seconds": 255.08,
+        "cumulative_time": "04:15"
+    },
+    "TWELVE": {
+        "cumulative_seconds": 87.17,
+        "cumulative_time": "01:27"
+    },
+    "THREE": {
+        "cumulative_seconds": 143.02,
+        "cumulative_time": "02:23"
+    },
+    "TEN": {
+        "cumulative_seconds": 36.32,
+        "cumulative_time": "00:36"
+    },
+    "THIRTEEN": {
+        "cumulative_seconds": 25.5,
+        "cumulative_time": "00:26"
+    },
+    "ELEVEN": {
+        "cumulative_seconds": 26.42,
+        "cumulative_time": "00:26"
+    },
+    "FOURTEEN": {
+        "cumulative_seconds": 11.2,
+        "cumulative_time": "00:11"
+    },
+    "FIFTEEN": {
+        "cumulative_seconds": 34.5,
+        "cumulative_time": "00:34"
+    },
+    "NINE": {
+        "cumulative_seconds": 2.86,
+        "cumulative_time": "00:03"
+    },
+    "ONE": {
+        "cumulative_seconds": 128.28,
+        "cumulative_time": "02:08"
+    },
+    "FOUR": {
+        "cumulative_seconds": 175.47,
+        "cumulative_time": "02:55"
+    },
+    "EIGHT": {
+        "cumulative_seconds": 11.5,
+        "cumulative_time": "00:12"
+    }
+}
