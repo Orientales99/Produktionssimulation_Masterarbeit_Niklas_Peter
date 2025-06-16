@@ -1,0 +1,66 @@
+{
+    "Ma: 3, 2": {
+        "Produktion": 11618.0,
+        "Wartet auf Material": 30894.0,
+        "Leerlauf": 33949.0,
+        "Wartet auf WR": 9817.0
+    },
+    "Ma: 3, 3": {
+        "Produktion": 1485.0,
+        "Wartet auf Material": 208.0,
+        "Leerlauf": 65535.0,
+        "Wartet auf WR": 19051.0
+    },
+    "Ma: 2, 2": {
+        "Produktion": 17184.0,
+        "Wartet auf Material": 372.0,
+        "Leerlauf": 64363.0,
+        "Wartet auf WR": 4360.0
+    },
+    "Ma: 0, 1": {
+        "Produktion": 19028.0,
+        "Wartet auf Material": 2060.0,
+        "Wartet auf Abholung": 126.0,
+        "Leerlauf": 58716.0,
+        "Wartet auf WR": 6349.0
+    },
+    "Ma: 0, 3": {
+        "Produktion": 13865.0,
+        "Wartet auf Material": 388.0,
+        "Wartet auf Abholung": 246.0,
+        "Leerlauf": 69889.0,
+        "Wartet auf WR": 1891.0
+    },
+    "Ma: 2, 1": {
+        "Produktion": 21979.0,
+        "Wartet auf Material": 30530.0,
+        "Leerlauf": 28510.0,
+        "Wartet auf WR": 5260.0
+    },
+    "Ma: 1, 1": {
+        "Produktion": 21592.0,
+        "Wartet auf Material": 1248.0,
+        "Wartet auf Abholung": 1090.0,
+        "Leerlauf": 58744.0,
+        "Wartet auf WR": 3605.0
+    },
+    "Ma: 0, 2": {
+        "Produktion": 9381.0,
+        "Wartet auf Material": 22172.0,
+        "Wartet auf Abholung": 42.0,
+        "Leerlauf": 45200.0,
+        "Wartet auf WR": 9483.0
+    },
+    "Ma: 3, 1": {
+        "Produktion": 821.0,
+        "Wartet auf Material": 94.0,
+        "Leerlauf": 69370.0,
+        "Wartet auf WR": 15994.0
+    },
+    "Ma: 1, 2": {
+        "Produktion": 23514.0,
+        "Wartet auf Material": 30184.0,
+        "Leerlauf": 21606.0,
+        "Wartet auf WR": 10975.0
+    }
+}
